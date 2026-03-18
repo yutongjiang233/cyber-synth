@@ -5,36 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cyber-Synth v3.0 | Cloud Native Engine</title>
     <style>
+        /* Cyberpunk / Psychedelic UI Styles */
         :root {
-            --bg-dark: #09090b; --card-bg: rgba(26, 26, 29, 0.7);
+            --bg-dark: #09090b; --card-bg: rgba(26, 26, 29, 0.8);
             --primary: #c084fc; --accent-green: #4ade80; --accent-blue: #38bdf8;
-            --text-main: #f1f5f9; --text-muted: #94a3b8; --grid-line: rgba(255, 255, 255, 0.03);
+            --text-main: #f1f5f9; --text-muted: #94a3b8; --grid-line: rgba(255, 255, 255, 0.05);
         }
         body { background-color: var(--bg-dark); color: var(--text-main); font-family: 'Courier New', monospace; margin: 0; padding: 20px; min-height: 100vh; display: flex; align-items: center; justify-content: center; background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px); background-size: 20px 20px; }
-        .container { max-width: 1000px; width: 100%; background: var(--card-bg); border-radius: 12px; box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); display: flex; flex-direction: column; overflow: hidden; font-size: 0.9rem; }
-        .synth-rack { padding: 20px; display: grid; grid-template-columns: 1fr 1fr 1fr 1.5fr; gap: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-        .status-rack { padding: 20px; display: grid; grid-template-columns: 1fr 3fr; gap: 20px; background: rgba(0, 0, 0, 0.3); }
-        h1 { font-size: 1.5rem; margin: 0; grid-column: 1 / -1; background: linear-gradient(to right, var(--accent-green), var(--primary), var(--accent-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
-        p.subtitle { color: var(--text-muted); margin: 0 0 20px 0; font-size: 0.8rem; grid-column: 1 / -1; }
-        .parameter-group { border: 1px solid rgba(255, 255, 255, 0.03); border-radius: 8px; padding: 15px; position: relative; background: rgba(0, 0, 0, 0.2); }
-        .group-label { position: absolute; top: -10px; left: 15px; background: #0d0d0f; padding: 0 8px; font-size: 0.75rem; color: var(--primary); text-transform: uppercase; font-weight: bold; }
-        .control-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-        .control-label { color: #cbd5e1; font-size: 0.8rem; min-width: 60px; }
-        .segmented-control { display: flex; gap: 5px; margin-top: 5px; }
-        .segment, .segment-blue { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; }
-        .segment:hover { border-color: var(--accent-green); } .segment.active { background: var(--accent-green); border-color: var(--accent-green); color: black; font-weight: bold;}
-        .segment-blue:hover { border-color: var(--accent-blue); } .segment-blue.active { background: var(--accent-blue); border-color: var(--accent-blue); color: black; font-weight: bold;}
+        .container { max-width: 1000px; width: 100%; background: var(--card-bg); border-radius: 12px; box-shadow: 0 0 40px rgba(192, 132, 252, 0.2); backdrop-filter: blur(12px); border: 1px solid rgba(192, 132, 252, 0.3); display: flex; flex-direction: column; overflow: hidden; }
+        .synth-rack { padding: 25px; display: grid; grid-template-columns: 1fr 1fr 1fr 1.5fr; gap: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .status-rack { padding: 25px; display: grid; grid-template-columns: 1fr 3fr; gap: 20px; background: rgba(0, 0, 0, 0.5); }
+        h1 { font-size: 1.8rem; margin: 0; grid-column: 1 / -1; background: linear-gradient(to right, var(--accent-green), var(--primary), var(--accent-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px rgba(192,132,252,0.3); }
+        p.subtitle { color: var(--accent-blue); margin: 0 0 20px 0; font-size: 0.9rem; grid-column: 1 / -1; font-weight: bold; }
+        .parameter-group { border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 15px; position: relative; background: rgba(0, 0, 0, 0.4); box-shadow: inset 0 0 15px rgba(0,0,0,0.5); }
+        .group-label { position: absolute; top: -10px; left: 15px; background: #0d0d0f; padding: 0 8px; font-size: 0.75rem; color: var(--primary); text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
+        .control-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+        .control-label { color: #cbd5e1; font-size: 0.85rem; min-width: 65px; }
+        .segmented-control { display: flex; gap: 5px; margin-top: 5px; flex-wrap: wrap;}
+        .segment, .segment-blue { background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.2); color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; }
+        .segment:hover { border-color: var(--accent-green); box-shadow: 0 0 8px rgba(74,222,128,0.4); } 
+        .segment.active { background: var(--accent-green); border-color: var(--accent-green); color: black; font-weight: bold; box-shadow: 0 0 12px rgba(74,222,128,0.6);}
+        .segment-blue:hover { border-color: var(--accent-blue); box-shadow: 0 0 8px rgba(56,189,248,0.4); } 
+        .segment-blue.active { background: var(--accent-blue); border-color: var(--accent-blue); color: black; font-weight: bold; box-shadow: 0 0 12px rgba(56,189,248,0.6);}
         .control-slider { flex-grow: 1; margin: 0 10px; cursor: pointer; accent-color: var(--primary); }
-        .timbre-input { width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 0.9rem; box-sizing: border-box; resize: none; }
-        .timbre-input:focus { outline: none; border-color: var(--accent-blue); box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2); }
-        button { grid-column: 1 / -1; background: linear-gradient(135deg, var(--accent-green), var(--primary)); color: black; border: none; padding: 20px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.05em; }
-        button:hover { filter: brightness(1.1); } button:disabled { opacity: 0.5; cursor: not-allowed; }
-        #status-box { color: var(--text-muted); font-size: 0.8rem; min-height: 100px; line-height: 1.5; word-break: break-all; }
-        #final-prompt { color: var(--accent-blue); }
-        audio { width: 100%; height: 40px; }
-        @keyframes pulse { 50% { opacity: 0.5; } }
-        .loading { animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; color: var(--primary); }
-        .logo-area { text-align: right; color: rgba(255, 255, 255, 0.05); font-size: 0.6rem; font-style: italic;}
+        .timbre-input { width: 100%; background: rgba(0, 0, 0, 0.6); border: 1px solid var(--primary); color: var(--accent-green); padding: 12px; border-radius: 6px; font-family: monospace; font-size: 0.95rem; box-sizing: border-box; resize: none; margin-top: 5px; }
+        .timbre-input:focus { outline: none; box-shadow: 0 0 10px rgba(192, 132, 252, 0.5); }
+        button { grid-column: 1 / -1; background: linear-gradient(135deg, var(--accent-green), var(--primary)); color: black; border: none; padding: 20px; font-size: 1.2rem; font-weight: 900; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 0 20px rgba(192, 132, 252, 0.4); }
+        button:hover { filter: brightness(1.2); box-shadow: 0 0 30px rgba(192, 132, 252, 0.6); transform: translateY(-2px); } 
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+        #status-box { color: var(--accent-green); font-size: 0.85rem; min-height: 100px; line-height: 1.6; word-break: break-all; background: rgba(0,255,0,0.05); padding: 10px; border-radius: 4px; border: 1px dashed rgba(74,222,128,0.3); font-family: 'Courier New', Courier, monospace; }
+        #final-prompt { color: var(--primary); font-weight: bold; }
+        audio { width: 100%; height: 45px; outline: none; }
+        audio::-webkit-media-controls-panel { background-color: var(--card-bg); }
+        audio::-webkit-media-controls-play-button, audio::-webkit-media-controls-mute-button { background-color: var(--primary); border-radius: 50%; }
+        @keyframes pulse { 0% { opacity: 1; text-shadow: 0 0 10px var(--primary); } 50% { opacity: 0.5; text-shadow: none; } 100% { opacity: 1; text-shadow: 0 0 10px var(--primary); } }
+        .loading { animation: pulse 1.5s ease-in-out infinite; color: var(--primary); font-weight: bold; }
+        .logo-area { text-align: right; color: rgba(255, 255, 255, 0.2); font-size: 0.7rem; font-style: italic; letter-spacing: 1px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -42,7 +48,7 @@
 <div class="container">
     <div class="synth-rack">
         <h1>Cyber-Synth v3.0 API</h1>
-        <p class="subtitle">Serverless Neural DSP deployed on A100 Cluster</p>
+        <p class="subtitle">▶ SERVERLESS NEURAL DSP DEPLOYED ON A100 CLUSTER</p>
         
         <div class="parameter-group">
             <span class="group-label">OSC Generator</span>
@@ -83,44 +89,69 @@
                     <div class="segment" data-bpm="140">140</div>
                 </div>
             </div>
-            <textarea class="timbre-input" id="timbre-text" rows="2" placeholder="Sonic texture... e.g., analog pads..."></textarea>
+            <textarea class="timbre-input" id="timbre-text" rows="2" placeholder="Enter sonic texture... e.g., analog pads, glitchy noise..."></textarea>
         </div>
     </div>
 
     <div class="status-rack">
-        <button id="btn-generate">🔮 SYNTHESIZE AUDIO RITUAL</button>
+        <button id="btn-generate">🔮 INITIATE SYNTHESIS RITUAL</button>
         <div>
-            <div id="status-box">SYSTEM IDLE<br>Serverless backend connected. Waiting for parameters.</div>
+            <div id="status-box">SYSTEM IDLE<br>> Secure connection established.<br>> Replicate A100 Cluster standing by...</div>
             <div class="parameter-group" style="margin-top: 20px;">
                 <span class="group-label">Neural Audio Manifestation</span>
                 <audio id="audio-player" controls></audio>
             </div>
         </div>
-        <div class="logo-area" style="grid-column: 1/-1">NYU Grad Thesis | Serverless Architecture</div>
+        <div class="logo-area" style="grid-column: 1/-1">NYU GRAD THESIS // INTERACTIVE MEDIA // 2024</div>
     </div>
 </div>
 
 <script>
     let activeWave = 'Sine'; let activeModDest = 'Pitch'; let activeBpm = 120;
-    function bindSegmentedControl(id, callback) { document.querySelectorAll(`#${id} .segment, #${id} .segment-blue`).forEach(seg => { seg.addEventListener('click', (e) => { document.querySelector(`#${id} .active`).classList.remove('active'); e.target.classList.add('active'); callback(e.target.getAttribute('data-wave') || e.target.getAttribute('data-mod') || e.target.getAttribute('data-bpm')); }); }); }
-    bindSegmentedControl('waveform-control', val => activeWave = val); bindSegmentedControl('mod-control', val => activeModDest = val); bindSegmentedControl('bpm-control', val => activeBpm = val);
+    function bindSegmentedControl(id, callback) { 
+        document.querySelectorAll(`#${id} .segment, #${id} .segment-blue`).forEach(seg => { 
+            seg.addEventListener('click', (e) => { 
+                document.querySelector(`#${id} .active`).classList.remove('active'); 
+                e.target.classList.add('active'); 
+                callback(e.target.getAttribute('data-wave') || e.target.getAttribute('data-mod') || e.target.getAttribute('data-bpm')); 
+            }); 
+        }); 
+    }
+    bindSegmentedControl('waveform-control', val => activeWave = val); 
+    bindSegmentedControl('mod-control', val => activeModDest = val); 
+    bindSegmentedControl('bpm-control', val => activeBpm = val);
 
-    const btn = document.getElementById("btn-generate"); const statusBox = document.getElementById("status-box"); const audio = document.getElementById("audio-player"); const timbreText = document.getElementById("timbre-text");
+    const btn = document.getElementById("btn-generate"); 
+    const statusBox = document.getElementById("status-box"); 
+    const audio = document.getElementById("audio-player"); 
+    const timbreText = document.getElementById("timbre-text");
 
     function constructPrompt() {
-        const attack = parseInt(document.getElementById("attack").value); const release = parseInt(document.getElementById("release").value); const lfoDepth = parseInt(document.getElementById("lfo-depth").value); const timbre = timbreText.value || "synthesized textures";
+        const attack = parseInt(document.getElementById("attack").value); 
+        const release = parseInt(document.getElementById("release").value); 
+        const lfoDepth = parseInt(document.getElementById("lfo-depth").value); 
+        const timbre = timbreText.value || "synthesized cyberpunk textures";
+        
         let prompt = `electronic music, ${activeBpm} BPM, `;
-        if (activeWave === 'Sine') prompt += "smooth sine wave tones, "; else if (activeWave === 'Sawtooth') prompt += "bright sawtooth, "; else prompt += "complex wave, ";
-        if (attack > 70) prompt += "slow evolving atmospheric pads, "; else if (attack < 30) prompt += "sharp staccato, ";
-        if (release > 70) prompt += "long infinite reverb tail, ";
-        if (lfoDepth > 20) prompt += `LFO modulation on ${activeModDest}, `;
+        if (activeWave === 'Sine') prompt += "smooth sine wave tones, "; 
+        else if (activeWave === 'Sawtooth') prompt += "bright piercing sawtooth, "; 
+        else prompt += "complex distorted wave, ";
+        
+        if (attack > 70) prompt += "slow evolving atmospheric pads, "; 
+        else if (attack < 30) prompt += "sharp staccato strikes, ";
+        
+        if (release > 70) prompt += "long infinite cosmic reverb tail, ";
+        if (lfoDepth > 20) prompt += `intense LFO modulation on ${activeModDest}, `;
+        
         return prompt + timbre;
     }
 
     btn.addEventListener("click", async () => {
         const fullPrompt = constructPrompt();
-        btn.disabled = true; btn.innerText = "⏳ Requesting Cloud GPU..."; audio.src = "";
-        statusBox.innerHTML = `<span class="loading">Sending parameters to Vercel Gateway...</span><br>Prompt:<br><span id="final-prompt">'${fullPrompt}'</span>`;
+        btn.disabled = true; 
+        btn.innerText = "⏳ ALLOCATING CLOUD GPU..."; 
+        audio.src = "";
+        statusBox.innerHTML = `> <span class="loading">Transmitting parameters to Vercel Gateway...</span><br>> Compiling prompt:<br>> <span id="final-prompt">[ ${fullPrompt} ]</span>`;
 
         try {
             const response = await fetch("/api/predict", {
@@ -129,25 +160,26 @@
                 body: JSON.stringify({ prompt: fullPrompt })
             });
             let prediction = await response.json();
-            if (response.status !== 201) throw new Error(prediction.detail || "Gateway Error");
+            if (response.status !== 201) throw new Error(prediction.detail || "Gateway API Error");
 
             while (prediction.status !== "succeeded" && prediction.status !== "failed") {
                 await new Promise(r => setTimeout(r, 2000));
                 const pollRes = await fetch(`/api/predict?id=${prediction.id}`);
                 prediction = await pollRes.json();
-                statusBox.innerHTML = `<span class="loading">GPU Cluster Status: [${prediction.status.toUpperCase()}]...</span><br>Prompt:<br><span id="final-prompt">'${fullPrompt}'</span>`;
+                statusBox.innerHTML = `> <span class="loading">Replicate A100 Status: [${prediction.status.toUpperCase()}]...</span><br>> Rendering audio latent space...<br>> Prompt: <span id="final-prompt">${fullPrompt}</span>`;
             }
 
             if (prediction.status === "succeeded") {
                 audio.src = prediction.output; 
-                statusBox.innerHTML = `Ritual Complete.<br>Audio fully manifested from latent space.`;
+                statusBox.innerHTML = `> Ritual Complete.<br>> Audio fully manifested from latent space.<br>> Ready for playback.`;
             } else {
-                throw new Error("Generation failed on Replicate.");
+                throw new Error("Generation failed inside Replicate Cluster.");
             }
         } catch (error) {
-            statusBox.innerHTML = `❌ RITUAL ERROR: ${error.message}`;
+            statusBox.innerHTML = `> <span style="color:red">❌ FATAL RITUAL ERROR: ${error.message}</span>`;
         } finally {
-            btn.disabled = false; btn.innerText = "🔮 SYNTHESIZE AUDIO RITUAL";
+            btn.disabled = false; 
+            btn.innerText = "🔮 INITIATE SYNTHESIS RITUAL";
         }
     });
 </script>
