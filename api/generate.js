@@ -1,7 +1,6 @@
 import Replicate from "replicate";
 
-// 🚨 终极护盾：突破 Vercel 免费版的 10 秒限制，允许最多运行 60 秒！
-// Stable Audio 生成高质量音频需要时间，这行代码是保命符
+// 护盾：允许 Vercel 运行最多 60 秒
 export const maxDuration = 60; 
 
 const replicate = new Replicate({
@@ -15,27 +14,25 @@ export default async function handler(req, res) {
 
   try {
     const { prompt } = req.body;
-    console.log("正在召唤真正的 DiT 算力 (Stable Audio)，提示词：", prompt);
+    console.log("正在召唤顶级 DiT 算力 (Stable Audio 2.5)，提示词：", prompt);
 
-    // 🚀 核心替换：换成 Stability AI 的官方 DiT 模型
+    // 🚀 调用永远在线、速度极快的官方 2.5 版本
     const output = await replicate.run(
-      "stability-ai/stable-audio", 
+      "stability-ai/stable-audio-2.5", 
       {
         input: {
           prompt: prompt,
-          // 注意！Stable Audio 控制时长的参数名是 seconds_total，而不是 duration
-          seconds_total: 30,
-          // 增加 steps 参数可以提升音质（数值越大音质越好，但生成越慢，默认一般是 100）
-          steps: 100 
+          duration: 30, // 完美支持 30 秒（最高甚至支持 190 秒）
+          steps: 8 // ⚠️ 关键修复：2.5 版本的官方最高画质步数就是 8，千万不能写 100！
         }
       }
     );
 
-    // 把生成的高清音频链接返回给你的前端赛博 UI
     res.status(200).json({ audioUrl: output });
 
   } catch (error) {
     console.error("生成失败:", error);
+    // 把 Replicate 真正的报错信息返回给前端，方便排查
     res.status(500).json({ error: error.message });
   }
 }
