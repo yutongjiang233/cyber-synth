@@ -1,6 +1,9 @@
 import Replicate from "replicate";
 
-// 绝对安全写法：从 Vercel 的环境变量中自动读取密码，不在代码里暴露
+// 🚨 终极护盾：突破 Vercel 免费版的 10 秒限制，允许最多运行 60 秒！
+// 没有这一行，生成 30 秒音乐一定会超时报错
+export const maxDuration = 60; 
+
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN, 
 });
@@ -21,7 +24,8 @@ export default async function handler(req, res) {
           prompt: prompt,
           model_version: "stereo-large",
           output_format: "wav",
-          duration: 8
+          // 👇 魔法就在这里！把 8 改成了 30，现在你可以生成 30 秒的完整片段了！
+          duration: 30 
         }
       }
     );
