@@ -1,0 +1,8 @@
+{
+  "name": "ai-synth-ritual",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "replicate": "^0.25.0"
+  }
+}
