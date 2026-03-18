@@ -1,7 +1,7 @@
 import Replicate from "replicate";
 
 // 🚨 终极护盾：突破 Vercel 免费版的 10 秒限制，允许最多运行 60 秒！
-// 没有这一行，生成 30 秒音乐一定会超时报错
+// Stable Audio 生成高质量音频需要时间，这行代码是保命符
 export const maxDuration = 60; 
 
 const replicate = new Replicate({
@@ -15,21 +15,23 @@ export default async function handler(req, res) {
 
   try {
     const { prompt } = req.body;
-    console.log("正在召唤 Replicate 算力，提示词：", prompt);
+    console.log("正在召唤真正的 DiT 算力 (Stable Audio)，提示词：", prompt);
 
+    // 🚀 核心替换：换成 Stability AI 的官方 DiT 模型
     const output = await replicate.run(
-      "meta/musicgen:b05b1dff1d8c6dc63d14b0cdb42135378dcb87f6373b0d3d341ede46e59e2b38",
+      "stability-ai/stable-audio", 
       {
         input: {
           prompt: prompt,
-          model_version: "stereo-large",
-          output_format: "wav",
-          // 👇 魔法就在这里！把 8 改成了 30，现在你可以生成 30 秒的完整片段了！
-          duration: 30 
+          // 注意！Stable Audio 控制时长的参数名是 seconds_total，而不是 duration
+          seconds_total: 30,
+          // 增加 steps 参数可以提升音质（数值越大音质越好，但生成越慢，默认一般是 100）
+          steps: 100 
         }
       }
     );
 
+    // 把生成的高清音频链接返回给你的前端赛博 UI
     res.status(200).json({ audioUrl: output });
 
   } catch (error) {
