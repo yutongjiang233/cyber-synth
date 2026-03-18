@@ -1,175 +1,155 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.4">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber-Synth v3.0 | Cloud Native Engine</title>
+    <style>
+        :root {
+            --bg-dark: #09090b; --card-bg: rgba(26, 26, 29, 0.7);
+            --primary: #c084fc; --accent-green: #4ade80; --accent-blue: #38bdf8;
+            --text-main: #f1f5f9; --text-muted: #94a3b8; --grid-line: rgba(255, 255, 255, 0.03);
+        }
+        body { background-color: var(--bg-dark); color: var(--text-main); font-family: 'Courier New', monospace; margin: 0; padding: 20px; min-height: 100vh; display: flex; align-items: center; justify-content: center; background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px); background-size: 20px 20px; }
+        .container { max-width: 1000px; width: 100%; background: var(--card-bg); border-radius: 12px; box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); display: flex; flex-direction: column; overflow: hidden; font-size: 0.9rem; }
+        .synth-rack { padding: 20px; display: grid; grid-template-columns: 1fr 1fr 1fr 1.5fr; gap: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .status-rack { padding: 20px; display: grid; grid-template-columns: 1fr 3fr; gap: 20px; background: rgba(0, 0, 0, 0.3); }
+        h1 { font-size: 1.5rem; margin: 0; grid-column: 1 / -1; background: linear-gradient(to right, var(--accent-green), var(--primary), var(--accent-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+        p.subtitle { color: var(--text-muted); margin: 0 0 20px 0; font-size: 0.8rem; grid-column: 1 / -1; }
+        .parameter-group { border: 1px solid rgba(255, 255, 255, 0.03); border-radius: 8px; padding: 15px; position: relative; background: rgba(0, 0, 0, 0.2); }
+        .group-label { position: absolute; top: -10px; left: 15px; background: #0d0d0f; padding: 0 8px; font-size: 0.75rem; color: var(--primary); text-transform: uppercase; font-weight: bold; }
+        .control-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .control-label { color: #cbd5e1; font-size: 0.8rem; min-width: 60px; }
+        .segmented-control { display: flex; gap: 5px; margin-top: 5px; }
+        .segment, .segment-blue { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; }
+        .segment:hover { border-color: var(--accent-green); } .segment.active { background: var(--accent-green); border-color: var(--accent-green); color: black; font-weight: bold;}
+        .segment-blue:hover { border-color: var(--accent-blue); } .segment-blue.active { background: var(--accent-blue); border-color: var(--accent-blue); color: black; font-weight: bold;}
+        .control-slider { flex-grow: 1; margin: 0 10px; cursor: pointer; accent-color: var(--primary); }
+        .timbre-input { width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 0.9rem; box-sizing: border-box; resize: none; }
+        .timbre-input:focus { outline: none; border-color: var(--accent-blue); box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2); }
+        button { grid-column: 1 / -1; background: linear-gradient(135deg, var(--accent-green), var(--primary)); color: black; border: none; padding: 20px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.05em; }
+        button:hover { filter: brightness(1.1); } button:disabled { opacity: 0.5; cursor: not-allowed; }
+        #status-box { color: var(--text-muted); font-size: 0.8rem; min-height: 100px; line-height: 1.5; word-break: break-all; }
+        #final-prompt { color: var(--accent-blue); }
+        audio { width: 100%; height: 40px; }
+        @keyframes pulse { 50% { opacity: 0.5; } }
+        .loading { animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; color: var(--primary); }
+        .logo-area { text-align: right; color: rgba(255, 255, 255, 0.05); font-size: 0.6rem; font-style: italic;}
+    </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="en"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Cyber-Synth v3.0 | Cloud Native Engine&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>:root {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--bg-dark: #09090b; --card-bg: rgba(26, 26, 29, 0.7);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--primary: #c084fc; --accent-green: #4ade80; --accent-blue: #38bdf8;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--text-main: #f1f5f9; --text-muted: #94a3b8; --grid-line: rgba(255, 255, 255, 0.03);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>body { background-color: var(--bg-dark); color: var(--text-main); font-family: 'Courier New', monospace; margin: 0; padding: 20px; min-height: 100vh; display: flex; align-items: center; justify-content: center; background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px); background-size: 20px 20px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.container { max-width: 1000px; width: 100%; background: var(--card-bg); border-radius: 12px; box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); display: flex; flex-direction: column; overflow: hidden; font-size: 0.9rem; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.synth-rack { padding: 20px; display: grid; grid-template-columns: 1fr 1fr 1fr 1.5fr; gap: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.status-rack { padding: 20px; display: grid; grid-template-columns: 1fr 3fr; gap: 20px; background: rgba(0, 0, 0, 0.3); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>h1 { font-size: 1.5rem; margin: 0; grid-column: 1 / -1; background: linear-gradient(to right, var(--accent-green), var(--primary), var(--accent-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>p.subtitle { color: var(--text-muted); margin: 0 0 20px 0; font-size: 0.8rem; grid-column: 1 / -1; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.parameter-group { border: 1px solid rgba(255, 255, 255, 0.03); border-radius: 8px; padding: 15px; position: relative; background: rgba(0, 0, 0, 0.2); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.group-label { position: absolute; top: -10px; left: 15px; background: #0d0d0f; padding: 0 8px; font-size: 0.75rem; color: var(--primary); text-transform: uppercase; font-weight: bold; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.control-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.control-label { color: #cbd5e1; font-size: 0.8rem; min-width: 60px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.segmented-control { display: flex; gap: 5px; margin-top: 5px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.segment, .segment-blue { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.segment:hover { border-color: var(--accent-green); } .segment.active { background: var(--accent-green); border-color: var(--accent-green); color: black; font-weight: bold;}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.segment-blue:hover { border-color: var(--accent-blue); } .segment-blue.active { background: var(--accent-blue); border-color: var(--accent-blue); color: black; font-weight: bold;}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.control-slider { flex-grow: 1; margin: 0 10px; cursor: pointer; accent-color: var(--primary); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.timbre-input { width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 0.9rem; box-sizing: border-box; resize: none; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.timbre-input:focus { outline: none; border-color: var(--accent-blue); box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>button { grid-column: 1 / -1; background: linear-gradient(135deg, var(--accent-green), var(--primary)); color: black; border: none; padding: 20px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.05em; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>button:hover { filter: brightness(1.1); } button:disabled { opacity: 0.5; cursor: not-allowed; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>#status-box { color: var(--text-muted); font-size: 0.8rem; min-height: 100px; line-height: 1.5; word-break: break-all; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>#final-prompt { color: var(--accent-blue); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>audio { width: 100%; height: 40px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>@keyframes pulse { 50% { opacity: 0.5; } }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.loading { animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; color: var(--primary); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.logo-area { text-align: right; color: rgba(255, 255, 255, 0.05); font-size: 0.6rem; font-style: italic;}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;div class="container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="synth-rack"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;h1&gt;Cyber-Synth v3.0 API&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;p class="subtitle"&gt;Serverless Neural DSP deployed on A100 Cluster&lt;/p&gt;</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="parameter-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="group-label"&gt;OSC Generator&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="segmented-control" id="waveform-control"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="segment active" data-wave="Sine"&gt;Sin&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="segment" data-wave="Sawtooth"&gt;Saw&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="segment" data-wave="Square"&gt;Squ&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="segment" data-wave="Triangle"&gt;Tri&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="parameter-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="group-label"&gt;Envelope (Amp)&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="control-row"&gt;&lt;span class="control-label"&gt;Attack&lt;/span&gt;&lt;input type="range" class="control-slider" id="attack" min="0" max="100" value="70"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="control-row"&gt;&lt;span class="control-label"&gt;Decay&lt;/span&gt;&lt;input type="range" class="control-slider" id="decay" min="0" max="100" value="50"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="control-row"&gt;&lt;span class="control-label"&gt;Sustain&lt;/span&gt;&lt;input type="range" class="control-slider" id="sustain" min="0" max="100" value="80"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="control-row"&gt;&lt;span class="control-label"&gt;Release&lt;/span&gt;&lt;input type="range" class="control-slider" id="release" min="0" max="100" value="90"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="parameter-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="group-label"&gt;Modulation (LFO)&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="segmented-control" id="mod-control"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="segment-blue active" data-mod="Pitch"&gt;Pitch&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="segment-blue" data-mod="Filter"&gt;Filter&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="segment-blue" data-mod="Volume"&gt;Amp&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="control-row"&gt;&lt;span class="control-label"&gt;Rate&lt;/span&gt;&lt;input type="range" class="control-slider" id="lfo-rate" min="0" max="100" value="60"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="control-row"&gt;&lt;span class="control-label"&gt;Depth&lt;/span&gt;&lt;input type="range" class="control-slider" id="lfo-depth" min="0" max="100" value="40"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="parameter-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="group-label"&gt;Sequence &amp; Source&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="control-row"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="control-label"&gt;Tempo&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="segmented-control" id="bpm-control"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="segment" data-bpm="60"&gt;60&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="segment active" data-bpm="120"&gt;120&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="segment" data-bpm="140"&gt;140&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;textarea class="timbre-input" id="timbre-text" rows="2" placeholder="Sonic texture... e.g., analog pads..."&gt;&lt;/textarea&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="status-rack"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button id="btn-generate"&gt;🔮 SYNTHESIZE AUDIO RITUAL&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="status-box"&gt;SYSTEM IDLE&lt;br&gt;Serverless backend connected. Waiting for parameters.&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="parameter-group" style="margin-top: 20px;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="group-label"&gt;Neural Audio Manifestation&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;audio id="audio-player" controls&gt;&lt;/audio&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="logo-area" style="grid-column: 1/-1"&gt;NYU Grad Thesis | Serverless Architecture&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1">&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>// 纯洁的原生 JavaScript，无需任何外部依赖！</p>
-<p class="p1"><span class="Apple-converted-space">    </span>let activeWave = 'Sine'; let activeModDest = 'Pitch'; let activeBpm = 120;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>function bindSegmentedControl(id, callback) { document.querySelectorAll(`#${id} .segment, #${id} .segment-blue`).forEach(seg =&gt; { seg.addEventListener('click', (e) =&gt; { document.querySelector(`#${id} .active`).classList.remove('active'); e.target.classList.add('active'); callback(e.target.getAttribute('data-wave') || e.target.getAttribute('data-mod') || e.target.getAttribute('data-bpm')); }); }); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>bindSegmentedControl('waveform-control', val =&gt; activeWave = val); bindSegmentedControl('mod-control', val =&gt; activeModDest = val); bindSegmentedControl('bpm-control', val =&gt; activeBpm = val);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>const btn = document.getElementById("btn-generate"); const statusBox = document.getElementById("status-box"); const audio = document.getElementById("audio-player"); const timbreText = document.getElementById("timbre-text");</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function constructPrompt() {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const attack = parseInt(document.getElementById("attack").value); const release = parseInt(document.getElementById("release").value); const lfoDepth = parseInt(document.getElementById("lfo-depth").value); const timbre = timbreText.value || "synthesized textures";</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let prompt = `electronic music, ${activeBpm} BPM, `;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>if (activeWave === 'Sine') prompt += "smooth sine wave tones, "; else if (activeWave === 'Sawtooth') prompt += "bright sawtooth, "; else prompt += "complex wave, ";</p>
-<p class="p1"><span class="Apple-converted-space">        </span>if (attack &gt; 70) prompt += "slow evolving atmospheric pads, "; else if (attack &lt; 30) prompt += "sharp staccato, ";</p>
-<p class="p1"><span class="Apple-converted-space">        </span>if (release &gt; 70) prompt += "long infinite reverb tail, ";</p>
-<p class="p1"><span class="Apple-converted-space">        </span>if (lfoDepth &gt; 20) prompt += `LFO modulation on ${activeModDest}, `;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>return prompt + timbre;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>btn.addEventListener("click", async () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const fullPrompt = constructPrompt();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>btn.disabled = true; btn.innerText = "⏳ Requesting Cloud GPU..."; audio.src = "";</p>
-<p class="p1"><span class="Apple-converted-space">        </span>statusBox.innerHTML = `&lt;span class="loading"&gt;Sending parameters to Vercel Gateway...&lt;/span&gt;&lt;br&gt;Prompt:&lt;br&gt;&lt;span id="final-prompt"&gt;'${fullPrompt}'&lt;/span&gt;`;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>// 1. 发送请求给 Vercel 后端</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const response = await fetch("/api/predict", {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>method: "POST",</p>
-<p class="p1"><span class="Apple-converted-space">                </span>headers: { "Content-Type": "application/json" },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>body: JSON.stringify({ prompt: fullPrompt })</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">            </span>let prediction = await response.json();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (response.status !== 201) throw new Error(prediction.detail || "Gateway Error");</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// 2. 轮询循环：每 2 秒问一次后端做好了没</p>
-<p class="p1"><span class="Apple-converted-space">            </span>while (prediction.status !== "succeeded" &amp;&amp; prediction.status !== "failed") {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>await new Promise(r =&gt; setTimeout(r, 2000));</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const pollRes = await fetch(`/api/predict?id=${prediction.id}`);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>prediction = await pollRes.json();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>statusBox.innerHTML = `&lt;span class="loading"&gt;GPU Cluster Status: [${prediction.status.toUpperCase()}]...&lt;/span&gt;&lt;br&gt;Prompt:&lt;br&gt;&lt;span id="final-prompt"&gt;'${fullPrompt}'&lt;/span&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// 3. 拿到音频！</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (prediction.status === "succeeded") {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>audio.src = prediction.output; // Replicate 直接返回音频链接</p>
-<p class="p1"><span class="Apple-converted-space">                </span>statusBox.innerHTML = `Ritual Complete.&lt;br&gt;Audio fully manifested from latent space.`;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>throw new Error("Generation failed on Replicate.");</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>} catch (error) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>statusBox.innerHTML = `❌ RITUAL ERROR: ${error.message}`;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>} finally {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>btn.disabled = false; btn.innerText = "🔮 SYNTHESIZE AUDIO RITUAL";</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>});</p>
-<p class="p1">&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+
+<div class="container">
+    <div class="synth-rack">
+        <h1>Cyber-Synth v3.0 API</h1>
+        <p class="subtitle">Serverless Neural DSP deployed on A100 Cluster</p>
+        
+        <div class="parameter-group">
+            <span class="group-label">OSC Generator</span>
+            <div class="segmented-control" id="waveform-control">
+                <div class="segment active" data-wave="Sine">Sin</div>
+                <div class="segment" data-wave="Sawtooth">Saw</div>
+                <div class="segment" data-wave="Square">Squ</div>
+                <div class="segment" data-wave="Triangle">Tri</div>
+            </div>
+        </div>
+
+        <div class="parameter-group">
+            <span class="group-label">Envelope (Amp)</span>
+            <div class="control-row"><span class="control-label">Attack</span><input type="range" class="control-slider" id="attack" min="0" max="100" value="70"></div>
+            <div class="control-row"><span class="control-label">Decay</span><input type="range" class="control-slider" id="decay" min="0" max="100" value="50"></div>
+            <div class="control-row"><span class="control-label">Sustain</span><input type="range" class="control-slider" id="sustain" min="0" max="100" value="80"></div>
+            <div class="control-row"><span class="control-label">Release</span><input type="range" class="control-slider" id="release" min="0" max="100" value="90"></div>
+        </div>
+
+        <div class="parameter-group">
+            <span class="group-label">Modulation (LFO)</span>
+            <div class="segmented-control" id="mod-control">
+                <div class="segment-blue active" data-mod="Pitch">Pitch</div>
+                <div class="segment-blue" data-mod="Filter">Filter</div>
+                <div class="segment-blue" data-mod="Volume">Amp</div>
+            </div>
+            <div class="control-row"><span class="control-label">Rate</span><input type="range" class="control-slider" id="lfo-rate" min="0" max="100" value="60"></div>
+            <div class="control-row"><span class="control-label">Depth</span><input type="range" class="control-slider" id="lfo-depth" min="0" max="100" value="40"></div>
+        </div>
+
+        <div class="parameter-group">
+            <span class="group-label">Sequence & Source</span>
+            <div class="control-row">
+                <span class="control-label">Tempo</span>
+                <div class="segmented-control" id="bpm-control">
+                    <div class="segment" data-bpm="60">60</div>
+                    <div class="segment active" data-bpm="120">120</div>
+                    <div class="segment" data-bpm="140">140</div>
+                </div>
+            </div>
+            <textarea class="timbre-input" id="timbre-text" rows="2" placeholder="Sonic texture... e.g., analog pads..."></textarea>
+        </div>
+    </div>
+
+    <div class="status-rack">
+        <button id="btn-generate">🔮 SYNTHESIZE AUDIO RITUAL</button>
+        <div>
+            <div id="status-box">SYSTEM IDLE<br>Serverless backend connected. Waiting for parameters.</div>
+            <div class="parameter-group" style="margin-top: 20px;">
+                <span class="group-label">Neural Audio Manifestation</span>
+                <audio id="audio-player" controls></audio>
+            </div>
+        </div>
+        <div class="logo-area" style="grid-column: 1/-1">NYU Grad Thesis | Serverless Architecture</div>
+    </div>
+</div>
+
+<script>
+    let activeWave = 'Sine'; let activeModDest = 'Pitch'; let activeBpm = 120;
+    function bindSegmentedControl(id, callback) { document.querySelectorAll(`#${id} .segment, #${id} .segment-blue`).forEach(seg => { seg.addEventListener('click', (e) => { document.querySelector(`#${id} .active`).classList.remove('active'); e.target.classList.add('active'); callback(e.target.getAttribute('data-wave') || e.target.getAttribute('data-mod') || e.target.getAttribute('data-bpm')); }); }); }
+    bindSegmentedControl('waveform-control', val => activeWave = val); bindSegmentedControl('mod-control', val => activeModDest = val); bindSegmentedControl('bpm-control', val => activeBpm = val);
+
+    const btn = document.getElementById("btn-generate"); const statusBox = document.getElementById("status-box"); const audio = document.getElementById("audio-player"); const timbreText = document.getElementById("timbre-text");
+
+    function constructPrompt() {
+        const attack = parseInt(document.getElementById("attack").value); const release = parseInt(document.getElementById("release").value); const lfoDepth = parseInt(document.getElementById("lfo-depth").value); const timbre = timbreText.value || "synthesized textures";
+        let prompt = `electronic music, ${activeBpm} BPM, `;
+        if (activeWave === 'Sine') prompt += "smooth sine wave tones, "; else if (activeWave === 'Sawtooth') prompt += "bright sawtooth, "; else prompt += "complex wave, ";
+        if (attack > 70) prompt += "slow evolving atmospheric pads, "; else if (attack < 30) prompt += "sharp staccato, ";
+        if (release > 70) prompt += "long infinite reverb tail, ";
+        if (lfoDepth > 20) prompt += `LFO modulation on ${activeModDest}, `;
+        return prompt + timbre;
+    }
+
+    btn.addEventListener("click", async () => {
+        const fullPrompt = constructPrompt();
+        btn.disabled = true; btn.innerText = "⏳ Requesting Cloud GPU..."; audio.src = "";
+        statusBox.innerHTML = `<span class="loading">Sending parameters to Vercel Gateway...</span><br>Prompt:<br><span id="final-prompt">'${fullPrompt}'</span>`;
+
+        try {
+            const response = await fetch("/api/predict", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt: fullPrompt })
+            });
+            let prediction = await response.json();
+            if (response.status !== 201) throw new Error(prediction.detail || "Gateway Error");
+
+            while (prediction.status !== "succeeded" && prediction.status !== "failed") {
+                await new Promise(r => setTimeout(r, 2000));
+                const pollRes = await fetch(`/api/predict?id=${prediction.id}`);
+                prediction = await pollRes.json();
+                statusBox.innerHTML = `<span class="loading">GPU Cluster Status: [${prediction.status.toUpperCase()}]...</span><br>Prompt:<br><span id="final-prompt">'${fullPrompt}'</span>`;
+            }
+
+            if (prediction.status === "succeeded") {
+                audio.src = prediction.output; 
+                statusBox.innerHTML = `Ritual Complete.<br>Audio fully manifested from latent space.`;
+            } else {
+                throw new Error("Generation failed on Replicate.");
+            }
+        } catch (error) {
+            statusBox.innerHTML = `❌ RITUAL ERROR: ${error.message}`;
+        } finally {
+            btn.disabled = false; btn.innerText = "🔮 SYNTHESIZE AUDIO RITUAL";
+        }
+    });
+</script>
 </body>
 </html>
