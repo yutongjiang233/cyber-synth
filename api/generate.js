@@ -14,16 +14,21 @@ export default async function handler(req, res) {
 
   try {
     const { prompt } = req.body;
-    console.log("正在召唤顶级 DiT 算力 (Stable Audio 2.5)，提示词：", prompt);
+    
+    // 🎛️ 核心魔法：母带级音质增强外挂
+    // 强制要求 AI 做到：轨道分离、乐器清晰、无浑浊感、宽广立体声
+    const enhancedPrompt = `${prompt}, multi-track, distinct individual instruments, crisp and clear separation, professional 3D studio mix, wide stereo imaging, extreme high fidelity, lossless FLAC quality, mastered, perfectly balanced EQ, zero muddiness, punchy transients`;
 
-    // 🚀 调用永远在线、速度极快的官方 2.5 版本
+    console.log("正在召唤顶级 DiT 算力，增强后的咒语：", enhancedPrompt);
+
+    // 调用官方 2.5 版本大模型
     const output = await replicate.run(
       "stability-ai/stable-audio-2.5", 
       {
         input: {
-          prompt: prompt,
-          duration: 30, // 完美支持 30 秒（最高甚至支持 190 秒）
-          steps: 8 // ⚠️ 关键修复：2.5 版本的官方最高画质步数就是 8，千万不能写 100！
+          prompt: enhancedPrompt, // 注入我们强化过的神级提示词
+          duration: 30, // 30秒完整时长
+          steps: 8 // 官方最佳步数
         }
       }
     );
@@ -32,7 +37,6 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error("生成失败:", error);
-    // 把 Replicate 真正的报错信息返回给前端，方便排查
     res.status(500).json({ error: error.message });
   }
 }
