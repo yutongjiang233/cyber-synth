@@ -1,283 +1,69 @@
-/* --- 全局样式与变量定义 --- */
-:root {
-    /* 核心颜色提取：深空蓝黑、水晶青色、叶脉绿色、金色高光、星云紫色 */
-    --bg-dark: #010103; /* 接近黑色的最深空，用于最底层背景 */
-    --bg-panel: #0a0a18; /* 深蓝黑面板背景 */
-    
-    --color-cyan: #00ffff; /* 水晶青色发光 */
-    --color-green: #00ffaa; /* 叶脉绿色发光 */
-    --color-gold: #ffd700; /* 金色高光线 */
-    --color-purple: #9400d3; /* 星云紫色发光 */
-    --color-white: #ffffff;
-    --color-text-dim: #aab5c0; /* 调暗的文本色 */
-
-    /* 字体：无衬线未来主义/神秘感字体 */
-    --font-main: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    --font-heading: 'Optima', 'Candara', 'Calibri', 'Arial', sans-serif;
-
-    /* 边框样式：带金色高光的深色边框 */
-    --border-style: 2px solid #1a1a3a;
-    --border-highlight: 1px solid #ffd70033; /* 1/5不透明度的金色边框 */
-}
-
-/* 基础重置，确保全屏填充且无边距 */
-body, html {
+/* --- 基础重置 --- */
+* {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
+}
+
+html, body {
     width: 100%;
-    height: 100%;
-    background-color: var(--bg-dark); /* 最深背景色 */
-    font-family: var(--font-main);
-    color: var(--color-text-dim);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden; /* 防止出现滚动条 */
+    height: 100vh; /* 视口高度，确保铺满整个屏幕 */
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; /* 默认无衬线字体 */
 }
 
-/* 核心布局容器 */
-.synthesizer-main {
-    width: 90%;
-    max-width: 1400px;
-    height: 90vh; /* 占视口高度的 90% */
+/* --- 核心：全屏背景设置 --- */
+body {
+    /* ⚠️ 核心修改点：直接引用根目录下的文件名 */
+    /* 因为图片直接在项目根目录下，直接使用 url('文件名') 即可，不需要文件夹前缀 */
+    background-image: url('mandala.jpg'); 
+    
+    background-size: cover;       /* 核心：保证图片等比例缩放并完全覆盖整个背景，不留黑边 */
+    background-position: center;  /* 核心：将曼陀罗中心居中对齐 */
+    background-repeat: no-repeat; /* 核心：不重复平铺图片 */
+    background-attachment: fixed; /* 可选：背景固定，获得视差效果，推荐保持 */
+
+    /* 使用 Flexbox 将 UI 元素在页面顶部水平居中 */
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2rem;
-    background: radial-gradient(circle, #101030 0%, #050510 60%, #000 100%);
-    box-shadow: 0 0 50px rgba(0, 255, 255, 0.1);
-    border-radius: 20px;
+    justify-content: center; /* 水平居中 */
+    align-items: flex-start; /* 垂直靠上 */
+    padding-top: 80px;       /* 距离顶部的距离，可根据需要调整 */
 }
 
-/* --- 头部样式 --- */
-.syn-header {
+/* --- 交互框/文字容器 --- */
+.ui-container {
     text-align: center;
-    margin-bottom: 2rem;
+    max-width: 900px; /* 限制文字的最大宽度 */
+    padding: 30px;
+    
+    /* 半透明深色遮罩，保证文字清晰 */
+    background-color: rgba(0, 0, 0, 0.4); 
+    backdrop-filter: blur(8px); /* 毛玻璃模糊效果 */
+    border-radius: 12px; /* 圆角 */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* 微微的高光边框 */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* 阴影增加立体感 */
 }
 
-.glow-text {
-    font-family: var(--font-heading);
-    color: var(--color-cyan);
+/* --- 标题发光效果 --- */
+.glow-title {
+    color: #00FFFF; /* 青色/天蓝色 */
     font-size: 2.5rem;
-    margin: 0;
-    /* 霓虹发光效果，组合了青色和绿色 */
-    text-shadow: 
-        0 0 10px var(--color-cyan), 
-        0 0 20px var(--color-cyan), 
-        0 0 30px var(--color-green);
     letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    
+    /* 模拟原图的霓虹灯发光效果 */
+    text-shadow: 
+        0 0 5px #00FFFF,
+        0 0 15px #00FFFF,
+        0 0 30px #00FFFF,
+        0 0 50px #0088FF;
 }
 
-/* --- 曼陀罗核心区域 --- */
-.central-manda-core {
-    flex-grow: 1; /* 填充中间区域 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    width: 100%;
-}
-
-.mandala-container {
-    position: relative;
-    width: 90vmin; /* 响应式：取屏幕宽高较小值的 90% */
-    height: 90vmin;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.manda-core-img {
-    width: 90%;
-    height: 90%;
-    border-radius: 50%; /* 核心：裁剪成完美的圆形，使其符合曼陀罗特性 */
-    object-fit: cover;
-    box-shadow: 0 0 40px rgba(0, 255, 255, 0.2);
-    /* 核心动画：应用呼吸脉动效果 */
-    animation: breathe 8s ease-in-out infinite alternate;
-}
-
-/* 曼陀罗背景的漫射发光 */
-.manda-glow {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90vmin;
-    height: 90vmin;
-    border-radius: 50%;
-    /* 径向渐变模拟金色和青色的发光，与图片边缘的水晶呼应 */
-    background: radial-gradient(circle, #ffd70022 0%, #00ffff22 50%, rgba(0,0,0,0) 80%);
-    filter: blur(20px); /* 模糊处理，营造柔和光晕 */
-    pointer-events: none; /* 确保它不拦截点击事件 */
-    z-index: -1; /* 放置在图片下方 */
-}
-
-/* --- 控制面板区域 --- */
-.control-panels {
-    width: 100%;
-    display: flex;
-    justify-content: space-around;
-    gap: 1.5rem;
-    margin-top: 2rem;
-}
-
-.panel {
-    background-color: var(--bg-panel);
-    border: var(--border-style);
-    border-radius: 12px;
-    padding: 1.5rem;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    /* 面板内部的金色和青色细微光晕 */
-    box-shadow: 
-        0 0 20px rgba(0, 255, 255, 0.05),
-        inset 0 0 10px #ffd70008;
-}
-
-.panel h2 {
-    font-family: var(--font-heading);
-    font-size: 1.3rem;
-    color: var(--color-gold); /* 面板标题使用金色 */
-    margin: 0 0 1rem 0;
-    text-align: center;
-    border-bottom: 1px solid #ffd7001a;
-    padding-bottom: 0.5rem;
-}
-
-.control-group {
-    margin-bottom: 1rem;
-    display: flex;
-    flex-direction: column;
-}
-
-.control-group label {
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-    color: var(--color-cyan); /* 标签使用青色 */
-}
-
-/* --- 霓虹滑块 (Slider) 样式 --- */
-/* 这里使用了较为复杂的跨浏览器滑块美化 */
-
-input[type=range] {
-    -webkit-appearance: none; /* 清除默认样式 */
-    width: 100%;
-    background: transparent;
-}
-
-/* 滑块的轨道 */
-input[type=range]::-webkit-slider-runnable-track {
-    width: 100%;
-    height: 10px;
-    cursor: pointer;
-    background: var(--bg-dark);
-    border-radius: 5px;
-    border: 1px solid #ffd70011;
-}
-
-/* 滑块的滑块头 (Thumb) */
-input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    height: 20px;
-    width: 20px;
-    border-radius: 50%;
-    background: var(--color-green); /* 滑块头使用绿色 */
-    border: 2px solid var(--color-cyan);
-    cursor: pointer;
-    box-shadow: 0 0 15px var(--color-green); /* 绿色霓虹发光 */
-    transform: translateY(-5px); /* 垂直居中修正 */
-}
-
-/* 兼容 Firefox 的滑块样式 */
-input[type=range]::-moz-range-track {
-    width: 100%;
-    height: 10px;
-    cursor: pointer;
-    background: var(--bg-dark);
-    border-radius: 5px;
-    border: 1px solid #ffd70011;
-}
-input[type=range]::-moz-range-thumb {
-    height: 20px;
-    width: 20px;
-    border-radius: 50%;
-    background: var(--color-green);
-    border: 2px solid var(--color-cyan);
-    cursor: pointer;
-    box-shadow: 0 0 15px var(--color-green);
-}
-
-/* --- 下拉菜单和复选框样式 --- */
-select {
-    padding: 0.5rem;
-    background-color: #050510;
-    border: 1px solid #1a1a3a;
-    border-radius: 5px;
-    color: var(--color-cyan);
-    font-family: var(--font-main);
-}
-
-.check-group label {
-    color: var(--color-text-dim);
-}
-
-/* 状态监视器样式 */
-.status-monitor {
-    font-size: 0.9rem;
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-top: auto; /* 推到面板底部 */
-}
-
-.state-active {
-    color: var(--color-cyan);
-    font-weight: bold;
-    text-shadow: 0 0 5px var(--color-cyan);
-}
-
-/* --- 底部样式 --- */
-.syn-footer {
-    width: 100%;
-    text-align: center;
-    margin-top: 2rem;
-    border-top: 1px solid rgba(0, 255, 255, 0.1); /* 深蓝紫色分割线 */
-    padding-top: 1rem;
-}
-
-/* 霓虹按钮样式 */
-.harmonize-btn {
-    padding: 1rem 2rem;
-    font-size: 1.2rem;
-    font-family: var(--font-heading);
-    font-weight: bold;
-    color: var(--color-gold); /* 按钮文字金色 */
-    background-color: var(--bg-panel);
-    border: 2px solid var(--color-gold);
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-shadow: 0 0 5px var(--color-gold); /* 文字金色发光 */
-}
-
-.harmonize-btn:hover {
-    background-color: rgba(255, 215, 0, 0.1);
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); /* 鼠标悬停时的金色光晕 */
-}
-
-/* --- 定义动画关键帧 --- */
-
-/* 曼陀罗核心：呼吸/脉动效果 */
-@keyframes breathe {
-    0% {
-        box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
-        transform: scale(1); /* 原始大小 */
-    }
-    100% {
-        box-shadow: 0 0 60px rgba(0, 255, 255, 0.5); /* 更强烈的发光 */
-        transform: scale(1.03); /* 轻微放大，制造脉动感 */
-    }
+/* --- 描述文字 --- */
+.description {
+    color: #FFFFFF; /* 纯白色 */
+    font-size: 1rem;
+    line-height: 1.6;
+    letter-spacing: 0.5px;
+    opacity: 0.85; /* 稍微降低一点透明度 */
 }
