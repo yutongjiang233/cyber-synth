@@ -1,8 +1,6 @@
 import Replicate from "replicate";
 
-// 护盾：允许 Vercel 运行最多 60 秒
-export const maxDuration = 60; 
-
+// 🔐 安全第一：让代码去读取 Vercel 的环境变量，而不是把密码写在明面上！
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN, 
 });
@@ -15,21 +13,19 @@ export default async function handler(req, res) {
   try {
     const { prompt } = req.body;
     
-    // 🛡️ 终极“傻瓜式”融合外挂：将用户的输入包裹在强制性的系统指令中
-    const enhancedPrompt = `A cohesive, professionally mastered musical composition. 
-    User's requested vibe and elements: [ ${prompt} ]. 
-    STRICT INSTRUCTION: Any mention of real-world sounds, animals, nature, or foley (e.g., birds, water, noise) MUST be heavily processed, synthesized, pitched, and washed in reverb to act as ambient musical instruments. DO NOT generate raw, dry, or realistic sound effects. Everything must be a seamless organic fusion, glued together, harmonically rich, with a wide stereo soundscape and extreme high fidelity.`;
+    // 🎛️ 核心修复逻辑：声音融合外挂 (防止鸟叫声太突兀)
+    const enhancedPrompt = `${prompt}, pristine audio quality, masterfully mixed, high fidelity, 320kbps, clear studio recording, integrated foley fX seamlessly blended, mastered sound glue`;
 
-    console.log("拦截用户输入，转换后的神级咒语：", enhancedPrompt);
+    console.log("正在召唤顶级 DiT 算力，增强后的提示词：", enhancedPrompt);
 
-    // 调用官方 2.5 版本大模型
+    // 调用 Stability AI 的官方高端 DiT 模型
     const output = await replicate.run(
-      "stability-ai/stable-audio-2.5", 
+      "stability-ai/stable-audio-open",
       {
         input: {
           prompt: enhancedPrompt, 
-          duration: 30, 
-          steps: 8 
+          output_format: "wav",
+          duration: 15 // 生成 15 秒高清音乐
         }
       }
     );
