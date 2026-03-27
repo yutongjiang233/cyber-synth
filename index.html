@@ -1,96 +1,74 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Psychedelic Audio Ritual</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Quicksand:wght@300;400;600&display=swap" rel="stylesheet">
-    <link href="style.css" rel="stylesheet" type="text/css" />
+    <title>曼陀罗共鸣合成器 | MANDALA RESONANCE SYNTHESIZER</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            /* 如果文件未找到，提供一个深邃蓝黑的占位颜色 */
+            --mandala-preview-color: radial-gradient(circle, #001020 0%, #000 100%);
+        }
+    </style>
 </head>
 <body>
-    <canvas id="trailCanvas"></canvas>
 
-    <div class="synth-wrapper">
-        <header>
-            <h1>SONIC MANDALA</h1>
-            <p class="subtitle">Bioluminescent Neural Engine</p>
+    <main class="synthesizer-main">
+        
+        <header class="syn-header">
+            <h1 class="glow-text">MANDALA RESONANCE SYNTHESIZER</h1>
+            <p>Harmonizing Elemental Energies & Cosmic Frequencies</p>
         </header>
 
-        <div class="modules-grid">
-            <div class="panel">
-                <div class="panel-header">I. SOURCE</div>
-                <div class="btn-group" id="osc-buttons">
-                    <button class="cyber-btn active" data-wave="sine">SIN</button>
-                    <button class="cyber-btn" data-wave="sawtooth">SAW</button>
-                    <button class="cyber-btn" data-wave="square">SQU</button>
-                    <button class="cyber-btn" data-wave="triangle">TRI</button>
-                </div>
-                <div class="visualizer-container">
-                    <canvas id="oscCanvas"></canvas>
-                </div>
-                <p class="helper-text">*Resonate Core</p>
+        <section class="central-manda-core">
+            <div class="mandala-container">
+                <img src="mandala.jpg" alt="曼陀罗共鸣核心" class="manda-core-img" onerror="this.src=var(--mandala-preview-color); this.alt='[Core Image Not Found]'">
+                <div class="manda-glow"></div>
             </div>
+        </section>
 
-            <div class="panel">
-                <div class="panel-header">II. SCULPT</div>
-                <div class="vertical-sliders">
-                    <div class="v-slider-wrap">
-                        <input type="range" orient="vertical" class="ai-slider dyn-slider" value="70">
-                        <span>Cutoff</span>
-                    </div>
-                    <div class="v-slider-wrap">
-                        <input type="range" orient="vertical" class="ai-slider dyn-slider" value="30">
-                        <span>Reson</span>
-                    </div>
+        <section class="control-panels">
+            <div class="panel crystal-freq-panel">
+                <h2>CRYSTAL FREQUENCY</h2>
+                <div class="control-group">
+                    <label for="freq-range">Energy Pitch</label>
+                    <input type="range" id="freq-range" min="0" max="100" value="75">
                 </div>
-                <div class="visualizer-container" style="height: 50px; margin-top:15px; border-radius: 20px;">
-                    <canvas id="eqCanvas"></canvas>
+                <div class="control-group">
+                    <label>Resonance Mode</label>
+                    <select>
+                        <option value="harmonic">Harmonic [Default]</option>
+                        <option value="dissonant">Dissonant [Discord]</option>
+                        <option value="spectral">Spectral [Aura]</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="panel">
-                <div class="panel-header">III. BREATHE</div>
-                <div class="slider-container"><span class="slider-label">Attack</span><input type="range" class="ai-slider dyn-slider" value="10"></div>
-                <div class="slider-container"><span class="slider-label">Decay</span><input type="range" class="ai-slider dyn-slider" value="40"></div>
-                <div class="slider-container"><span class="slider-label">Sustain</span><input type="range" class="ai-slider dyn-slider" value="60"></div>
-                <div class="slider-container"><span class="slider-label">Release</span><input type="range" class="ai-slider dyn-slider" value="20"></div>
-            </div>
-
-            <div class="panel">
-                <div class="panel-header">IV. FLOW</div>
-                <div class="btn-group" id="lfo-buttons">
-                    <button class="cyber-btn lfo-btn">Pitch</button>
-                    <button class="cyber-btn lfo-btn active">Filter</button>
-                    <button class="cyber-btn lfo-btn">Amp</button>
+            <div class="panel elemental-flow-panel">
+                <h2>ELEMENTAL FLOW</h2>
+                <div class="control-group check-group">
+                    <label><input type="checkbox" checked> Leaf-Vein Connection (Chlorophyll)</label>
+                    <label><input type="checkbox"> Water-Spiral Vorticity (Hydro-Resonance)</label>
                 </div>
-                <div class="slider-container" style="margin-top:20px;"><span class="slider-label">Rate</span><input type="range" class="ai-slider dyn-slider" value="55"></div>
-                <div class="slider-container"><span class="slider-label">Depth</span><input type="range" class="ai-slider dyn-slider" value="35"></div>
-            </div>
-        </div>
-
-        <div class="bottom-grid">
-            <div class="panel flex-center">
-                <div class="bg-tempo-number" id="bgBpm">120</div>
-                <div class="panel-header no-border">HEARTBEAT</div>
-                <div class="slider-container tempo-container">
-                    <input type="range" id="bpmRange" min="70" max="150" value="120">
+                <div class="control-group">
+                    <label for="flow-rate">Growth Velocity</label>
+                    <input type="range" id="flow-rate" min="0" max="100" value="50">
                 </div>
-                <div class="bpm-display" id="bpmText">120 BPM</div>
             </div>
 
-            <div class="panel">
-                <div class="panel-header no-border text-left">INCANTATION</div>
-                <div class="input-group"><label>Species</label><input type="text" class="cyber-input" placeholder="e.g. Shpongle Psytrance / Ambient"></div>
-                <div class="input-group"><label>Texture</label><input type="text" class="cyber-input" placeholder="e.g. Bioluminescent pads, Granular birds"></div>
-                <div class="input-group"><label>Growth</label><input type="text" class="cyber-input" placeholder="e.g. Organic swell -> Tribal drop"></div>
+            <div class="panel cosmic-vib-panel">
+                <h2>COSMIC VIBRATION</h2>
+                <div class="control-group">
+                    <label for="vib-level">Nebula Intensity</label>
+                    <input type="range" id="vib-level" min="0" max="100" value="85">
+                </div>
+                <div class="status-monitor">
+                    <span>STATE:</span> <span class="state-active">ACTIVE [SYNC]</span>
+                </div>
             </div>
-        </div>
+        </section>
 
-        <div class="action-area">
-            <button class="generate-btn" id="generateBtn">✨ AWAKEN THE MANDALA ✨</button>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
-</body>
-</html>
+        <footer class="syn-footer">
+            <p>Initiate Harmonization Protocol...</p>
+            <button class
