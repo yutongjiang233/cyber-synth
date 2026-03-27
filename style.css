@@ -1,144 +1,267 @@
+/* --- 全局样式与变量定义 --- */
 :root {
-    /* 迷幻配色：深紫、荧光绿、水母青 */
-    --bg-deep: #07030f;
-    --bio-green: #39ff14;
-    --bio-blue: #00f0ff;
-    --bio-purple: #b026ff;
-    --panel-glass: rgba(20, 10, 35, 0.4);
-    --text-main: #e2d9f3;
-    --text-muted: #9a8db3;
-    --font-title: 'Cinzel', serif;
-    --font-organic: 'Quicksand', sans-serif; /* 更圆润自然的字体 */
+    /* 核心颜色提取：深空蓝黑、水晶青色、叶脉绿色、金色高光、星云紫色 */
+    --bg-dark: #010103; /* 接近黑色的最深空，用于最底层背景 */
+    --bg-panel: #0a0a18; /* 深蓝黑面板背景 */
+    
+    --color-cyan: #00ffff; /* 水晶青色发光 */
+    --color-green: #00ffaa; /* 叶脉绿色发光 */
+    --color-gold: #ffd700; /* 金色高光线 */
+    --color-purple: #9400d3; /* 星云紫色发光 */
+    --color-white: #ffffff;
+    --color-text-dim: #aab5c0; /* 调暗的文本色 */
+
+    /* 字体：无衬线未来主义/神秘感字体 */
+    --font-main: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-heading: 'Optima', 'Candara', 'Calibri', 'Arial', sans-serif;
+
+    /* 边框样式：带金色高光的深色边框 */
+    --border-style: 2px solid #1a1a3a;
+    --border-highlight: 1px solid #ffd70033; /* 1/5不透明度的金色边框 */
 }
 
-* { box-sizing: border-box; }
-
-body {
-    margin: 0; padding: 20px;
-    background-color: var(--bg-deep);
-    /* 星云曼陀罗式的径向背景渐变 */
-    background-image: 
-        radial-gradient(circle at 20% 80%, rgba(57, 255, 20, 0.08), transparent 40%),
-        radial-gradient(circle at 80% 20%, rgba(0, 240, 255, 0.08), transparent 40%),
-        radial-gradient(circle at 50% 50%, rgba(176, 38, 255, 0.1), transparent 60%);
-    color: var(--text-main); font-family: var(--font-organic);
-    display: flex; justify-content: center; align-items: center;
-    min-height: 100vh; overflow-x: hidden; user-select: none;
+/* 基础重置，确保全屏填充且无边距 */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-dark); /* 最深背景色 */
+    font-family: var(--font-main);
+    color: var(--color-text-dim);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* 防止出现滚动条 */
 }
 
-#trailCanvas {
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    pointer-events: none; z-index: 0; mix-blend-mode: screen;
+/* 核心布局容器 */
+.synthesizer-main {
+    width: 90%;
+    max-width: 1400px;
+    height: 90vh; /* 占视口高度的 90% */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem;
+    background: radial-gradient(circle, #101030 0%, #050510 60%, #000 100%);
+    box-shadow: 0 0 50px rgba(0, 255, 255, 0.1);
+    border-radius: 20px;
 }
 
-/* 毛玻璃半透明外壳，圆润化 */
-.synth-wrapper {
-    width: 100%; max-width: 1100px;
-    background: rgba(15, 8, 25, 0.5); backdrop-filter: blur(15px);
-    border: 1px solid rgba(176, 38, 255, 0.2); border-radius: 30px;
-    padding: 40px; box-shadow: 0 0 50px rgba(176, 38, 255, 0.15), inset 0 0 20px rgba(0, 240, 255, 0.05);
-    position: relative; z-index: 10;
+/* --- 头部样式 --- */
+.syn-header {
+    text-align: center;
+    margin-bottom: 2rem;
 }
 
-header { text-align: center; margin-bottom: 35px; }
-h1 {
-    font-family: var(--font-title); font-size: clamp(2.5rem, 5vw, 3.5rem); margin: 0 0 5px 0;
-    letter-spacing: 8px; 
-    background: linear-gradient(90deg, var(--bio-blue), var(--bio-purple), var(--bio-green));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 20px rgba(176, 38, 255, 0.3);
+.glow-text {
+    font-family: var(--font-heading);
+    color: var(--color-cyan);
+    font-size: 2.5rem;
+    margin: 0;
+    /* 霓虹发光效果，组合了青色和绿色 */
+    text-shadow: 
+        0 0 10px var(--color-cyan), 
+        0 0 20px var(--color-cyan), 
+        0 0 30px var(--color-green);
+    letter-spacing: 2px;
 }
-.subtitle { font-size: 1.2rem; color: var(--bio-blue); margin: 0; font-weight: 300; letter-spacing: 2px;}
 
-.modules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 25px; margin-bottom: 25px; }
+/* --- 曼陀罗核心区域 --- */
+.central-manda-core {
+    flex-grow: 1; /* 填充中间区域 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 100%;
+}
 
-/* 迷幻生物舱体（圆角极大，毛玻璃） */
+.mandala-container {
+    position: relative;
+    width: 90vmin; /* 响应式：取屏幕宽高较小值的 90% */
+    height: 90vmin;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.manda-core-img {
+    width: 90%;
+    height: 90%;
+    border-radius: 50%; /* 核心：裁剪成完美的圆形，使其符合曼陀罗特性 */
+    object-fit: cover;
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.2);
+    /* 核心动画：应用呼吸脉动效果 */
+    animation: breathe 8s ease-in-out infinite alternate;
+}
+
+/* 曼陀罗背景的漫射发光 */
+.manda-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vmin;
+    height: 90vmin;
+    border-radius: 50%;
+    /* 径向渐变模拟金色和青色的发光，与图片边缘的水晶呼应 */
+    background: radial-gradient(circle, #ffd70022 0%, #00ffff22 50%, rgba(0,0,0,0) 80%);
+    filter: blur(20px); /* 模糊处理，营造柔和光晕 */
+    pointer-events: none; /* 确保它不拦截点击事件 */
+    z-index: -1; /* 放置在图片下方 */
+}
+
+/* --- 控制面板区域 --- */
+.control-panels {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
 .panel {
-    background: var(--panel-glass); 
-    border: 1px solid rgba(0, 240, 255, 0.15);
-    border-radius: 20px; padding: 25px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 15px rgba(255,255,255,0.02);
-    position: relative; transition: all 0.3s ease;
-}
-.panel:hover { border-color: rgba(176, 38, 255, 0.4); box-shadow: 0 10px 40px rgba(176, 38, 255, 0.1); }
-
-.panel-header {
-    font-family: var(--font-title); color: var(--text-main); text-align: center;
-    padding-bottom: 12px; margin-bottom: 20px; font-size: 1.1rem; letter-spacing: 3px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-.no-border { border: none; margin-bottom: 10px; }
-.text-left { text-align: left; }
-
-.btn-group { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;}
-
-/* 类似细胞的卵石按钮 */
-.cyber-btn {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.1);
-    color: var(--text-muted); font-family: var(--font-organic);
-    padding: 8px 16px; border-radius: 20px; cursor: pointer;
-    transition: all 0.3s ease; font-weight: 600;
-}
-.cyber-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
-.cyber-btn.active {
-    background: linear-gradient(135deg, var(--bio-blue), var(--bio-purple));
-    border: none; color: white;
-    box-shadow: 0 0 15px var(--bio-blue), inset 0 0 10px rgba(255,255,255,0.3);
+    background-color: var(--bg-panel);
+    border: var(--border-style);
+    border-radius: 12px;
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    /* 面板内部的金色和青色细微光晕 */
+    box-shadow: 
+        0 0 20px rgba(0, 255, 255, 0.05),
+        inset 0 0 10px #ffd70008;
 }
 
-/* 画布容器：纯圆角，像一个显微镜视窗 */
-.visualizer-container {
-    background: rgba(0,0,0,0.4); border-radius: 15px;
-    height: 90px; width: 100%; position: relative; overflow: hidden;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+.panel h2 {
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+    color: var(--color-gold); /* 面板标题使用金色 */
+    margin: 0 0 1rem 0;
+    text-align: center;
+    border-bottom: 1px solid #ffd7001a;
+    padding-bottom: 0.5rem;
 }
-canvas { width: 100%; height: 100%; display: block; mix-blend-mode: screen; }
-.helper-text { text-align:center; font-size:0.75rem; color: var(--bio-purple); margin-top:12px; font-style: italic;}
 
-/* 像发光经脉一样的滑块 */
-.slider-container { display: flex; align-items: center; margin-bottom: 15px; }
-.slider-label { width: 60px; font-size: 0.9rem; color: var(--text-muted); font-weight: 600;}
-input[type=range] { -webkit-appearance: none; flex-grow: 1; background: transparent; height: 20px; cursor: pointer;}
+.control-group {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.control-group label {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--color-cyan); /* 标签使用青色 */
+}
+
+/* --- 霓虹滑块 (Slider) 样式 --- */
+/* 这里使用了较为复杂的跨浏览器滑块美化 */
+
+input[type=range] {
+    -webkit-appearance: none; /* 清除默认样式 */
+    width: 100%;
+    background: transparent;
+}
+
+/* 滑块的轨道 */
 input[type=range]::-webkit-slider-runnable-track {
-    width: 100%; height: 4px; border-radius: 2px; 
-    background: rgba(255,255,255,0.1);
+    width: 100%;
+    height: 10px;
+    cursor: pointer;
+    background: var(--bg-dark);
+    border-radius: 5px;
+    border: 1px solid #ffd70011;
 }
+
+/* 滑块的滑块头 (Thumb) */
 input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
-    background: var(--bio-green); margin-top: -6px;
-    box-shadow: 0 0 10px var(--bio-green), 0 0 20px rgba(57, 255, 20, 0.4);
-    transition: transform 0.1s;
+    -webkit-appearance: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: var(--color-green); /* 滑块头使用绿色 */
+    border: 2px solid var(--color-cyan);
+    cursor: pointer;
+    box-shadow: 0 0 15px var(--color-green); /* 绿色霓虹发光 */
+    transform: translateY(-5px); /* 垂直居中修正 */
 }
-input[type=range]::-webkit-slider-thumb:active { transform: scale(1.3); }
 
-.vertical-sliders { display: flex; justify-content: space-around; height: 120px; margin-bottom: 12px; }
-.v-slider-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.v-slider-wrap span { font-size: 0.8rem; color: var(--text-muted); }
-input[type=range][orient=vertical] { writing-mode: bt-lr; -webkit-appearance: slider-vertical; width: 16px; height: 100px; }
-
-.bottom-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; margin-bottom: 30px; }
-.flex-center { display: flex; flex-direction: column; justify-content: center; position: relative;}
-.tempo-container { margin: 10px 0; }
-.bpm-display { font-size: 3.5rem; font-family: var(--font-organic); font-weight: 300; color: white; text-align: center; text-shadow: 0 0 20px var(--bio-purple);}
-.bg-tempo-number { position: absolute; font-size: 10rem; font-family: var(--font-title); color: rgba(255,255,255,0.02); top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 0;}
-
-/* 输入框 */
-.input-group { margin-bottom: 15px; display: flex; align-items: center; background: rgba(0,0,0,0.2); border-radius: 30px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);}
-.input-group label { width: 100px; font-size: 0.8rem; color: var(--bio-blue); padding: 12px; text-align: center; font-weight: 600;}
-.cyber-input { flex-grow: 1; background: transparent; border: none; color: white; padding: 12px 15px; font-family: var(--font-organic); font-size: 1rem; width: 100%;}
-.cyber-input:focus { outline: none; background: rgba(176, 38, 255, 0.1); }
-
-.action-area { text-align: center; }
-.generate-btn {
-    background: linear-gradient(90deg, #1a0b2e, #3a0ca3, #1a0b2e);
-    border: 1px solid var(--bio-purple); color: white; font-family: var(--font-title);
-    font-size: clamp(1.2rem, 3vw, 1.5rem); letter-spacing: 4px; padding: 20px 60px; border-radius: 50px;
-    cursor: pointer; position: relative; overflow: hidden; transition: all 0.4s ease;
-    box-shadow: 0 0 30px rgba(176, 38, 255, 0.4); width: 100%; max-width: 700px;
+/* 兼容 Firefox 的滑块样式 */
+input[type=range]::-moz-range-track {
+    width: 100%;
+    height: 10px;
+    cursor: pointer;
+    background: var(--bg-dark);
+    border-radius: 5px;
+    border: 1px solid #ffd70011;
 }
-.generate-btn:hover { 
-    background: linear-gradient(90deg, #3a0ca3, var(--bio-purple), #3a0ca3);
-    box-shadow: 0 0 50px var(--bio-purple), 0 0 20px var(--bio-blue); 
-    transform: translateY(-2px);
+input[type=range]::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: var(--color-green);
+    border: 2px solid var(--color-cyan);
+    cursor: pointer;
+    box-shadow: 0 0 15px var(--color-green);
 }
+
+/* --- 下拉菜单和复选框样式 --- */
+select {
+    padding: 0.5rem;
+    background-color: #050510;
+    border: 1px solid #1a1a3a;
+    border-radius: 5px;
+    color: var(--color-cyan);
+    font-family: var(--font-main);
+}
+
+.check-group label {
+    color: var(--color-text-dim);
+}
+
+/* 状态监视器样式 */
+.status-monitor {
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: auto; /* 推到面板底部 */
+}
+
+.state-active {
+    color: var(--color-cyan);
+    font-weight: bold;
+    text-shadow: 0 0 5px var(--color-cyan);
+}
+
+/* --- 底部样式 --- */
+.syn-footer {
+    width: 100%;
+    text-align: center;
+    margin-top: 2rem;
+    border-top: 1px solid rgba(0, 255, 255, 0.1); /* 深蓝紫色分割线 */
+    padding-top: 1rem;
+}
+
+/* 霓虹按钮样式 */
+.harmonize-btn {
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    font-family: var(--font-heading);
+    font-weight: bold;
+    color: var(--color-gold); /* 按钮文字金色 */
+    background-color: var(--bg-panel);
+    border: 2px solid var(--color-gold);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 5px var(--color-gold); /* 文字金色发光 */
+}
+
+.harmonize-btn:hover {
+    background-color: rgba(255, 215,
