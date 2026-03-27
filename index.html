@@ -5,14 +5,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Music Generator</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="ui-container">
-        <h1 class="glow-title">AI MUSIC GENERATOR</h1>
+
+    <div class="app-container">
         
-        <p class="description">
-            Powered by DiT Model
-        </p>
+        <div class="glass-panel top-header">
+            <h1 class="neon-title">AI MUSIC GENERATOR</h1>
+            <p class="long-description">
+                DIT description. Bio-lum luminescent energy and particle networks organically connect and flow through all components, create, intertwined, living biological ecosystem - complex, shifting cosmic nebula gradients
+            </p>
+        </div>
+
+        <div class="synth-grid">
+            
+            <div class="glass-panel module">
+                <h2>I. OSCILLATOR</h2>
+                <div class="btn-group">
+                    <button class="active cyan-glow">SIN</button>
+                    <button>SQU</button>
+                    <button>TRI</button>
+                    <button>SAW</button>
+                </div>
+                <div class="visualizer-box wave-vis"></div>
+            </div>
+
+            <div class="glass-panel module">
+                <h2>II. FILTER</h2>
+                <div class="knob-container">
+                    <div class="knob-wrapper">
+                        <div class="crystal-knob cyan-purple"><div class="indicator"></div></div>
+                        <label>Cutoff</label>
+                    </div>
+                    <div class="knob-wrapper">
+                        <div class="crystal-knob cyan-purple"><div class="indicator"></div></div>
+                        <label>Resonance</label>
+                    </div>
+                </div>
+                <div class="visualizer-box spec-vis"></div>
+            </div>
+
+            <div class="glass-panel module">
+                <h2>III. ENVELOPE</h2>
+                <div class="slider-group">
+                    <div class="slider-row"><label>Attack</label><input type="range" class="glow-slider"></div>
+                    <div class="slider-row"><label>Decay</label><input type="range" class="glow-slider"></div>
+                    <div class="slider-row"><label>Sustain</label><input type="range" class="glow-slider"></div>
+                    <div class="slider-row"><label>Release</label><input type="range" class="glow-slider"></div>
+                </div>
+            </div>
+
+            <div class="glass-panel module">
+                <h2>IV. LFO</h2>
+                <div class="btn-group lfo-waves">
+                    <button class="active cyan-glow"><i class="fa-solid fa-wave-square"></i> SIN</button>
+                    <button>SQU</button>
+                    <button>TRI</button>
+                    <button>SAW</button>
+                </div>
+                <div class="knob-container">
+                    <div class="knob-wrapper">
+                        <div class="crystal-knob cyan-pink"><div class="indicator" style="transform: rotate(45deg);"></div></div>
+                        <label>RATE<br><small>Hz</small></label>
+                    </div>
+                    <div class="knob-wrapper">
+                        <div class="crystal-knob cyan-pink"><div class="indicator" style="transform: rotate(-30deg);"></div></div>
+                        <label>DEPTH<br><small>%</small></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel module span-2 ritual-config">
+                <h2>RITUAL CONFIGURATION</h2>
+                <div class="bpm-display">120 <span class="bpm-text">BPM</span></div>
+                <div class="slider-row tempo-row">
+                    <input type="range" class="glow-slider orb-slider">
+                </div>
+            </div>
+
+            <div class="glass-panel module span-2 spell-input">
+                <h2>Sonic Ritual Spell - Input</h2>
+                <div class="input-row">
+                    <label>[GENRE]</label>
+                    <input type="text" value="Hard acid techno">
+                </div>
+                <div class="input-row">
+                    <label>[SOUNDS]</label>
+                    <input type="text" value="Roland TB-303 squelch, heavy resonance">
+                </div>
+                <div class="input-row">
+                    <label>[STRUCTURE]</label>
+                    <input type="text" value="Ambient build to driving drop">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="bottom-action">
+            <button class="synthesize-btn"><i class="fa-solid fa-crystal-ball"></i> SYNTHESIZE AUDIO RITUAL <i class="fa-solid fa-crystal-ball"></i></button>
+        </div>
+
+        <div class="glass-panel side-bar">
+            <i class="fa-solid fa-gear"></i>
+            <i class="fa-solid fa-volume-high"></i>
+            <i class="fa-solid fa-network-wired"></i>
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <i class="fa-solid fa-circle-info"></i>
+        </div>
+
     </div>
+
 </body>
 </html>
