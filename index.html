@@ -1,103 +1,144 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Music Generator - DiT Engine</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
-    <link href="style.css" rel="stylesheet" type="text/css" />
-</head>
-<body>
-    <canvas id="trailCanvas"></canvas>
+:root {
+    /* 迷幻配色：深紫、荧光绿、水母青 */
+    --bg-deep: #07030f;
+    --bio-green: #39ff14;
+    --bio-blue: #00f0ff;
+    --bio-purple: #b026ff;
+    --panel-glass: rgba(20, 10, 35, 0.4);
+    --text-main: #e2d9f3;
+    --text-muted: #9a8db3;
+    --font-title: 'Cinzel', serif;
+    --font-organic: 'Quicksand', sans-serif; /* 更圆润自然的字体 */
+}
 
-    <div class="synth-wrapper">
-        <header>
-            <h1>AI MUSIC GENERATOR</h1>
-            <p class="subtitle">Neural DSP specialized for Electronic Music Generation.</p>
-            <p class="dit-tag">*Powered by Latent Diffusion Transformer (DiT) Acoustic Architecture.*</p>
-        </header>
+* { box-sizing: border-box; }
 
-        <div class="modules-grid">
-            <div class="panel">
-                <div class="panel-subheader">OSC GENERATOR - SOURCE</div>
-                <div class="panel-header">I. OSCILLATOR</div>
-                <div class="btn-group" id="osc-buttons">
-                    <button class="cyber-btn active" data-wave="sine">SIN</button>
-                    <button class="cyber-btn" data-wave="sawtooth">SAW</button>
-                    <button class="cyber-btn" data-wave="square">SQU</button>
-                    <button class="cyber-btn" data-wave="triangle">TRI</button>
-                </div>
-                <div class="visualizer-container">
-                    <canvas id="oscCanvas"></canvas>
-                </div>
-                <p class="helper-text">*Click buttons for Audio Test</p>
-            </div>
+body {
+    margin: 0; padding: 20px;
+    background-color: var(--bg-deep);
+    /* 星云曼陀罗式的径向背景渐变 */
+    background-image: 
+        radial-gradient(circle at 20% 80%, rgba(57, 255, 20, 0.08), transparent 40%),
+        radial-gradient(circle at 80% 20%, rgba(0, 240, 255, 0.08), transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(176, 38, 255, 0.1), transparent 60%);
+    color: var(--text-main); font-family: var(--font-organic);
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh; overflow-x: hidden; user-select: none;
+}
 
-            <div class="panel">
-                <div class="panel-subheader">NEW, FILTER - SCULPTOR</div>
-                <div class="panel-header">II. FILTER</div>
-                <div class="vertical-sliders">
-                    <div class="v-slider-wrap">
-                        <input type="range" orient="vertical" class="ai-slider dyn-slider" value="70">
-                        <span>Cutoff</span>
-                    </div>
-                    <div class="v-slider-wrap">
-                        <input type="range" orient="vertical" class="ai-slider dyn-slider" value="30">
-                        <span>Resonance</span>
-                    </div>
-                </div>
-                <div class="visualizer-container" style="height: 50px; margin-top:10px;">
-                    <canvas id="eqCanvas"></canvas>
-                </div>
-            </div>
+#trailCanvas {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    pointer-events: none; z-index: 0; mix-blend-mode: screen;
+}
 
-            <div class="panel">
-                <div class="panel-subheader">ENVELOPE (AMP SHAPER)</div>
-                <div class="panel-header">III. ENVELOPE</div>
-                <div class="slider-container"><span class="slider-label">Attack</span><input type="range" class="ai-slider dyn-slider" value="10"></div>
-                <div class="slider-container"><span class="slider-label">Decay</span><input type="range" class="ai-slider dyn-slider" value="40"></div>
-                <div class="slider-container"><span class="slider-label">Sustain</span><input type="range" class="ai-slider dyn-slider" value="60"></div>
-                <div class="slider-container"><span class="slider-label">Release</span><input type="range" class="ai-slider dyn-slider" value="20"></div>
-            </div>
+/* 毛玻璃半透明外壳，圆润化 */
+.synth-wrapper {
+    width: 100%; max-width: 1100px;
+    background: rgba(15, 8, 25, 0.5); backdrop-filter: blur(15px);
+    border: 1px solid rgba(176, 38, 255, 0.2); border-radius: 30px;
+    padding: 40px; box-shadow: 0 0 50px rgba(176, 38, 255, 0.15), inset 0 0 20px rgba(0, 240, 255, 0.05);
+    position: relative; z-index: 10;
+}
 
-            <div class="panel">
-                <div class="panel-subheader">MODULATION (LFO)</div>
-                <div class="panel-header">IV. LFO</div>
-                <div class="btn-group" id="lfo-buttons">
-                    <button class="cyber-btn lfo-btn">Pitch</button>
-                    <button class="cyber-btn lfo-btn active">Filter</button>
-                    <button class="cyber-btn lfo-btn">Amp</button>
-                </div>
-                <div class="slider-container"><span class="slider-label">Rate</span><input type="range" class="ai-slider dyn-slider" value="55"></div>
-                <div class="slider-container" style="margin-top:20px;"><span class="slider-label">Depth</span><input type="range" class="ai-slider dyn-slider" value="35"></div>
-            </div>
-        </div>
+header { text-align: center; margin-bottom: 35px; }
+h1 {
+    font-family: var(--font-title); font-size: clamp(2.5rem, 5vw, 3.5rem); margin: 0 0 5px 0;
+    letter-spacing: 8px; 
+    background: linear-gradient(90deg, var(--bio-blue), var(--bio-purple), var(--bio-green));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(176, 38, 255, 0.3);
+}
+.subtitle { font-size: 1.2rem; color: var(--bio-blue); margin: 0; font-weight: 300; letter-spacing: 2px;}
 
-        <div class="bottom-grid">
-            <div class="panel flex-center">
-                <div class="bg-tempo-number" id="bgBpm">120</div>
-                <div class="panel-header no-border">RITUAL CONFIGURATION</div>
-                <div class="slider-container tempo-container">
-                    <span>Tempo</span>
-                    <input type="range" id="bpmRange" min="70" max="150" value="120">
-                </div>
-                <div class="bpm-display" id="bpmText">120 BPM</div>
-            </div>
+.modules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 25px; margin-bottom: 25px; }
 
-            <div class="panel">
-                <div class="panel-header no-border text-left">SONIC RITUAL SPELL - INPUT</div>
-                <div class="input-group"><label>[GENRE]</label><input type="text" class="cyber-input" placeholder="e.g. Psytrance / Space Rock"></div>
-                <div class="input-group"><label>[SOUNDS/TEXTURE]</label><input type="text" class="cyber-input" placeholder="e.g. Liquid Acid Lines, Interstellar Hum"></div>
-                <div class="input-group"><label>[STRUCTURE]</label><input type="text" class="cyber-input" placeholder="e.g. Ambient Swell -> Driving Bass Drop"></div>
-                <div class="example-text">EXAMPLE: [GENRE: Psytrance] [SOUNDS: Liquid Acid Lines, Pulsating Sub Bass] [STRUCTURE: Ambient Swell -> Driving Bass Drop]</div>
-            </div>
-        </div>
+/* 迷幻生物舱体（圆角极大，毛玻璃） */
+.panel {
+    background: var(--panel-glass); 
+    border: 1px solid rgba(0, 240, 255, 0.15);
+    border-radius: 20px; padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 15px rgba(255,255,255,0.02);
+    position: relative; transition: all 0.3s ease;
+}
+.panel:hover { border-color: rgba(176, 38, 255, 0.4); box-shadow: 0 10px 40px rgba(176, 38, 255, 0.1); }
 
-        <div class="action-area">
-            <button class="generate-btn" id="generateBtn">🔮 SYNTHESIZE AUDIO RITUAL 🔮</button>
-        </div>
-    </div>
+.panel-header {
+    font-family: var(--font-title); color: var(--text-main); text-align: center;
+    padding-bottom: 12px; margin-bottom: 20px; font-size: 1.1rem; letter-spacing: 3px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.no-border { border: none; margin-bottom: 10px; }
+.text-left { text-align: left; }
 
-    <script src="script.js"></script>
-</body>
-</html>
+.btn-group { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;}
+
+/* 类似细胞的卵石按钮 */
+.cyber-btn {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text-muted); font-family: var(--font-organic);
+    padding: 8px 16px; border-radius: 20px; cursor: pointer;
+    transition: all 0.3s ease; font-weight: 600;
+}
+.cyber-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
+.cyber-btn.active {
+    background: linear-gradient(135deg, var(--bio-blue), var(--bio-purple));
+    border: none; color: white;
+    box-shadow: 0 0 15px var(--bio-blue), inset 0 0 10px rgba(255,255,255,0.3);
+}
+
+/* 画布容器：纯圆角，像一个显微镜视窗 */
+.visualizer-container {
+    background: rgba(0,0,0,0.4); border-radius: 15px;
+    height: 90px; width: 100%; position: relative; overflow: hidden;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+}
+canvas { width: 100%; height: 100%; display: block; mix-blend-mode: screen; }
+.helper-text { text-align:center; font-size:0.75rem; color: var(--bio-purple); margin-top:12px; font-style: italic;}
+
+/* 像发光经脉一样的滑块 */
+.slider-container { display: flex; align-items: center; margin-bottom: 15px; }
+.slider-label { width: 60px; font-size: 0.9rem; color: var(--text-muted); font-weight: 600;}
+input[type=range] { -webkit-appearance: none; flex-grow: 1; background: transparent; height: 20px; cursor: pointer;}
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%; height: 4px; border-radius: 2px; 
+    background: rgba(255,255,255,0.1);
+}
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+    background: var(--bio-green); margin-top: -6px;
+    box-shadow: 0 0 10px var(--bio-green), 0 0 20px rgba(57, 255, 20, 0.4);
+    transition: transform 0.1s;
+}
+input[type=range]::-webkit-slider-thumb:active { transform: scale(1.3); }
+
+.vertical-sliders { display: flex; justify-content: space-around; height: 120px; margin-bottom: 12px; }
+.v-slider-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.v-slider-wrap span { font-size: 0.8rem; color: var(--text-muted); }
+input[type=range][orient=vertical] { writing-mode: bt-lr; -webkit-appearance: slider-vertical; width: 16px; height: 100px; }
+
+.bottom-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; margin-bottom: 30px; }
+.flex-center { display: flex; flex-direction: column; justify-content: center; position: relative;}
+.tempo-container { margin: 10px 0; }
+.bpm-display { font-size: 3.5rem; font-family: var(--font-organic); font-weight: 300; color: white; text-align: center; text-shadow: 0 0 20px var(--bio-purple);}
+.bg-tempo-number { position: absolute; font-size: 10rem; font-family: var(--font-title); color: rgba(255,255,255,0.02); top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 0;}
+
+/* 输入框 */
+.input-group { margin-bottom: 15px; display: flex; align-items: center; background: rgba(0,0,0,0.2); border-radius: 30px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);}
+.input-group label { width: 100px; font-size: 0.8rem; color: var(--bio-blue); padding: 12px; text-align: center; font-weight: 600;}
+.cyber-input { flex-grow: 1; background: transparent; border: none; color: white; padding: 12px 15px; font-family: var(--font-organic); font-size: 1rem; width: 100%;}
+.cyber-input:focus { outline: none; background: rgba(176, 38, 255, 0.1); }
+
+.action-area { text-align: center; }
+.generate-btn {
+    background: linear-gradient(90deg, #1a0b2e, #3a0ca3, #1a0b2e);
+    border: 1px solid var(--bio-purple); color: white; font-family: var(--font-title);
+    font-size: clamp(1.2rem, 3vw, 1.5rem); letter-spacing: 4px; padding: 20px 60px; border-radius: 50px;
+    cursor: pointer; position: relative; overflow: hidden; transition: all 0.4s ease;
+    box-shadow: 0 0 30px rgba(176, 38, 255, 0.4); width: 100%; max-width: 700px;
+}
+.generate-btn:hover { 
+    background: linear-gradient(90deg, #3a0ca3, var(--bio-purple), #3a0ca3);
+    box-shadow: 0 0 50px var(--bio-purple), 0 0 20px var(--bio-blue); 
+    transform: translateY(-2px);
+}
