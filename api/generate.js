@@ -1,6 +1,9 @@
 import Replicate from "replicate";
 
-// 🔐 安全第一：让代码去读取 Vercel 的环境变量，而不是把密码写在明面上！
+// 🛡️ 突破 Vercel 免费版的 10 秒死线
+export const maxDuration = 60; 
+
+// 🔐 安全读取 Vercel 云端密码
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN, 
 });
@@ -13,19 +16,19 @@ export default async function handler(req, res) {
   try {
     const { prompt } = req.body;
     
-    // 🎛️ 核心修复逻辑：声音融合外挂 (防止鸟叫声太突兀)
+    // 🎛️ 终极融合外挂：强制 AI 把所有突兀的声音（如鸟叫）胶合进高质量的电子乐空间中
     const enhancedPrompt = `${prompt}, pristine audio quality, masterfully mixed, high fidelity, 320kbps, clear studio recording, integrated foley fX seamlessly blended, mastered sound glue`;
 
-    console.log("正在召唤顶级 DiT 算力，增强后的提示词：", enhancedPrompt);
+    console.log("正在召唤真正的 DiT 引擎 (Stable Audio 2.5)，提示词：", enhancedPrompt);
 
-    // 调用 Stability AI 的官方高端 DiT 模型
+    // 🚀 核心纠正：这里绝对是官方满血版的 stable-audio-2.5！
     const output = await replicate.run(
-      "stability-ai/stable-audio-open",
+      "stability-ai/stable-audio-2.5",
       {
         input: {
           prompt: enhancedPrompt, 
-          output_format: "wav",
-          duration: 15 // 生成 15 秒高清音乐
+          duration: 30, // 给你完整的 30 秒！
+          steps: 8 // 2.5 版本的官方限制，最完美的画质步数
         }
       }
     );
