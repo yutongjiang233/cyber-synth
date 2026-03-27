@@ -3,67 +3,322 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-html, body {
-    width: 100%;
-    height: 100vh; /* 视口高度，确保铺满整个屏幕 */
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; /* 默认无衬线字体 */
-}
-
-/* --- 核心：全屏背景设置 --- */
 body {
-    /* ⚠️ 核心修改点：直接引用根目录下的文件名 */
-    /* 因为图片直接在项目根目录下，直接使用 url('文件名') 即可，不需要文件夹前缀 */
-    background-image: url('mandala.jpg'); 
-    
-    background-size: cover;       /* 核心：保证图片等比例缩放并完全覆盖整个背景，不留黑边 */
-    background-position: center;  /* 核心：将曼陀罗中心居中对齐 */
-    background-repeat: no-repeat; /* 核心：不重复平铺图片 */
-    background-attachment: fixed; /* 可选：背景固定，获得视差效果，推荐保持 */
-
-    /* 使用 Flexbox 将 UI 元素在页面顶部水平居中 */
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden; /* 防止滚动 */
+    background-image: url('mandala.jpg'); /* 直接引用根目录的背景图 */
+    background-size: cover;
+    background-position: center;
+    background-color: #050510;
+    color: #fff;
     display: flex;
-    justify-content: center; /* 水平居中 */
-    align-items: flex-start; /* 垂直靠上 */
-    padding-top: 80px;       /* 距离顶部的距离，可根据需要调整 */
+    justify-content: center;
+    align-items: center;
 }
 
-/* --- 交互框/文字容器 --- */
-.ui-container {
+.app-container {
+    width: 95%;
+    max-width: 1400px;
+    height: 95vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+}
+
+/* --- 核心：毛玻璃/发光水晶面板 --- */
+.glass-panel {
+    background: rgba(20, 15, 45, 0.4); /* 深紫色半透明底色 */
+    backdrop-filter: blur(12px); /* 毛玻璃模糊效果 */
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(100, 200, 255, 0.2); /* 微微的青色高光边框 */
+    border-radius: 16px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 255, 255, 0.05);
+    padding: 20px;
+}
+
+/* --- 顶部描述框 --- */
+.top-header {
     text-align: center;
-    max-width: 900px; /* 限制文字的最大宽度 */
-    padding: 30px;
-    
-    /* 半透明深色遮罩，保证文字清晰 */
-    background-color: rgba(0, 0, 0, 0.4); 
-    backdrop-filter: blur(8px); /* 毛玻璃模糊效果 */
-    border-radius: 12px; /* 圆角 */
-    border: 1px solid rgba(255, 255, 255, 0.1); /* 微微的高光边框 */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* 阴影增加立体感 */
-}
-
-/* --- 标题发光效果 --- */
-.glow-title {
-    color: #00FFFF; /* 青色/天蓝色 */
-    font-size: 2.5rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
     margin-bottom: 20px;
-    
-    /* 模拟原图的霓虹灯发光效果 */
-    text-shadow: 
-        0 0 5px #00FFFF,
-        0 0 15px #00FFFF,
-        0 0 30px #00FFFF,
-        0 0 50px #0088FF;
+    padding: 25px;
 }
 
-/* --- 描述文字 --- */
-.description {
-    color: #FFFFFF; /* 纯白色 */
-    font-size: 1rem;
+.neon-title {
+    color: #00ffff;
+    font-size: 2.2rem;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px #00ffff, 0 0 20px #0088ff;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+.long-description {
+    font-size: 0.95rem;
     line-height: 1.6;
-    letter-spacing: 0.5px;
-    opacity: 0.85; /* 稍微降低一点透明度 */
+    color: rgba(255, 255, 255, 0.85);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* --- 中部网格布局 --- */
+.synth-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto auto;
+    gap: 20px;
+    flex-grow: 1;
+}
+
+.module h2 {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 20px;
+    text-align: center;
+    letter-spacing: 1px;
+    text-shadow: 0 0 8px rgba(255,255,255,0.3);
+}
+
+.span-2 {
+    grid-column: span 2;
+}
+
+/* --- 按钮样式 --- */
+.btn-group {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.btn-group button {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.6);
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn-group button.active.cyan-glow {
+    border-color: #00ffff;
+    color: #00ffff;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4), inset 0 0 10px rgba(0, 255, 255, 0.2);
+}
+
+/* --- 可视化占位框 (波形/频谱) --- */
+.visualizer-box {
+    height: 100px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+    position: relative;
+    overflow: hidden;
+}
+
+/* 用 CSS 渐变假装这里有波形/频谱 */
+.wave-vis { background: radial-gradient(circle at center, rgba(0,255,255,0.2) 0%, rgba(0,0,0,0.5) 70%); }
+.spec-vis { background: linear-gradient(0deg, rgba(255,0,255,0.2) 0%, transparent 100%); }
+
+/* --- 🌟 发光水晶旋钮 (纯 CSS 实现，替代齿轮) --- */
+.knob-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 100px;
+}
+
+.knob-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.knob-wrapper label {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+}
+
+.crystal-knob {
+    width: 55px;
+    height: 55px;
+    /* 核心：用 clip-path 裁出六边形水晶形状 */
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    position: relative;
+    cursor: pointer;
+    box-shadow: inset 0 0 15px rgba(255,255,255,0.8);
+}
+
+.cyan-purple { background: linear-gradient(135deg, #00ffff 0%, #aa00ff 100%); }
+.cyan-pink { background: linear-gradient(135deg, #00ffff 0%, #ff007f 100%); }
+
+/* 水晶旋钮上的指示点 */
+.indicator {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #fff;
+}
+
+/* --- 滑块样式 (发光光球手柄) --- */
+.slider-group {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 10px;
+}
+
+.slider-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.slider-row label {
+    width: 50px;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.7);
+}
+
+.glow-slider {
+    -webkit-appearance: none;
+    flex-grow: 1;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    outline: none;
+}
+
+/* 滑块手柄 - 迷幻光球 */
+.glow-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 20%, #ff00ff 80%);
+    box-shadow: 0 0 15px #ff00ff, 0 0 5px #fff;
+    cursor: pointer;
+}
+
+/* --- Ritual Config (BPM) --- */
+.ritual-config {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.bpm-display {
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: #ff00ff;
+    text-shadow: 0 0 15px #ff00ff, 0 0 30px #aa00ff;
+    margin-bottom: 20px;
+    font-family: 'Times New Roman', serif; /* 类似截图中的哥特/衬线字体风格 */
+}
+
+.bpm-text { font-size: 1.5rem; }
+
+.tempo-row { width: 80%; }
+.orb-slider::-webkit-slider-thumb {
+    width: 30px;
+    height: 30px;
+    background: radial-gradient(circle, #aa00ff 20%, #4400aa 80%);
+    border: 2px solid rgba(255,255,255,0.5);
+}
+
+/* --- Input --- */
+.spell-input {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.input-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.input-row label {
+    width: 100px;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.9rem;
+}
+
+.input-row input {
+    flex-grow: 1;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 12px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.3s;
+}
+
+.input-row input:focus {
+    border-color: #00ffff;
+    box-shadow: 0 0 10px rgba(0,255,255,0.3);
+}
+
+/* --- 底部合成按钮 --- */
+.bottom-action {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.synthesize-btn {
+    background: linear-gradient(90deg, rgba(170,0,255,0.3), rgba(0,255,255,0.3));
+    border: 1px solid #ff00ff;
+    padding: 15px 40px;
+    border-radius: 30px;
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(255,0,255,0.4);
+    backdrop-filter: blur(5px);
+    transition: 0.3s;
+}
+
+.synthesize-btn:hover {
+    box-shadow: 0 0 30px rgba(255,0,255,0.8), 0 0 20px #00ffff;
+    transform: scale(1.02);
+}
+
+/* --- 右侧悬浮图标条 --- */
+.side-bar {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    padding: 20px 15px;
+    font-size: 1.2rem;
+    color: rgba(255,255,255,0.5);
+}
+
+.side-bar i:hover {
+    color: #00ffff;
+    text-shadow: 0 0 10px #00ffff;
+    cursor: pointer;
 }
