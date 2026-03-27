@@ -264,4 +264,20 @@ select {
 }
 
 .harmonize-btn:hover {
-    background-color: rgba(255, 215,
+    background-color: rgba(255, 215, 0, 0.1);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); /* 鼠标悬停时的金色光晕 */
+}
+
+/* --- 定义动画关键帧 --- */
+
+/* 曼陀罗核心：呼吸/脉动效果 */
+@keyframes breathe {
+    0% {
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+        transform: scale(1); /* 原始大小 */
+    }
+    100% {
+        box-shadow: 0 0 60px rgba(0, 255, 255, 0.5); /* 更强烈的发光 */
+        transform: scale(1.03); /* 轻微放大，制造脉动感 */
+    }
+}
