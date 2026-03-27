@@ -3,8 +3,12 @@ let analysisManager; // 全局分析管理器
 
 // 初始化 AudioContext 的标准函数
 function initAudioContext() {
-    if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-    if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
 }
 
 // 振荡器测试音效函数（保持不变）
@@ -13,12 +17,12 @@ function playOscillatorTest(type) {
     const osc = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
     osc.type = type;
-    osc.frequency.setValueAtTime(110, audioCtx.currentTime); 
+    osc.frequency.setValueAtTime(110, audioCtx.currentTime);
     gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-    gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05); 
+    gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05);
     gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
     osc.connect(gainNode); gainNode.connect(audioCtx.destination);
-    osc.start(); osc.stop(audioCtx.currentTime + 1); 
+    osc.start(); osc.stop(audioCtx.currentTime + 1);
 }
 
 // 生成时的充能音效函数（保持不变）
@@ -115,7 +119,7 @@ class AudioAnalysisManager {
         // 默认背景和画布清除
         this.filterCtx.clearRect(0, 0, this.filterCanvas.width, this.filterCanvas.height);
         this.oscCtx.clearRect(0, 0, this.oscCanvas.width, this.oscCanvas.height);
-        this.ctx.fillStyle = 'rgba(5, 5, 5, 0.1)'; // 深色背景，幽灵般拖影
+        this.ctx.fillStyle = 'rgba(10, 11, 16, 0.15)'; // 深色背景，幽灵般拖影
         this.ctx.fillRect(0, 0, this.width, this.height);
 
         let rmsMultiplier = 1; // 响度系数，用于控制动画强度
@@ -176,10 +180,10 @@ class AudioAnalysisManager {
             else this.ctx.lineTo(i, y);
         }
         // 根据是否在播放，改变颜色
-        this.ctx.strokeStyle = this.analyser ? 'rgba(182, 32, 224, 0.5)' : 'rgba(139, 0, 0, 0.05)';
+        this.ctx.strokeStyle = this.analyser ? 'rgba(182, 32, 224, 0.5)' : 'rgba(0, 229, 255, 0.1)';
         this.ctx.lineWidth = 1;
         this.ctx.shadowBlur = 20;
-        this.ctx.shadowColor = this.analyser ? '#b620e0' : '#8b0000';
+        this.ctx.shadowColor = this.analyser ? '#b620e0' : '#00e5ff';
         this.ctx.stroke(); this.ctx.shadowBlur = 0;
 
         // --- 真正的动态波形图 (OSC Canvas)：根据时域数据绘制 ---
@@ -197,11 +201,6 @@ class AudioAnalysisManager {
             this.oscCtx.strokeStyle = '#b620e0'; this.oscCtx.lineWidth = 2; // 紫色波形
             this.oscCtx.shadowBlur = 10; this.oscCtx.shadowColor = '#b620e0';
             this.oscCtx.stroke(); this.oscCtx.shadowBlur = 0;
-        } else {
-            // 默认一条直线
-            this.oscCtx.beginPath();
-            this.oscCtx.moveTo(0, oscCanvas.height/2); this.oscCtx.lineTo(oscCanvas.width, oscCanvas.height/2);
-            this.oscCtx.strokeStyle = '#2e2e2e'; this.oscCtx.lineWidth = 1; this.oscCtx.stroke();
         }
 
         // --- 真正的动态 EQ 频谱图 (Filter Canvas)：根据频域数据绘制 ---
@@ -214,7 +213,7 @@ class AudioAnalysisManager {
                 this.eqData[i] += (target - this.eqData[i]) * 0.2; // 平滑过渡
                 
                 let gradient = this.filterCtx.createLinearGradient(0, this.filterCanvas.height, 0, 0);
-                gradient.addColorStop(0, '#8b0000'); gradient.addColorStop(1, '#cf6214'); // 血红到橘
+                gradient.addColorStop(0, '#00e5ff'); gradient.addColorStop(1, '#b620e0'); // 虹彩渐变
                 this.filterCtx.fillStyle = gradient;
                 this.filterCtx.fillRect(i * barWidth + 2, this.filterCanvas.height - this.eqData[i], barWidth - 4, this.eqData[i]);
             }
@@ -234,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     analysisManager.start(); // 默认开启背景粒子动画
 
-    // I. OSCILLATOR 按钮测试音效（已修复ID）
+    // 振荡器按钮点击事件（保持不变）
     const oscButtons = document.querySelectorAll('#osc-buttons .cyber-btn');
     oscButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -244,16 +243,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // IV. LFO 按钮（已修复ID，添加点亮逻辑）
-    const lfoButtons = document.querySelectorAll('#lfo-buttons .lfo-btn');
+    // LFO 按钮点击事件（保持不变）
+    const lfoButtons = document.querySelectorAll('.lfo-btn');
     lfoButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             lfoButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active'); // 添加 active class 点亮按钮
+            btn.classList.add('active');
         });
     });
 
-    // BPM 和 Tempo 滑块（已修复ID）
+    // BPM 和 Tempo 滑块（保持不变）
     const bpmRange = document.getElementById('bpmRange');
     const bpmText = document.getElementById('bpmText');
     const bgBpm = document.getElementById('bgBpm');
@@ -265,13 +264,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 核心逻辑：点击生成按钮 ---
     const generateBtn = document.getElementById('generateBtn');
     generateBtn.addEventListener('click', async () => {
-        playSynthesisRiser(); // 播放本地充能音效测试
+        playSynthesisRiser(); // 播放充能音效测试
         
         // --- 视觉效果大升级：视觉同步引擎上线 ---
         generateBtn.innerText = "⚡ CONTACTING REPLICATE NEURAL DSP... ⚡";
-        generateBtn.style.background = "linear-gradient(180deg, #101010, #cf6214)";
+        generateBtn.style.background = "linear-gradient(90deg, #005f73, #0a9396, #005f73)";
         generateBtn.style.pointerEvents = "none";
-        generateBtn.style.boxShadow = "0 0 25px rgba(207, 98, 20, 0.5)";
+        generateBtn.style.boxShadow = "0 0 25px rgba(0, 229, 255, 0.5)";
         
         // --- 获取前端输入的咒语 (Prompt) ---
         // 我们需要把几个输入框的内容整合，并且加上音质增强关键词
@@ -299,31 +298,31 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.audioUrl) {
                 // 生成成功后的视觉
                 generateBtn.innerText = "🎵 RITUAL COMPLETE. CONNECTING ENGINE... 🎵";
-                generateBtn.style.background = "linear-gradient(180deg, var(--distressed-orange), var(--blood-red))";
+                generateBtn.style.background = "linear-gradient(90deg, #b620e0, #00e5ff)";
 
-                // 创建一个 HTML5 Audio 元素，重要：开启跨域分析
+                // 创建一个 HTML5 Audio 元素，重要：开启跨域分析，否则 CORS 报错
                 const ritualAudio = new Audio(data.audioUrl);
                 ritualAudio.crossOrigin = "anonymous"; 
                 
                 // --- 魔法降临：将音频连接到赛博分析引擎 ---
                 analysisManager.setupAnalyser(ritualAudio);
 
-                // 播放完毕后的清理逻辑
+                // 音频播放完毕后的清理逻辑
                 ritualAudio.onended = () => {
                     analysisManager.analyser = null; // 关闭分析器连接
                     generateBtn.innerText = "🔮 SYNTHESIZE AUDIO RITUAL 🔮";
                     generateBtn.style.background = ""; 
                     generateBtn.style.pointerEvents = "auto";
-                    generateBtn.style.boxShadow = "0 0 25px rgba(139, 0, 0, 0.5)";
+                    generateBtn.style.boxShadow = "0 0 25px rgba(182, 32, 224, 0.5)";
                 };
                 
-                // --- 终极时刻：开始播放，真正的同步动画弹出来！ ---
+                // --- 终极时刻：开始播放，真正的同步动画将瞬间弹出来！ ---
                 ritualAudio.play();
 
             } else { throw new Error("No audio returned"); }
 
         } catch (error) {
-            console.error(error);
+            console.error("生成出错:", error);
             generateBtn.innerText = "❌ SYNTHESIS FAILED ❌";
             setTimeout(() => {
                 generateBtn.innerText = "🔮 SYNTHESIZE AUDIO RITUAL 🔮";
