@@ -15,20 +15,21 @@ export default async function handler(req, res) {
   try {
     const { prompt } = req.body;
     
-    // 🎛️ 核心魔法：母带级音质增强外挂
-    // 强制要求 AI 做到：轨道分离、乐器清晰、无浑浊感、宽广立体声
-    const enhancedPrompt = `${prompt}, multi-track, distinct individual instruments, crisp and clear separation, professional 3D studio mix, wide stereo imaging, extreme high fidelity, lossless FLAC quality, mastered, perfectly balanced EQ, zero muddiness, punchy transients`;
+    // 🛡️ 终极“傻瓜式”融合外挂：将用户的输入包裹在强制性的系统指令中
+    const enhancedPrompt = `A cohesive, professionally mastered musical composition. 
+    User's requested vibe and elements: [ ${prompt} ]. 
+    STRICT INSTRUCTION: Any mention of real-world sounds, animals, nature, or foley (e.g., birds, water, noise) MUST be heavily processed, synthesized, pitched, and washed in reverb to act as ambient musical instruments. DO NOT generate raw, dry, or realistic sound effects. Everything must be a seamless organic fusion, glued together, harmonically rich, with a wide stereo soundscape and extreme high fidelity.`;
 
-    console.log("正在召唤顶级 DiT 算力，增强后的咒语：", enhancedPrompt);
+    console.log("拦截用户输入，转换后的神级咒语：", enhancedPrompt);
 
     // 调用官方 2.5 版本大模型
     const output = await replicate.run(
       "stability-ai/stable-audio-2.5", 
       {
         input: {
-          prompt: enhancedPrompt, // 注入我们强化过的神级提示词
-          duration: 30, // 30秒完整时长
-          steps: 8 // 官方最佳步数
+          prompt: enhancedPrompt, 
+          duration: 30, 
+          steps: 8 
         }
       }
     );
