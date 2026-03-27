@@ -27,10 +27,10 @@
                     <button class="cyber-btn" data-wave="square">SQU</button>
                     <button class="cyber-btn" data-wave="triangle">TRI</button>
                 </div>
-                <div class="waveform-display">
-                    <div class="magic-wave"></div>
+                <div class="visualizer-container">
+                    <canvas id="oscCanvas"></canvas>
                 </div>
-                <p style="text-align:center; font-size:0.75rem; color:var(--text-muted); margin-top:8px;">*Click buttons for Audio Test</p>
+                <p class="helper-text">*Click buttons for Audio Test</p>
             </div>
 
             <div class="panel">
@@ -38,55 +38,58 @@
                 <div class="panel-header">II. FILTER</div>
                 <div class="vertical-sliders">
                     <div class="v-slider-wrap">
-                        <input type="range" orient="vertical" class="ai-slider" value="70">
-                        <span style="font-size: 0.8rem;">Cutoff</span>
+                        <input type="range" orient="vertical" class="ai-slider dyn-slider" value="70">
+                        <span>Cutoff</span>
                     </div>
                     <div class="v-slider-wrap">
-                        <input type="range" orient="vertical" class="ai-slider" value="30">
-                        <span style="font-size: 0.8rem;">Resonance</span>
+                        <input type="range" orient="vertical" class="ai-slider dyn-slider" value="30">
+                        <span>Resonance</span>
                     </div>
                 </div>
-                <div style="height:40px; border:1px solid #333; background:rgba(0,0,0,0.5); border-radius:4px;"></div>
+                <div class="visualizer-container" style="height: 50px; margin-top:10px;">
+                    <canvas id="eqCanvas"></canvas>
+                </div>
             </div>
 
             <div class="panel">
                 <div class="panel-subheader">ENVELOPE (AMP SHAPER)</div>
                 <div class="panel-header">III. ENVELOPE</div>
-                <div class="slider-container"><span class="slider-label">Attack</span><input type="range" class="ai-slider" value="10"></div>
-                <div class="slider-container"><span class="slider-label">Decay</span><input type="range" class="ai-slider" value="40"></div>
-                <div class="slider-container"><span class="slider-label">Sustain</span><input type="range" class="ai-slider" value="60"></div>
-                <div class="slider-container"><span class="slider-label">Release</span><input type="range" class="ai-slider" value="20"></div>
+                <div class="slider-container"><span class="slider-label">Attack</span><input type="range" class="ai-slider dyn-slider" value="10"></div>
+                <div class="slider-container"><span class="slider-label">Decay</span><input type="range" class="ai-slider dyn-slider" value="40"></div>
+                <div class="slider-container"><span class="slider-label">Sustain</span><input type="range" class="ai-slider dyn-slider" value="60"></div>
+                <div class="slider-container"><span class="slider-label">Release</span><input type="range" class="ai-slider dyn-slider" value="20"></div>
             </div>
 
             <div class="panel">
                 <div class="panel-subheader">MODULATION (LFO)</div>
                 <div class="panel-header">IV. LFO</div>
-                <div class="btn-group">
-                    <button class="cyber-btn">Pitch</button>
-                    <button class="cyber-btn active">Filter</button>
-                    <button class="cyber-btn">Amp</button>
+                <div class="btn-group" id="lfo-buttons">
+                    <button class="cyber-btn lfo-btn">Pitch</button>
+                    <button class="cyber-btn lfo-btn active">Filter</button>
+                    <button class="cyber-btn lfo-btn">Amp</button>
                 </div>
-                <div class="slider-container"><span class="slider-label">Rate</span><input type="range" class="ai-slider" value="55"></div>
-                <div class="slider-container" style="margin-top:20px;"><span class="slider-label">Depth</span><input type="range" class="ai-slider" value="35"></div>
+                <div class="slider-container"><span class="slider-label">Rate</span><input type="range" class="ai-slider dyn-slider" value="55"></div>
+                <div class="slider-container" style="margin-top:20px;"><span class="slider-label">Depth</span><input type="range" class="ai-slider dyn-slider" value="35"></div>
             </div>
         </div>
 
         <div class="bottom-grid">
-            <div class="panel" style="display:flex; flex-direction:column; justify-content:center;">
-                <div class="panel-header" style="border:none; margin-bottom:5px;">RITUAL CONFIGURATION</div>
-                <div class="slider-container">
-                    <span style="margin-right:10px;">Tempo</span>
+            <div class="panel flex-center">
+                <div class="bg-tempo-number" id="bgBpm">120</div>
+                <div class="panel-header no-border">RITUAL CONFIGURATION</div>
+                <div class="slider-container tempo-container">
+                    <span>Tempo</span>
                     <input type="range" id="bpmRange" min="70" max="150" value="120">
                 </div>
                 <div class="bpm-display" id="bpmText">120 BPM</div>
             </div>
 
             <div class="panel">
-                <div class="panel-header" style="border:none; margin-bottom:10px; text-align:left;">SONIC RITUAL SPELL - INPUT</div>
+                <div class="panel-header no-border text-left">SONIC RITUAL SPELL - INPUT</div>
                 <div class="input-group"><label>[GENRE]</label><input type="text" class="cyber-input" placeholder="e.g. Psytrance / Space Rock"></div>
                 <div class="input-group"><label>[SOUNDS/TEXTURE]</label><input type="text" class="cyber-input" placeholder="e.g. Liquid Acid Lines, Interstellar Hum"></div>
-                <div class="input-group"><label>[STRUCTURE/EVOLUTION]</label><input type="text" class="cyber-input" placeholder="e.g. Ambient Swell -> Driving Bass Drop -> Fade"></div>
-                <div class="example-text">EXAMPLE: [GENRE: Psytrance] [SOUNDS: Liquid Acid Lines, Pulsating Sub Bass] [STRUCTURE: Ambient Swell -> Driving Bass Drop -> Climactic Build]</div>
+                <div class="input-group"><label>[STRUCTURE]</label><input type="text" class="cyber-input" placeholder="e.g. Ambient Swell -> Driving Bass Drop"></div>
+                <div class="example-text">EXAMPLE: [GENRE: Psytrance] [SOUNDS: Liquid Acid Lines, Pulsating Sub Bass] [STRUCTURE: Ambient Swell -> Driving Bass Drop]</div>
             </div>
         </div>
 
@@ -97,5 +100,4 @@
 
     <script src="script.js"></script>
 </body>
-</html> 
-
+</html>
