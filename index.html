@@ -565,15 +565,24 @@
                     
                     const enhanceData = await enhanceResponse.json();
                     const finalPrompt = enhanceData.optimizedPrompt || fullPrompt;
+                    
+                    // 🔴🔴🔴 完美植入：在这里接住后端传回来的消杀词！
+                    const finalNegative = enhanceData.negativePrompt || ""; 
+                    
                     console.log(`[BPM: ${currentTempo}] 魔法词已组装完毕:`, finalPrompt); 
+                    console.log(`[消杀层已激活]:`, finalNegative); 
 
-                    // 【第二步】：将终极咒语发给 Stable Audio
+                    // 【第二步】：将终极咒语和消杀词发给 Stable Audio
                     genBtn.textContent = "COMMUNICATING WITH DiT CORE...";
                     
                     const response = await fetch('/api/generate', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ prompt: finalPrompt })
+                        // 🔴🔴🔴 完美植入：把消杀词打包进 body，发给你的 /api/generate
+                        body: JSON.stringify({ 
+                            prompt: finalPrompt,
+                            negative_prompt: finalNegative 
+                        })
                     });
 
                     let prediction = await response.json();
