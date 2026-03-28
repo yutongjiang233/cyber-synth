@@ -541,31 +541,95 @@
                 requestAnimationFrame(animateSliders);
             }
 
-            // --- 5. 绑定生成按钮 ---
-            genBtn.addEventListener('click', () => {
-                isSynthesizing = !isSynthesizing; 
+            // --- 5. 🔴 真·云端联网版：接入 Vercel + Replicate API ---
+            // 获取输入框的内容
+            const genreInput = document.querySelectorAll('.glow-input')[0];
+            const soundsInput = document.querySelectorAll('.glow-input')[1];
+            const structureInput = document.querySelectorAll('.glow-input')[2];
+
+            let pollInterval; 
+            let currentAudio = null; 
+
+            genBtn.addEventListener('click', async () => {
+                // 如果正在合成中，防止重复点击
+                if (isSynthesizing) return; 
                 
-                if (isSynthesizing) {
-                    genBtn.textContent = "STOP RITUAL";
-                    genBtn.classList.add('processing');
-                    mainTitle.classList.add('synthesizing');
-                    mainGrid.classList.add('synthesizing');
+                // 启动 UI 暴走状态
+                isSynthesizing = true;
+                genBtn.textContent = "COMMUNICATING WITH DiT CORE...";
+                genBtn.classList.add('processing');
+                mainTitle.classList.add('synthesizing');
+                mainGrid.classList.add('synthesizing');
+                document.querySelectorAll('.auto-panel').forEach(p => p.classList.add('active-module'));
+                
+                animateSliders(); 
+
+                // 如果之前有播放音乐，先暂停
+                if(currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                }
+
+                // 拼接给大模型的 Prompt
+                const fullPrompt = `${genreInput.value}, ${soundsInput.value}, ${structureInput.value}`;
+                
+                try {
+                    // 1. 发送第一波请求，获取生成任务小票
+                    const response = await fetch('/api/generate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ prompt: fullPrompt })
+                    });
+
+                    let prediction = await response.json();
                     
-                    document.querySelectorAll('.auto-panel').forEach(p => p.classList.add('active-module'));
-                    
-                    animateSliders(); 
-                } else {
-                    genBtn.textContent = "SYNTHESIZE AUDIO RITUAL";
-                    genBtn.classList.remove('processing');
-                    mainTitle.classList.remove('synthesizing');
-                    mainGrid.classList.remove('synthesizing');
-                    
-                    document.querySelectorAll('.auto-panel').forEach(p => p.classList.remove('active-module'));
-                    oscButtons.forEach(b => b.classList.remove('auto-active'));
-                    
-                    autoSliders.forEach(slider => slider.targetValue = parseFloat(slider.value));
+                    if (response.status !== 201) throw new Error(prediction.detail || "API Error");
+
+                    // 2. 开始轮询，每 3 秒去 Vercel 查询进度
+                    pollInterval = setInterval(async () => {
+                        const statusResponse = await fetch(`/api/status?id=${prediction.id}`);
+                        let statusData = await statusResponse.json();
+
+                        // 在按钮上实时显示当前模型状态 (Starting, Processing...)
+                        genBtn.textContent = `SYNTHESIZING... [${statusData.status.toUpperCase()}]`;
+
+                        if (statusData.status === "succeeded") {
+                            clearInterval(pollInterval);
+                            
+                            // 拿到生成的音频 URL (处理单个字符串或数组格式)
+                            const audioUrl = Array.isArray(statusData.output) ? statusData.output[0] : statusData.output; 
+                            currentAudio = new Audio(audioUrl);
+                            currentAudio.play();
+
+                            resetUI("RITUAL COMPLETE - PLAYING...");
+                            
+                            // 音乐放完后恢复按钮
+                            currentAudio.onended = () => { genBtn.textContent = "SYNTHESIZE AUDIO RITUAL"; };
+
+                        } else if (statusData.status === "failed" || statusData.status === "canceled") {
+                            clearInterval(pollInterval);
+                            resetUI("RITUAL FAILED - TRY AGAIN");
+                        }
+                    }, 3000);
+
+                } catch (error) {
+                    console.error("Error:", error);
+                    resetUI("SYSTEM ERROR - OFFLINE");
                 }
             });
+
+            // 辅助函数：恢复界面安静状态
+            function resetUI(buttonText) {
+                isSynthesizing = false;
+                genBtn.textContent = buttonText;
+                genBtn.classList.remove('processing');
+                mainTitle.classList.remove('synthesizing');
+                mainGrid.classList.remove('synthesizing');
+                document.querySelectorAll('.auto-panel').forEach(p => p.classList.remove('active-module'));
+                oscButtons.forEach(b => b.classList.remove('auto-active'));
+                autoSliders.forEach(slider => slider.targetValue = parseFloat(slider.value));
+                setTimeout(() => { if(!currentAudio || currentAudio.paused) genBtn.textContent = "SYNTHESIZE AUDIO RITUAL"; }, 3000);
+            }
 
         });
     </script>
