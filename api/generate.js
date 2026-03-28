@@ -13,8 +13,8 @@ export default async function handler(req, res) {
             model: "stability-ai/stable-audio-2.5", // 👈 精确指向最新的 2.5 版本
             input: {
                 prompt: req.body.prompt,
-                duration: 180, // 👈 物理极限拉满：180 秒（3分钟完整曲目）
-                steps: 8       // 👈 画质参数拉满：官方允许的最高 8 步
+                duration: 90, 
+                steps: 8       
             }
         });
 
