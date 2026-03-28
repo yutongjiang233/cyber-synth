@@ -6,7 +6,7 @@
     <title>AI Music Generator - Advanced Ritual UI</title>
     <style>
         /* ===========================================
-           CSS 变量定义 (全局色彩与动画曲线) - 在源代码基础上修改
+           1. CSS 全局变量 (色彩、玻璃质感与动画)
            =========================================== */
         :root {
             --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -14,34 +14,38 @@
             
             --neon-cyan: #00ffff;
             --neon-purple: #ff00ff;
-            /* 🔴 修改点 1：把纯色背景换成极低透明度的微光渐变，去掉厚重感 */
+            
+            /* 🔴 高透玻璃质感核心变量 */
             --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 100%); 
             --glass-border: rgba(0, 255, 255, 0.25);
             --text-main: rgba(255, 255, 255, 0.9);
             --text-muted: rgba(255, 255, 255, 0.5);
             
-            /* 🔴 新增点 1: Envelope 模块专用颜色变量 */
-            --adsr-track-bg: linear-gradient(to right, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.8));
-            --adsr-track-glow: rgba(77, 240, 255, 0.3);
-            --adsr-thumb-glow: rgba(77, 240, 255, 0.8);
+            /* Envelope 轨道专有颜色 */
+            --track-dark: rgba(15, 20, 35, 0.6);
         }
 
         /* ===========================================
-           基础与排版 - 原封不动
+           2. 基础布局与排版
            =========================================== */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
 
         body {
             width: 100vw; height: 100vh; overflow: hidden;
+            /* 🔴 请确保 mandala.jpg 存在，或者替换为你真实的星空背景路径 */
             background-image: url('mandala.jpg');
             background-size: cover; background-position: center;
             color: var(--text-main);
             display: flex; justify-content: center; align-items: center;
         }
 
-        .app-container { width: 95%; max-width: 1300px; height: 95vh; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        .app-container { 
+            width: 95%; max-width: 1300px; height: 95vh; 
+            display: flex; flex-direction: column; justify-content: space-between; 
+            position: relative; 
+        }
 
-        /* 标题区 - 原封不动 */
+        /* 标题区 */
         .top-panel { text-align: center; margin-bottom: 20px; }
         .hologram-title {
             font-size: 2.2rem; letter-spacing: 4px; font-weight: 600;
@@ -50,458 +54,23 @@
         }
         .hologram-subtitle { font-size: 0.9rem; color: var(--text-muted); letter-spacing: 1px; font-weight: 300;}
 
-        /* ===========================================
-           网格布局 - 🔴 重新细化，使布局更贴合原界面
-           =========================================== */
+        /* 网格布局 */
         .synth-grid { 
             display: grid; 
-            /* 🔴 修改点 2: 重新定义网格列宽，使 Oscillator 和 LFO 小，Filter 和 Envelope 大 */
-            grid-template-columns: 1fr 1fr 2fr 1fr; /* Osc (1), Filter (1), Envelope (2), LFO (1) - Envelope spans more space */
-            gap: 20px; 
-            flex-grow: 1; 
+            /* 调整列宽：让 Envelope 面板稍微宽一点，因为它包含横向滑块 */
+            grid-template-columns: 1fr 1fr 1.5fr 1fr; 
+            gap: 20px; flex-grow: 1; 
         }
         .span-2 { grid-column: span 2; }
 
         /* ===========================================
-           高透玻璃面板核心逻辑 - 在源代码基础上修改透明度
+           3. 高透玻璃面板 (.glass-panel)
            =========================================== */
         .glass-panel {
             background: var(--glass-bg);
-            /* 🔴 修改点 3：将模糊度从 8px 降到 4px，透出背景漩涡细节 */
+            /* 🔴 核心：降低模糊度，透出背景 */
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
             
             border: 1px solid var(--glass-border);
-            /* 🔴 修改点 4：增加顶部和左侧的白色细高光，模拟玻璃切边的物理质感 */
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            border-left: 1px solid rgba(255, 255, 255, 0.2);
-            
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 
-                inset 0 0 20px rgba(0, 255, 255, 0.05),
-                0 8px 32px rgba(0, 0, 0, 0.3);
-            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.4s var(--ease-out-expo);
-            
-            /* 🔴 修改点 5: 确保内部元素排列整齐 */
-            display: flex;
-            flex-direction: column;
-        }
-        .glass-panel:hover {
-            border-color: rgba(0, 255, 255, 0.5);
-            box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.1), 0 8px 32px rgba(0, 0, 0, 0.4);
-        }
-        .module h2 { font-size: 0.9rem; color: var(--neon-cyan); margin-bottom: 15px; font-weight: 500; letter-spacing: 2px; text-shadow: 0 0 5px rgba(0, 255, 255, 0.4); }
-
-        /* ===========================================
-           专业 PNG 资产波形按钮 (指定到 images 文件夹) - 原封不动
-           =========================================== */
-        .waveform-group { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 15px; }
-        .waveform-group.small { justify-content: flex-start; gap: 8px; }
-        .waveform-group.small .wave-btn { flex: none; width: 40px; }
-
-        .wave-btn {
-            flex: 1; 
-            aspect-ratio: 1; /* 保持完美正方形 */
-            background-color: transparent; border: none; box-shadow: none; padding: 0;
-            background-size: contain; background-repeat: no-repeat; background-position: center;
-            cursor: pointer; transition: transform 0.2s ease, filter 0.3s ease;
-        }
-
-        .wave-btn:hover {
-            transform: scale(1.05);
-            filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.6)); 
-        }
-        .wave-btn.active {
-            filter: drop-shadow(0 0 15px rgba(0, 255, 255, 1)); 
-        }
-
-        /* 核心：精确指向 images 文件夹里的资产 */
-        .osc-sin { background-image: url('images/osc-sin.png'); }
-        .osc-tri { background-image: url('images/osc-tri.png'); }
-        .osc-squ { background-image: url('images/osc-squ.png'); }
-        .osc-saw { background-image: url('images/osc-saw.png'); }
-
-        /* ===========================================
-           霓虹滑块推杆 & 输入框 - 用于其他模块，原封不动
-           =========================================== */
-        .control-row-clean, .fader-group { display: flex; flex-direction: column; gap: 15px; }
-        .fader-group { flex-direction: row; justify-content: space-around; height: 120px; align-items: flex-end; }
-        .slider-item, .fader-item { display: flex; align-items: center; gap: 12px; }
-        .fader-item { flex-direction: column; }
-        .slider-item label, .fader-item label { width: 60px; font-size: 0.8rem; color: var(--text-muted); font-weight: 500;}
-
-        input[type="range"].neon-slider {
-            -webkit-appearance: none; flex-grow: 1; height: 4px;
-            background: rgba(255, 255, 255, 0.1); border-radius: 2px; outline: none; cursor: pointer;
-        }
-        input[type="range"].neon-slider.vertical { transform: rotate(-90deg); width: 80px; margin-bottom: 40px; }
-        input[type="range"].neon-slider::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
-            background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); transition: transform 0.1s;
-        }
-        input[type="range"].neon-slider::-webkit-slider-thumb:hover { transform: scale(1.3); }
-
-        /* ===========================================
-           🔴 新增点 2: Envelope 模块 - 核心自定义组件 HTML 结构对应的 CSS
-           =========================================== */
-        
-        /* Envelope 模块特定容器 */
-        #envelope-container {
-            grid-column: span 2; /* 🔴 修改点 6: 在网格中跨越 2 列，使其变大 */
-            justify-content: flex-start; /* 标题和内容不被拉开 */
-        }
-
-        /* 自定义滑块组容器 */
-        .adsr-slider-group {
-            display: flex;
-            flex-direction: column;
-            gap: 15px; /* 滑块项之间的垂直间距 */
-            margin-top: 15px;
-        }
-
-        /* 单个自定义滑块项 (轨道 + 把手 + 标签) */
-        .adsr-slider-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* 🔴 修改点 7: 居中排列下方标签和轨道 */
-            position: relative;
-        }
-
-        /* 自定义滑块轨道 (替代浏览器自带的标准滑块样式) */
-        .custom-adsr-slider-track {
-            width: 100%;
-            height: 6px; /* 轨道的厚度 */
-            background: var(--adsr-track-bg);
-            border-radius: 3px;
-            box-shadow: 0 0 5px var(--adsr-track-glow);
-            margin-bottom: 5px; /* 为下方标签预留空间 */
-            position: relative; /* 🔴 修改点 8: 作为自定义滑块把手的定位基准 */
-            cursor: pointer;
-        }
-
-        /* 🔴 修改点 9: 这是一个极其 brittle 且难以完善的 CSS-only teardrop 尝试。
-           为了展示逻辑，我使用了多个伪元素和复杂旋转来实现一个 stylized 的 teardrop 形状并水平对齐。
-           为了 true fidelity 到 image_17.png 的垂直 teardrop 形状，强烈建议使用 PNG 资产资产，并在 CSS 中设置。
-           我将在下面展示如何设置 PNG 资产。 */
-
-        /* 自定义滑块把手容器 */
-        .slider-thumb-container {
-            width: 30px; /* 调整尺寸 */
-            height: 40px; /* 调整尺寸 */
-            cursor: pointer;
-            position: absolute;
-            top: -15px; /* 🔴 修改点 10: 使把手水平居中对齐轨道 */
-            transform: rotate(-135deg); /* 🔴 修改点 11: 这是一个尝试对齐 tear-drop 形状的旋转 */
-            background: linear-gradient(to bottom, #77d4da 0%, #a2eaef 50%, #77d4da 100%);
-            border-radius: 50% 50% 0 50%; /* Tear-drop like pointing downwards-left */
-            box-shadow: 0 0 10px var(--adsr-thumb-glow);
-            transition: left 0.1s linear; /* 平滑拖拽效果 */
-        }
-
-        /* 🔴 更好的方案: 使用资产作为滑块把手资产。取消注释下面的代码，替换 src 资产。 */
-        /* .slider-thumb-container {
-            width: 30px; 
-            height: 40px;
-            cursor: pointer;
-            position: absolute;
-            top: -15px; 
-            background-image: url('images/envelope_teardrop_thumb.png'); /* 指向你抠出的把手资产图资产 */
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            /* 取消之前的复杂 CSS 形状和渐变设置 */
-            /* border-radius: ... ; background: ... ; box-shadow: ... ; */
-        } */
-
-        /* 滑块把手内部发光池 (伪元素) */
-        .slider-thumb-container::before {
-            content: '';
-            position: absolute;
-            top: 10px; /* 🔴 修改点 12: 内部调整位置 */
-            left: 5px; /* 🔴 修改点 13: 内部调整位置 */
-            width: 15px; /* 内部尺寸 */
-            height: 20px; /* 内部尺寸 */
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(77, 240, 255, 0.2) 100%);
-            border-radius: 50%;
-            filter: blur(2px);
-            transform: scale(0.8);
-        }
-
-        /* 滑块标签 (文字) */
-        .slider-label {
-            font-size: 0.8rem;
-            color: var(--text-main);
-            letter-spacing: 1px;
-            margin-top: 5px; /* 与轨道的垂直距离 */
-        }
-
-        /* ===========================================
-           原滑块样式 & 输入框 - 保留用于 Filter 等其他模块，原封不动
-           =========================================== */
-        /* ... 保留源代码中所有 input[type="range"] 的样式 ... */
-
-        /* 输入框 - 保留原封不动 */
-        .input-form { display: flex; flex-direction: column; gap: 12px; }
-        .input-row { display: flex; align-items: center; gap: 15px; }
-        .input-row label { width: 90px; font-size: 0.8rem; color: var(--text-muted); letter-spacing: 1px;}
-        .glow-input {
-            flex-grow: 1; padding: 10px 15px;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-bottom: 2px solid rgba(0, 255, 255, 0.3);
-            color: #fff; font-size: 0.9rem; border-radius: 6px; outline: none; transition: 0.3s;
-        }
-        .glow-input:focus { border-bottom-color: var(--neon-cyan); background: rgba(0, 255, 255, 0.05); }
-
-        /* 配置区 - 保留原封不动 */
-        .config-flex { display: flex; align-items: center; justify-content: space-around; height: 100%; gap: 20px;}
-        .bpm-display { font-size: 3rem; font-weight: 700; color: #fff; text-shadow: 0 0 15px var(--neon-purple); display: flex; align-items: baseline; gap: 5px; }
-        .bpm-text { font-size: 1rem; color: var(--text-muted); font-weight: normal; text-shadow: none; }
-        .tempo-slider-wrapper { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
-        .tempo-slider-wrapper label { font-size: 0.8rem; color: var(--text-muted); }
-
-        /* ===========================================
-           纯 CSS 动态数据流可视化 - 原封不动
-           =========================================== */
-        .visualizer-box {
-            height: 70px; border-radius: 6px; margin-top: 15px; position: relative; overflow: hidden;
-            background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .wave-vis::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 200%; height: 100%;
-            background: linear-gradient(90deg, transparent 0%, rgba(0, 255, 255, 0.4) 50%, transparent 100%);
-            animation: flow-wave 2.5s infinite linear; filter: blur(5px);
-        }
-        .wave-vis::after {
-            content: ''; position: absolute; top: 30%; left: 0; width: 200%; height: 2px;
-            background: linear-gradient(90deg, transparent, #fff, transparent);
-            animation: flow-wave 2s infinite linear reverse; box-shadow: 0 0 10px var(--neon-cyan);
-        }
-        @keyframes flow-wave { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
-
-        .spec-vis { display: flex; align-items: flex-end; justify-content: space-around; padding: 10px 5px; }
-        .spec-vis::before {
-            content: ''; position: absolute; width: 100%; height: 100%; top: 0; left: 0;
-            background: repeating-linear-gradient(90deg, transparent, transparent 4px, rgba(0,255,255,0.2) 4px, rgba(0,255,255,0.2) 8px);
-            mask-image: linear-gradient(to top, black 0%, transparent 80%);
-            -webkit-mask-image: linear-gradient(to top, black 0%, transparent 80%);
-        }
-
-        /* ===========================================
-           底部按钮 & 隐形开关 - 原封不动
-           =========================================== */
-        .bottom-action { display: flex; justify-content: center; margin-top: 10px; }
-        .synthesize-btn {
-            padding: 15px 40px; background: transparent; border: 1px solid var(--neon-purple);
-            border-radius: 30px; color: #fff; font-size: 1.1rem; font-weight: 600; letter-spacing: 2px;
-            cursor: pointer; transition: 0.3s; animation: pulse-glow 2s infinite alternate;
-        }
-        .synthesize-btn:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--neon-purple); background: rgba(255, 0, 255, 0.1); }
-        @keyframes pulse-glow { 0% { box-shadow: 0 0 5px rgba(255, 0, 255, 0.3); } 100% { box-shadow: 0 0 20px rgba(255, 0, 255, 0.8), inset 0 0 10px rgba(255, 0, 255, 0.4); border-color: #ffaaff; } }
-
-        .edit-hotzone { position: fixed; top: 0; left: 0; width: 100px; height: 100px; z-index: 1000; }
-        .edit-toggle {
-            position: fixed; top: 20px; left: 20px; z-index: 1001;
-            padding: 8px 16px; border-radius: 6px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.5); color: #fff; font-size: 0.8rem;
-            opacity: 0; pointer-events: none; transition: 0.3s; cursor: pointer; backdrop-filter: blur(4px);
-        }
-        .edit-toggle.show, .edit-toggle.active { opacity: 1; pointer-events: auto; }
-        .edit-toggle.active { border-color: #ff0055; color: #ff0055; box-shadow: 0 0 10px rgba(255,0,85,0.4); }
-
-        /* ===========================================
-           入场瀑布流动效 - 原封不动
-           =========================================== */
-        .reveal { opacity: 0; transform: translateY(40px); transition: opacity var(--duration-normal) var(--ease-out-expo), transform var(--duration-normal) var(--ease-out-expo); }
-        body.loaded .reveal { opacity: 1; transform: translateY(0); }
-        .delay-1 { transition-delay: 0.1s; } .delay-2 { transition-delay: 0.2s; }
-        .delay-3 { transition-delay: 0.3s; } .delay-4 { transition-delay: 0.4s; }
-        .delay-5 { transition-delay: 0.5s; } .delay-6 { transition-delay: 0.6s; }
-        .delay-7 { transition-delay: 0.7s; }
-    </style>
-</head>
-<body class="loaded"> <div class="edit-hotzone"></div>
-    <div class="edit-toggle active">EDIT RITUAL</div>
-
-    <div class="app-container reveal">
-        
-        <div class="top-panel">
-            <h1 class="hologram-title">AI MUSIC GENERATOR</h1>
-            <p class="hologram-subtitle">Powered by DiT Model | Sonic Ritual Spell Configuration</p>
-        </div>
-
-        <div class="synth-grid">
-            
-            <div id="oscillator-container" class="glass-panel module reveal delay-1">
-                <h2>I. OSCILLATOR</h2>
-                <div class="control-row-clean">
-                    <div class="waveform-group">
-                        <button class="wave-btn osc-sin active" title="Sine"></button>
-                        <button class="wave-btn osc-tri" title="Triangle"></button>
-                        <button class="wave-btn osc-squ" title="Square"></button>
-                        <button class="wave-btn osc-saw" title="Sawtooth"></button>
-                    </div>
-                    <div class="visualizer-box wave-vis"></div>
-                </div>
-            </div>
-
-            <div id="filter-container" class="glass-panel module reveal delay-2">
-                <h2>II. FILTER</h2>
-                <div class="control-row-clean">
-                    <div class="slider-item">
-                        <label>Cutoff</label>
-                        <input type="range" class="neon-slider" min="0" max="100" value="70">
-                    </div>
-                    <div class="slider-item">
-                        <label>Reso</label>
-                        <input type="range" class="neon-slider" min="0" max="100" value="40">
-                    </div>
-                    <div class="waveform-group small">
-                        <button class="wave-btn osc-sin active" title="Lowpass"></button>
-                        <button class="wave-btn osc-squ" title="Highpass"></button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="envelope-container" class="glass-panel module reveal delay-3">
-                <h2>III. ENVELOPE</h2>
-                
-                <div class="adsr-slider-group">
-                    
-                    <div class="adsr-slider-item">
-                        <div class="custom-adsr-slider-track">
-                            <input type="range" class="neon-slider-invisible-logic" min="0" max="100" value="40">
-                            <div class="slider-thumb-container" style="left: 40px;"></div> </div>
-                        <p class="slider-label">Attack</p>
-                    </div>
-
-                    <div class="adsr-slider-item">
-                        <div class="custom-adsr-slider-track">
-                            <input type="range" class="neon-slider-invisible-logic" min="0" max="100" value="60">
-                            <div class="slider-thumb-container" style="left: 60px;"></div>
-                        </div>
-                        <p class="slider-label">Decay</p>
-                    </div>
-
-                    <div class="adsr-slider-item">
-                        <div class="custom-adsr-slider-track">
-                            <input type="range" class="neon-slider-invisible-logic" min="0" max="100" value="50">
-                            <div class="slider-thumb-container" style="left: 50px;"></div>
-                        </div>
-                        <p class="slider-label">Sustain</p>
-                    </div>
-
-                    <div class="adsr-slider-item">
-                        <div class="custom-adsr-slider-track">
-                            <input type="range" class="neon-slider-invisible-logic" min="0" max="100" value="80">
-                            <div class="slider-thumb-container" style="left: 80px;"></div>
-                        </div>
-                        <p class="slider-label">Release</p>
-                    </div>
-
-                </div>
-                
-                </div>
-
-            <div id="lfo-container" class="glass-panel module reveal delay-4">
-                <h2>IV. LFO</h2>
-                <div class="control-row-clean">
-                    <div class="waveform-group">
-                        <button class="wave-btn osc-sin active" title="Sine"></button>
-                        <button class="wave-btn osc-squ" title="Triangle"></button>
-                        <button class="wave-btn osc-saw" title="Square"></button>
-                    </div>
-                    <div class="slider-item">
-                        <label>Range</label>
-                        <input type="range" class="neon-slider" min="0" max="100" value="60">
-                    </div>
-                    <div class="slider-item">
-                        <label>Depth</label>
-                        <input type="range" class="neon-slider" min="0" max="100" value="90">
-                    </div>
-                </div>
-            </div>
-
-            <div id="ritual-config-container" class="glass-panel module reveal delay-5 span-2">
-                <h2>RITUAL CONFIGURATION</h2>
-                <div class="config-flex">
-                    <div class="bpm-display">120 <span class="bpm-text">BPM</span></div>
-                    <div class="tempo-slider-wrapper">
-                        <label>Tempo Slide</label>
-                        <input type="range" class="neon-slider" min="40" max="220" value="120">
-                    </div>
-                    <div class="visualizer-box spec-vis"></div>
-                </div>
-            </div>
-
-            <div id="ritual-input-container" class="glass-panel module reveal delay-6 span-2">
-                <h2>SONIC RITUAL SPELL - INPUT</h2>
-                <div class="input-form">
-                    <div class="input-row">
-                        <label>[GENRE]</label>
-                        <input type="text" class="glow-input" placeholder="Hard acid techno..." value="Hard acid techno...">
-                    </div>
-                    <div class="input-row">
-                        <label>[SOUNDS]</label>
-                        <input type="text" class="glow-input" placeholder="Roland TB-303 squelch, heavy resonance..." value="Roland TB-303 squelch, heavy resonance...">
-                    </div>
-                    <div class="input-row">
-                        <label>[STRUCTURE]</label>
-                        <input type="text" class="glow-input" placeholder="Ambient build to driving drop..." value="Ambient build to driving drop...">
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="bottom-action reveal delay-7">
-            <button class="synthesize-btn">SYNTHESIZE AUDIO RITUAL</button>
-        </div>
-
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const sliders = document.querySelectorAll('.neon-slider-invisible-logic');
-            const thumbs = document.querySelectorAll('.slider-thumb-container');
-            const tracks = document.querySelectorAll('.custom-adsr-slider-track');
-
-            sliders.forEach((slider, index) => {
-                const thumb = thumbs[index];
-                const track = tracks[index];
-
-                function updateThumbPosition() {
-                    const value = slider.value;
-                    const max = slider.max;
-                    const min = slider.min;
-                    const trackWidth = track.offsetWidth;
-                    const thumbWidth = thumb.offsetWidth;
-
-                    // 计算把手资产 assets 资产 assets left 的物理百分比逻辑
-                    const percentage = (value - min) / (max - min);
-                    // 🔴 修改点 19: 计算把手资产 assets 资产 assets 资产 assets left 的物理 px 资产逻辑
-                    const leftPx = (trackWidth * percentage) - (thumbWidth / 2);
-                    thumb.style.left = leftPx + 'px';
-                }
-
-                // 初始化逻辑和把手位置资产把手位置资产
-                updateThumbPosition();
-
-                // 为滑块资产滑块资产输入添加监听器
-                slider.addEventListener('input', updateThumbPosition);
-
-                // 🔴 修改点 20: 需要添加点击轨道的逻辑资产轨道轨道逻辑
-                track.addEventListener('click', (e) => {
-                    const trackRect = track.getBoundingClientRect();
-                    const clickX = e.clientX - trackRect.left;
-                    const trackWidth = track.offsetWidth;
-                    const newValue = (clickX / trackWidth) * (slider.max - slider.min) + parseInt(slider.min);
-                    slider.value = newValue;
-                    updateThumbPosition();
-                    // 这里可以添加将 newValue 发送到实际音频合成引擎的逻辑将合成逻辑
-                });
-            });
-        });
-    </script>
-</body>
-</html>
+            /* 🔴 核心：顶部和左侧高光，勾
