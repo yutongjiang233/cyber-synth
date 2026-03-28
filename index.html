@@ -556,7 +556,9 @@
                 genBtn.classList.add('processing');
                 mainTitle.classList.add('synthesizing');
                 mainGrid.classList.add('synthesizing');
-                document.querySelectorAll('.auto-panel').forEach(p => p.classList.add('active-module'));
+                
+                // 🔴 修改点：将 '.auto-panel' 改成了 '.glass-panel'，让所有面板同时激活变色！
+                document.querySelectorAll('.glass-panel').forEach(p => p.classList.add('active-module'));
                 
                 animateSliders(); 
 
@@ -568,7 +570,7 @@
                 const fullPrompt = `${genreInput.value}, ${soundsInput.value}, ${structureInput.value}`;
                 
                 try {
-                    // 🔴 步骤 1：先呼叫 LLM 大语言模型帮你写“神级咒语”
+                    // 步骤 1：先呼叫 LLM 大语言模型帮你写“神级咒语”
                     genBtn.textContent = "OPTIMIZING SPELL (AI ASSISTANT)...";
                     
                     const enhanceResponse = await fetch('/api/enhance', {
@@ -582,7 +584,7 @@
                     const finalPrompt = enhanceData.optimizedPrompt || fullPrompt;
                     console.log("🔥 AI 自动为你定制的提示词:", finalPrompt); // 按 F12 可以在控制台偷看 AI 帮你写了什么！
 
-                    // 🔴 步骤 2：拿着定制好的长词，去呼叫音乐大模型
+                    // 步骤 2：拿着定制好的长词，去呼叫音乐大模型
                     genBtn.textContent = "COMMUNICATING WITH DiT CORE...";
                     
                     const response = await fetch('/api/generate', {
@@ -594,7 +596,7 @@
                     let prediction = await response.json();
                     if (response.status !== 201) throw new Error(prediction.detail || "API Error");
 
-                    // 🔴 步骤 3：开始轮询进度
+                    // 步骤 3：开始轮询进度
                     pollInterval = setInterval(async () => {
                         const statusResponse = await fetch(`/api/status?id=${prediction.id}`);
                         let statusData = await statusResponse.json();
@@ -626,7 +628,10 @@
                 genBtn.classList.remove('processing');
                 mainTitle.classList.remove('synthesizing');
                 mainGrid.classList.remove('synthesizing');
-                document.querySelectorAll('.auto-panel').forEach(p => p.classList.remove('active-module'));
+                
+                // 🔴 修改点：停止生成时，将所有面板的变色状态移除
+                document.querySelectorAll('.glass-panel').forEach(p => p.classList.remove('active-module'));
+                
                 oscButtons.forEach(b => b.classList.remove('auto-active'));
                 autoSliders.forEach(slider => slider.targetValue = parseFloat(slider.value));
                 setTimeout(() => { if(!currentAudio || currentAudio.paused) genBtn.textContent = "SYNTHESIZE AUDIO RITUAL"; }, 3000);
