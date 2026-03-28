@@ -14,7 +14,7 @@
 }
 
 /* ===========================================
-   基础与排版 (现代扁平化)
+   基础与排版
    =========================================== */
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
 
@@ -46,7 +46,7 @@ body {
    =========================================== */
 .glass-panel {
     background: var(--glass-bg);
-    backdrop-filter: blur(8px); /* 适度模糊，不破坏背景结构 */
+    backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border: 1px solid var(--glass-border);
     border-radius: 12px;
@@ -63,44 +63,36 @@ body {
 .module h2 { font-size: 0.9rem; color: var(--neon-cyan); margin-bottom: 15px; font-weight: 500; letter-spacing: 2px; text-shadow: 0 0 5px rgba(0, 255, 255, 0.4); }
 
 /* ===========================================
-   🌟 极简动态波形按钮 (SVG适配)
+   🌟 专业 PNG 资产波形按钮 (指定到 images 文件夹)
    =========================================== */
 .waveform-group { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 15px; }
-.waveform-group.small { justify-content: flex-start; gap: 8px;}
+.waveform-group.small { justify-content: flex-start; gap: 8px; }
+.waveform-group.small .wave-btn { flex: none; width: 40px; }
 
 .wave-btn {
     flex: 1; 
-    aspect-ratio: 1; /* 强制变成完美的正方形 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: rgba(0, 255, 255, 0.05);
-    border: 1px solid rgba(0, 255, 255, 0.3);
-    border-radius: 8px; /* 微微的圆角，像玻璃块 */
-    color: var(--text-muted); /* SVG的currentColor会继承这个颜色 */
-    cursor: pointer; 
-    transition: all 0.2s ease;
+    aspect-ratio: 1; /* 保持完美正方形 */
+    background-color: transparent; border: none; box-shadow: none; padding: 0;
+    background-size: contain; background-repeat: no-repeat; background-position: center;
+    cursor: pointer; transition: transform 0.2s ease, filter 0.3s ease;
 }
 
-.wave-btn:hover { 
-    background: rgba(0, 255, 255, 0.1); 
-    color: #fff; /* 悬停时SVG波形变亮 */
+.wave-btn:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.6)); 
 }
-
 .wave-btn.active {
-    background: rgba(0, 255, 255, 0.2);
-    border-color: var(--neon-cyan); 
-    color: var(--neon-cyan); /* 激活时SVG波形变成青色发光！ */
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5), inset 0 0 8px rgba(0, 255, 255, 0.3);
+    filter: drop-shadow(0 0 15px rgba(0, 255, 255, 1)); 
 }
 
-.waveform-group.small .wave-btn {
-    flex: none;
-    width: 40px;
-}
+/* 核心：精确指向 images 文件夹里的资产 */
+.osc-sin { background-image: url('images/osc-sin.png'); }
+.osc-tri { background-image: url('images/osc-tri.png'); }
+.osc-squ { background-image: url('images/osc-squ.png'); }
+.osc-saw { background-image: url('images/osc-saw.png'); }
 
 /* ===========================================
-   霓虹滑块推杆
+   霓虹滑块推杆 & 输入框
    =========================================== */
 .control-row-clean, .fader-group { display: flex; flex-direction: column; gap: 15px; }
 .fader-group { flex-direction: row; justify-content: space-around; height: 120px; align-items: flex-end; }
@@ -146,7 +138,6 @@ input[type="range"].neon-slider::-webkit-slider-thumb:hover { transform: scale(1
     height: 70px; border-radius: 6px; margin-top: 15px; position: relative; overflow: hidden;
     background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.05);
 }
-/* Oscillator 动态波形流 */
 .wave-vis::before {
     content: ''; position: absolute; top: 0; left: 0; width: 200%; height: 100%;
     background: linear-gradient(90deg, transparent 0%, rgba(0, 255, 255, 0.4) 50%, transparent 100%);
@@ -159,7 +150,6 @@ input[type="range"].neon-slider::-webkit-slider-thumb:hover { transform: scale(1
 }
 @keyframes flow-wave { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
 
-/* Filter 动态频段条 */
 .spec-vis { display: flex; align-items: flex-end; justify-content: space-around; padding: 10px 5px; }
 .spec-vis::before {
     content: ''; position: absolute; width: 100%; height: 100%; top: 0; left: 0;
@@ -180,7 +170,6 @@ input[type="range"].neon-slider::-webkit-slider-thumb:hover { transform: scale(1
 .synthesize-btn:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--neon-purple); background: rgba(255, 0, 255, 0.1); }
 @keyframes pulse-glow { 0% { box-shadow: 0 0 5px rgba(255, 0, 255, 0.3); } 100% { box-shadow: 0 0 20px rgba(255, 0, 255, 0.8), inset 0 0 10px rgba(255, 0, 255, 0.4); border-color: #ffaaff; } }
 
-/* 隐形开关 (左上角) */
 .edit-hotzone { position: fixed; top: 0; left: 0; width: 100px; height: 100px; z-index: 1000; }
 .edit-toggle {
     position: fixed; top: 20px; left: 20px; z-index: 1001;
