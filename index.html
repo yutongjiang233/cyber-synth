@@ -23,173 +23,24 @@
             <section class="module glass-panel reveal delay-1">
                 <h2>I. OSCILLATOR</h2>
                 <div class="waveform-group">
-                    <button class="wave-btn osc-sin">SIN</button>
-                    <button class="wave-btn osc-squ">SQU</button>
-                    <button class="wave-btn osc-tri">TRI</button>
-                    <button class="wave-btn osc-saw">SAW</button>
+                    <button class="wave-btn osc-sin active">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M 3 12 Q 8 3, 12 12 T 21 12" />
+                        </svg>
+                    </button>
+                    <button class="wave-btn osc-tri">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M 12 5 L 4 17 L 20 17 Z" />
+                        </svg>
+                    </button>
+                    <button class="wave-btn osc-squ">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M 4 16 V 8 H 12 V 16 H 20" />
+                        </svg>
+                    </button>
+                    <button class="wave-btn osc-saw">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M 3 16 L 9 6 L 15 16 L 21 6" />
+                        </svg>
+                    </button>
                 </div>
-                <div class="visualizer-box wave-vis"></div>
-            </section>
-
-            <section class="module glass-panel reveal delay-2">
-                <h2>II. FILTER</h2>
-                <div class="control-row-clean">
-                    <div class="slider-item">
-                        <label>Cutoff</label>
-                        <input type="range" class="neon-slider" value="70">
-                    </div>
-                    <div class="slider-item">
-                        <label>Resonance</label>
-                        <input type="range" class="neon-slider" value="30">
-                    </div>
-                </div>
-                <div class="visualizer-box spec-vis"></div>
-            </section>
-
-            <section class="module glass-panel reveal delay-3">
-                <h2>III. ENVELOPE</h2>
-                <div class="fader-group">
-                    <div class="fader-item"><label>A</label><input type="range" class="neon-slider vertical" value="20"></div>
-                    <div class="fader-item"><label>D</label><input type="range" class="neon-slider vertical" value="40"></div>
-                    <div class="fader-item"><label>S</label><input type="range" class="neon-slider vertical" value="70"></div>
-                    <div class="fader-item"><label>R</label><input type="range" class="neon-slider vertical" value="50"></div>
-                </div>
-            </section>
-
-            <section class="module glass-panel reveal delay-4">
-                <h2>IV. LFO</h2>
-                <div class="waveform-group small">
-                    <button class="wave-btn active">SIN</button>
-                    <button class="wave-btn">SQU</button>
-                    <button class="wave-btn">TRI</button>
-                </div>
-                <div class="control-row-clean lfo-sliders">
-                    <div class="slider-item"><label>Range</label><input type="range" class="neon-slider" value="40"></div>
-                    <div class="slider-item"><label>Depth</label><input type="range" class="neon-slider" value="80"></div>
-                </div>
-            </section>
-
-            <section class="module glass-panel span-2 config reveal delay-5">
-                <h2>RITUAL CONFIGURATION</h2>
-                <div class="config-flex">
-                    <div class="bpm-display"><span id="bpm-value">120</span> <span class="bpm-text">BPM</span></div>
-                    <div class="tempo-slider-wrapper">
-                        <label>Tempo Slide</label>
-                        <input type="range" id="tempo-slider" class="neon-slider" value="62" min="0" max="100">
-                    </div>
-                </div>
-            </section>
-
-            <section class="module glass-panel span-2 input reveal delay-6">
-                <h2>Sonic Ritual Spell - Input</h2>
-                <div class="input-form">
-                    <div class="input-row"><label>[GENRE]</label><input type="text" class="glow-input" placeholder="Hard acid techno..."></div>
-                    <div class="input-row"><label>[SOUNDS]</label><input type="text" class="glow-input" placeholder="Roland TB-303 squelch..."></div>
-                    <div class="input-row"><label>[STRUCTURE]</label><input type="text" class="glow-input" placeholder="Ambient build to drop..."></div>
-                </div>
-            </section>
-
-        </main>
-
-        <footer class="bottom-action reveal delay-7">
-            <button class="synthesize-btn">SYNTHESIZE AUDIO RITUAL</button>
-        </footer>
-    </div>
-
-    <script>
-        // ===========================================
-        // 1. 开场动画 & 3D 悬浮 (完美继承 Claude 代码逻辑)
-        // ===========================================
-        window.addEventListener('load', () => document.body.classList.add('loaded'));
-
-        class TiltEffect {
-            constructor(element) {
-                this.element = element;
-                this.element.style.transformStyle = 'preserve-3d';
-                this.element.style.perspective = '1000px';
-                this.element.addEventListener('mousemove', (e) => {
-                    const rect = this.element.getBoundingClientRect();
-                    const x = (e.clientX - rect.left) / rect.width - 0.5;
-                    const y = (e.clientY - rect.top) / rect.height - 0.5;
-                    // 15度的倾斜，带来高级但不夸张的悬浮感
-                    this.element.style.transform = `rotateY(${x * 15}deg) rotateX(${-y * 15}deg) translateZ(10px)`;
-                });
-                this.element.addEventListener('mouseleave', () => {
-                    this.element.style.transform = 'rotateY(0) rotateX(0) translateZ(0)';
-                });
-            }
-        }
-        document.querySelectorAll('.glass-panel').forEach(panel => new TiltEffect(panel));
-
-        // ===========================================
-        // 2. 真实 Web Audio 交互 (点按钮听声音)
-        // ===========================================
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        let audioCtx;
-        let oscillator = null;
-        let gainNode = null;
-
-        const startAudio = (type) => {
-            if (!audioCtx) audioCtx = new AudioContext();
-            if (oscillator) oscillator.stop();
-            if (!gainNode) {
-                gainNode = audioCtx.createGain();
-                gainNode.connect(audioCtx.destination);
-            }
-            
-            oscillator = audioCtx.createOscillator();
-            oscillator.type = type; 
-            oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // 440Hz A4音
-            oscillator.connect(gainNode);
-            
-            // 简单的淡入淡出包络，避免声音爆音
-            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.1); // 音量 0.3
-            
-            oscillator.start();
-        };
-
-        const stopAudio = () => {
-            if(oscillator && gainNode) {
-                gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.1);
-                setTimeout(() => {
-                    if(oscillator) { oscillator.stop(); oscillator = null; }
-                }, 100);
-            }
-        };
-
-        const waveBtns = document.querySelectorAll('.oscillator .wave-btn');
-        waveBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const isActive = btn.classList.contains('active');
-                waveBtns.forEach(b => b.classList.remove('active'));
-                stopAudio();
-
-                if (!isActive) {
-                    btn.classList.add('active');
-                    let waveType = 'sine';
-                    if (btn.classList.contains('osc-squ')) waveType = 'square';
-                    if (btn.classList.contains('osc-tri')) waveType = 'triangle';
-                    if (btn.classList.contains('osc-saw')) waveType = 'sawtooth';
-                    startAudio(waveType);
-                }
-            });
-        });
-
-        // ===========================================
-        // 3. UI 交互：BPM 滑块联动 & 隐藏开关
-        // ===========================================
-        const tempoSlider = document.getElementById('tempo-slider');
-        const bpmValue = document.getElementById('bpm-value');
-        tempoSlider.addEventListener('input', (e) => {
-            bpmValue.textContent = Math.round(70 + (e.target.value / 100) * 80);
-        });
-
-        // 隐藏开关逻辑
-        const editor = { isActive: false, toggle: function() { this.isActive = !this.isActive; document.getElementById('editToggle').classList.toggle('active', this.isActive); }};
-        document.getElementById('editToggle').addEventListener('click', () => editor.toggle());
-        document.querySelector('.edit-hotzone').addEventListener('mouseenter', () => document.getElementById('editToggle').classList.add('show'));
-        document.querySelector('.edit-hotzone').addEventListener('mouseleave', () => { setTimeout(() => { if(!editor.isActive) document.getElementById('editToggle').classList.remove('show'); }, 400); });
-    </script>
-</body>
-</html>
