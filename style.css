@@ -54,4 +54,148 @@ body {
     box-shadow: 
         inset 0 0 20px rgba(0, 255, 255, 0.05),
         0 8px 32px rgba(0, 0, 0, 0.3);
-    transition: border-color 0.3s ease, box-shadow 0.3s ease,
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.4s var(--ease-out-expo);
+}
+.glass-panel:hover {
+    border-color: rgba(0, 255, 255, 0.5);
+    box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.1), 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+.module h2 { font-size: 0.9rem; color: var(--neon-cyan); margin-bottom: 15px; font-weight: 500; letter-spacing: 2px; text-shadow: 0 0 5px rgba(0, 255, 255, 0.4); }
+
+/* ===========================================
+   🌟 极简动态波形按钮 (SVG适配)
+   =========================================== */
+.waveform-group { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 15px; }
+.waveform-group.small { justify-content: flex-start; gap: 8px;}
+
+.wave-btn {
+    flex: 1; 
+    aspect-ratio: 1; /* 强制变成完美的正方形 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 255, 255, 0.05);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 8px; /* 微微的圆角，像玻璃块 */
+    color: var(--text-muted); /* SVG的currentColor会继承这个颜色 */
+    cursor: pointer; 
+    transition: all 0.2s ease;
+}
+
+.wave-btn:hover { 
+    background: rgba(0, 255, 255, 0.1); 
+    color: #fff; /* 悬停时SVG波形变亮 */
+}
+
+.wave-btn.active {
+    background: rgba(0, 255, 255, 0.2);
+    border-color: var(--neon-cyan); 
+    color: var(--neon-cyan); /* 激活时SVG波形变成青色发光！ */
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5), inset 0 0 8px rgba(0, 255, 255, 0.3);
+}
+
+.waveform-group.small .wave-btn {
+    flex: none;
+    width: 40px;
+}
+
+/* ===========================================
+   霓虹滑块推杆
+   =========================================== */
+.control-row-clean, .fader-group { display: flex; flex-direction: column; gap: 15px; }
+.fader-group { flex-direction: row; justify-content: space-around; height: 120px; align-items: flex-end; }
+.slider-item, .fader-item { display: flex; align-items: center; gap: 12px; }
+.fader-item { flex-direction: column; }
+.slider-item label, .fader-item label { width: 60px; font-size: 0.8rem; color: var(--text-muted); font-weight: 500;}
+
+input[type="range"].neon-slider {
+    -webkit-appearance: none; flex-grow: 1; height: 4px;
+    background: rgba(255, 255, 255, 0.1); border-radius: 2px; outline: none; cursor: pointer;
+}
+input[type="range"].neon-slider.vertical { transform: rotate(-90deg); width: 80px; margin-bottom: 40px; }
+input[type="range"].neon-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); transition: transform 0.1s;
+}
+input[type="range"].neon-slider::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+/* 输入框 */
+.input-form { display: flex; flex-direction: column; gap: 12px; }
+.input-row { display: flex; align-items: center; gap: 15px; }
+.input-row label { width: 90px; font-size: 0.8rem; color: var(--text-muted); letter-spacing: 1px;}
+.glow-input {
+    flex-grow: 1; padding: 10px 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 2px solid rgba(0, 255, 255, 0.3);
+    color: #fff; font-size: 0.9rem; border-radius: 6px; outline: none; transition: 0.3s;
+}
+.glow-input:focus { border-bottom-color: var(--neon-cyan); background: rgba(0, 255, 255, 0.05); }
+
+/* 配置区 */
+.config-flex { display: flex; align-items: center; justify-content: space-around; height: 100%; gap: 20px;}
+.bpm-display { font-size: 3rem; font-weight: 700; color: #fff; text-shadow: 0 0 15px var(--neon-purple); display: flex; align-items: baseline; gap: 5px; }
+.bpm-text { font-size: 1rem; color: var(--text-muted); font-weight: normal; text-shadow: none; }
+.tempo-slider-wrapper { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
+.tempo-slider-wrapper label { font-size: 0.8rem; color: var(--text-muted); }
+
+/* ===========================================
+   纯 CSS 动态数据流可视化
+   =========================================== */
+.visualizer-box {
+    height: 70px; border-radius: 6px; margin-top: 15px; position: relative; overflow: hidden;
+    background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.05);
+}
+/* Oscillator 动态波形流 */
+.wave-vis::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 200%; height: 100%;
+    background: linear-gradient(90deg, transparent 0%, rgba(0, 255, 255, 0.4) 50%, transparent 100%);
+    animation: flow-wave 2.5s infinite linear; filter: blur(5px);
+}
+.wave-vis::after {
+    content: ''; position: absolute; top: 30%; left: 0; width: 200%; height: 2px;
+    background: linear-gradient(90deg, transparent, #fff, transparent);
+    animation: flow-wave 2s infinite linear reverse; box-shadow: 0 0 10px var(--neon-cyan);
+}
+@keyframes flow-wave { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
+
+/* Filter 动态频段条 */
+.spec-vis { display: flex; align-items: flex-end; justify-content: space-around; padding: 10px 5px; }
+.spec-vis::before {
+    content: ''; position: absolute; width: 100%; height: 100%; top: 0; left: 0;
+    background: repeating-linear-gradient(90deg, transparent, transparent 4px, rgba(0,255,255,0.2) 4px, rgba(0,255,255,0.2) 8px);
+    mask-image: linear-gradient(to top, black 0%, transparent 80%);
+    -webkit-mask-image: linear-gradient(to top, black 0%, transparent 80%);
+}
+
+/* ===========================================
+   底部按钮 & 隐形开关
+   =========================================== */
+.bottom-action { display: flex; justify-content: center; margin-top: 10px; }
+.synthesize-btn {
+    padding: 15px 40px; background: transparent; border: 1px solid var(--neon-purple);
+    border-radius: 30px; color: #fff; font-size: 1.1rem; font-weight: 600; letter-spacing: 2px;
+    cursor: pointer; transition: 0.3s; animation: pulse-glow 2s infinite alternate;
+}
+.synthesize-btn:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--neon-purple); background: rgba(255, 0, 255, 0.1); }
+@keyframes pulse-glow { 0% { box-shadow: 0 0 5px rgba(255, 0, 255, 0.3); } 100% { box-shadow: 0 0 20px rgba(255, 0, 255, 0.8), inset 0 0 10px rgba(255, 0, 255, 0.4); border-color: #ffaaff; } }
+
+/* 隐形开关 (左上角) */
+.edit-hotzone { position: fixed; top: 0; left: 0; width: 100px; height: 100px; z-index: 1000; }
+.edit-toggle {
+    position: fixed; top: 20px; left: 20px; z-index: 1001;
+    padding: 8px 16px; border-radius: 6px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.5); color: #fff; font-size: 0.8rem;
+    opacity: 0; pointer-events: none; transition: 0.3s; cursor: pointer; backdrop-filter: blur(4px);
+}
+.edit-toggle.show, .edit-toggle.active { opacity: 1; pointer-events: auto; }
+.edit-toggle.active { border-color: #ff0055; color: #ff0055; box-shadow: 0 0 10px rgba(255,0,85,0.4); }
+
+/* ===========================================
+   入场瀑布流动效
+   =========================================== */
+.reveal { opacity: 0; transform: translateY(40px); transition: opacity var(--duration-normal) var(--ease-out-expo), transform var(--duration-normal) var(--ease-out-expo); }
+body.loaded .reveal { opacity: 1; transform: translateY(0); }
+.delay-1 { transition-delay: 0.1s; } .delay-2 { transition-delay: 0.2s; }
+.delay-3 { transition-delay: 0.3s; } .delay-4 { transition-delay: 0.4s; }
+.delay-5 { transition-delay: 0.5s; } .delay-6 { transition-delay: 0.6s; }
+.delay-7 { transition-delay: 0.7s; }
