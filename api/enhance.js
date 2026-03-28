@@ -10,15 +10,14 @@ export default async function handler(req, res) {
     const userPrompt = req.body.prompt;
 
     try {
-      // ==========================================
-        // 🔴 核心修改区：加入“母带级 EQ”指令，解决闷和放屁的问题
         // ==========================================
-        const systemPrompt = `You are a master audio engineer and music producer. The user will give you a genre and some simple ideas. Expand them into a highly detailed, 60-word prompt for an AI music generator. 
+        // 🔴 核心修改：专为 Stable Audio 定制的“中括号时间戳 + 胶水混音”死命令
+        // ==========================================
+        const systemPrompt = `You are a master audio engineer. Expand the user's genre and ideas into a highly detailed, 60-word prompt specifically for the Stable Audio AI model.
         CRITICAL RULES YOU MUST FOLLOW:
-        1. NO REPETITIVE LOOPS: The music must have drastic dynamic changes.
-        2. MANDATORY STRUCTURE: Inject exact timestamps for build-ups and drops (e.g., "0:00 intro, 0:15 build, 0:30 drop").
-        3. PRISTINE AUDIO QUALITY (CRUCIAL): You MUST include these exact phrases to ensure clear sound: "crystal clear high-end, crisp transients, bright sparkling treble, tight punchy bassline, ultra-clean mix, wide stereo separation". 
-        4. AVOID MUDDINESS: Specifically describe the bass as "tight and punchy" NEVER "heavy sub-bass" to avoid distortion.
+        1. BRACKET TIMESTAMPS: You MUST use bracketed timestamps to force structure (e.g., "[0:00] atmospheric intro, [0:15] rising build-up, [0:30] massive rhythmic drop").
+        2. MIXING GLUE (CRUCIAL): To prevent stem tearing and ensure cohesion, you MUST end the prompt EXACTLY with this phrase: "Mastering grade, cohesive glued mix, heavy mix bus compression, warm analog tape saturation, shared spatial room reverb, elements perfectly blended."
+        3. CLEAN BASS: Use "tight punchy bassline" instead of "heavy sub-bass" to avoid distortion.
         Return ONLY the expanded English prompt. No conversational text.`;
 
         const llmResponse = await replicate.run(
@@ -33,12 +32,11 @@ export default async function handler(req, res) {
         );
 
         const enhancedPrompt = llmResponse.join("").trim();
-        
         res.status(200).json({ optimizedPrompt: enhancedPrompt });
     } catch (error) {
         console.error("LLM Enhance Error:", error.message);
-        // 即使 LLM 报错，兜底的模版也带上了强制结构
-        const fallbackPrompt = `Mastering grade, high fidelity, professional mix. ${userPrompt}. 0:00 atmospheric intro, 0:15 rising build-up, 0:30 explosive heavy drop, dynamic arrangement, no loops.`;
+        // 如果大模型报错，这个兜底方案也能保证强制输出胶水混音和时间戳
+        const fallbackPrompt = `[0:00] clear intro, [0:15] build-up, [0:30] dynamic drop. ${userPrompt}. tight punchy bassline. Mastering grade, cohesive glued mix, heavy mix bus compression, warm analog tape saturation, shared spatial room reverb, elements perfectly blended.`;
         res.status(200).json({ optimizedPrompt: fallbackPrompt });
     }
 }
