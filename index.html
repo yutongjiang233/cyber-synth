@@ -5,135 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Music Generator</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-
-    <div class="edit-hotzone"></div>
-    <button id="editToggle" class="edit-toggle holo-btn">⚙️ ADVANCED RITUAL</button>
     
     <div class="app-container">
         
-        <header class="top-panel holo-panel">
+        <header class="top-panel reveal">
             <h1 class="hologram-title">AI MUSIC GENERATOR</h1>
-            <p class="hologram-subtitle">
-                DIT Model | Sonic Ritual Spell Configuration
-            </p>
+            <p class="hologram-subtitle">DIT Model | Sonic Ritual Spell Configuration</p>
         </header>
 
         <main class="synth-grid">
             
-            <section class="module holo-panel oscillator">
+            <section class="module holo-panel reveal delay-1">
                 <h2>I. OSCILLATOR</h2>
                 <div class="control-row">[ SIN ] [ SQU ] [ TRI ] [ SAW ]</div>
                 <div class="placeholder-vis wave-vis"></div>
             </section>
 
-            <section class="module holo-panel filter">
+            <section class="module holo-panel reveal delay-2">
                 <h2>II. FILTER</h2>
                 <div class="control-row">Cutoff ---O--- Resonance</div>
                 <div class="placeholder-vis spec-vis"></div>
             </section>
 
-            <section class="module holo-panel envelope">
+            <section class="module holo-panel reveal delay-3">
                 <h2>III. ENVELOPE</h2>
                 <div class="control-row">A / D / Sustain / R</div>
-            </div>
+            </section>
 
-            <section class="module holo-panel lfo">
+            <section class="module holo-panel reveal delay-4">
                 <h2>IV. LFO</h2>
                 <div class="control-row">Range --O-- Depth</div>
-            </div>
+            </section>
 
-            <section class="module holo-panel span-2 config">
+            <section class="module holo-panel span-2 reveal delay-5">
                 <h2>RITUAL CONFIGURATION</h2>
                 <div class="control-row">120 BPM ------O------ Tempo</div>
-            </div>
+            </section>
 
-            <section class="module holo-panel span-2 input">
+            <section class="module holo-panel span-2 reveal delay-6">
                 <h2>Sonic Ritual Spell - Input</h2>
                 <div class="control-row input-labels">
                     <span>[GENRE]</span> <span>[SOUNDS]</span> <span>[STRUCTURE]</span>
                 </div>
-            </div>
+            </section>
 
         </main>
 
-        <footer class="bottom-action">
-            <button class="synthesize-btn neon-purple-vis">SYNTHESIZE AUDIO RITUAL</button>
+        <footer class="bottom-action reveal delay-7">
+            <button class="synthesize-btn">SYNTHESIZE AUDIO RITUAL</button>
         </footer>
-
-        <aside class="glass-sidebar holo-panel">
-            <i class="fa-solid fa-gear"></i>
-            <i class="fa-solid fa-volume-high"></i>
-            <i class="fa-solid fa-network-wired"></i>
-            <i class="fa-solid fa-clock-rotate-left"></i>
-            <i class="fa-solid fa-circle-info"></i>
-        </aside>
 
     </div>
 
     <script>
-        // 我们模拟一个简单的 editor 对象，维持原代码逻辑
-        const editor = {
-            isActive: false,
-            toggleEditMode: function() {
-                this.isActive = !this.isActive;
-                const btn = document.getElementById('editToggle');
-                if(this.isActive) {
-                    btn.classList.add('active');
-                    btn.innerHTML = '🔴 RITUAL EDITING...';
-                    btn.style.borderColor = 'rgba(255, 0, 0, 0.8)'; // 开启时边框变红
-                    btn.style.color = '#ff88ff';
-                } else {
-                    btn.classList.remove('active');
-                    btn.innerHTML = '⚙️ ADVANCED RITUAL';
-                    btn.style.borderColor = 'rgba(0, 255, 255, 0.3)';
-                    btn.style.color = '#fff';
-                }
+        // 1. 页面加载完成时，给 body 加上 loaded 标签，触发 CSS 入场动画
+        window.addEventListener('load', () => {
+            document.body.classList.add('loaded');
+        });
+
+        // 2. 原作者的 3D Tilt 鼠标悬浮倾斜特效
+        class TiltEffect {
+            constructor(element) {
+                this.element = element;
+                // 开启 3D 空间
+                this.element.style.transformStyle = 'preserve-3d';
+                this.element.style.perspective = '1000px';
+
+                this.element.addEventListener('mousemove', (e) => {
+                    const rect = this.element.getBoundingClientRect();
+                    // 计算鼠标在卡片上的相对位置
+                    const x = (e.clientX - rect.left) / rect.width - 0.5;
+                    const y = (e.clientY - rect.top) / rect.height - 0.5;
+                    // 让卡片根据鼠标位置倾斜 (可以修改 15deg 来控制倾斜幅度)
+                    this.element.style.transform = `rotateY(${x * 15}deg) rotateX(${-y * 15}deg) translateZ(10px)`;
+                });
+
+                this.element.addEventListener('mouseleave', () => {
+                    // 鼠标离开，卡片平滑复位
+                    this.element.style.transform = 'rotateY(0) rotateX(0) translateZ(0)';
+                });
             }
-        };
+        }
 
-        // 您复制来的原作者 JS 代码逻辑
-        document.getElementById('editToggle').addEventListener('click', () => {
-            editor.toggleEditMode();
-        });
-
-        const hotzone = document.querySelector('.edit-hotzone');
-        const editToggle = document.getElementById('editToggle');
-        let hideTimeout = null;
-
-        hotzone.addEventListener('mouseenter', () => {
-            clearTimeout(hideTimeout);
-            editToggle.classList.add('show');
-        });
-        
-        hotzone.addEventListener('mouseleave', () => {
-            hideTimeout = setTimeout(() => {
-                if (!editor.isActive) editToggle.classList.remove('show');
-            }, 400);
-        });
-        
-        editToggle.addEventListener('mouseenter', () => {
-            clearTimeout(hideTimeout);
-        });
-        
-        editToggle.addEventListener('mouseleave', () => {
-            hideTimeout = setTimeout(() => {
-                if (!editor.isActive) editToggle.classList.remove('show');
-            }, 400);
-        });
-
-        hotzone.addEventListener('click', () => {
-            editor.toggleEditMode();
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if ((e.key === 'e' || e.key === 'E') && !e.target.getAttribute('contenteditable')) {
-                editor.toggleEditMode();
-                // 键盘触发也要显示按钮
-                if(editor.isActive) editToggle.classList.add('show');
-            }
+        // 选中所有的全息面板，给它们装上这个 3D 引擎
+        document.querySelectorAll('.holo-panel').forEach(panel => {
+            new TiltEffect(panel);
         });
     </script>
 </body>
