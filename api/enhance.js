@@ -4,37 +4,42 @@ const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
 });
 
-// 🔴 新增：硬编码的消杀层负向提示词
-const NEGATIVE_PROMPT = "dialogue, speaking, vocals, singing, choir, lyrics, hiss, high-frequency artifacts, harsh treble, worst quality, low quality, poorly made, robotic, MIDI, blurry, muffled";
+// 🔴 进阶消杀层：除了人声，增加了对相位问题(phase issues)、爆音(clipping)和低频浑浊(muddy bass)的消杀
+const NEGATIVE_PROMPT = "dialogue, speaking, vocals, singing, choir, lyrics, hiss, noise, high-frequency artifacts, harsh treble, clipping, muddy bass, worst quality, low quality, poorly made, robotic, MIDI, blurry, muffled, mono, phase issues";
 
 export default async function handler(req, res) {
-    if (req.method!== 'POST') return res.status(405).send('Method Not Allowed');
+    if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
     const userPrompt = req.body.prompt;
+    // 🔴 关键修复：找回前端的物理旋钮 BPM 数据，默认 120
+    const userBpm = req.body.bpm || "120"; 
 
     try {
         // ==========================================
-        // 🔴 核心修改：针对 Stable Audio 2.5 的全新增强规则
-        // 移除了时间戳，强制使用管道符(|)和精确的BPM数值
+        // 🔴 终极大满配：融合了 Era(年代)、Key(调性)、智能字典与结构流
+        // 彻底榨干 Stable Audio 2.5 的模型潜力
         // ==========================================
-        const systemPrompt = `You are a master audio engineer and musicologist. Your task is to expand the user's short input into a highly detailed, expert-level prompt for the Stable Audio 2.5 AI model.
+        const systemPrompt = `You are an elite audio engineer and AI music prompt expert. Expand the user's input into a highly detailed, professional prompt for Stable Audio 2.5.
 
 CRITICAL RULES YOU MUST FOLLOW:
 
-1. STRICT SYNTAX & ORDER (CRUCIAL): You MUST structure the prompt EXACTLY in this sequential order, separated by pipes (|). Do NOT use bracketed timestamps:
-   "Format: | Genre: | Instruments: | Mood: [High-order emotional terms] | [Numerical] BPM | [Production Quality]"
+1. MANDATORY BPM (CRUCIAL): You MUST start the prompt EXACTLY with "${userBpm} BPM |". Do not change or invent this number.
 
-2. FORMAT OVERRIDE: 
-   - If the user asks for a single instrument, stem, sound effect, or isolated track, you MUST start with "Format: Solo" to strip background elements.
-   - For all other full songs, default to "Format: Band" or "Format: Orchestra".
+2. STRICT SYNTAX & ORDER: Use this exact sequential pipe-separated format:
+   "${userBpm} BPM | Key: [Pick a suitable musical key, e.g., C Minor, F# Major] | Era: [Pick a decade/era, e.g., Modern, 1980s, Vintage 70s] | Genre: [2-3 detailed sub-genres] | Instruments: [Specific gear & playing styles] | Mood: [3-4 high-order emotional terms] | Structure: [e.g., Intro -> Build-up -> Drop -> Fade] | Mix: [Production quality]"
 
-3. GENRE-AWARE RHYTHM & BPM:
-   - You MUST specify an exact numerical BPM appropriate for the genre (e.g., "125 BPM" for House, "70 BPM" for Slowcore).
-   - IF rhythm-driven (House, Jazz, Hip-Hop): Explicitly emphasize signature patterns (e.g., "syncopated rhythm", "polyrhythmic groove", "driving four-on-the-floor").
-   - IF beatless (Ambient, Cinematic, Drone): You MUST explicitly enforce "beatless, floating, zero percussion, no drums".
+3. SMART SOUND DICTIONARY (UPGRADE USER INPUTS):
+   - If Lofi/Chillhop: Use "dusty SP-1200", "warped detuned Rhodes piano", "vinyl crackle".
+   - If EDM/House: Use "euphoric supersaw leads", "hypnotic rolling bassline", "punchy 909 kick".
+   - If Cinematic: Use "Hans Zimmer style brass swells", "epic staccato strings", "booming taiko".
+   - If Bossa/Jazz: Use "syncopated nylon-string guitar", "brushed snare with human swing", "upright bass".
+   - BASS RULE: Always use "tight punchy bass" or "deep analog bass". Never use "heavy sub-bass" to prevent distortion.
 
-4. HIGH-FIDELITY MIXING GLUE: End the prompt EXACTLY with these acoustic modifiers to guarantee 3D sound and eliminate algorithmic artifacts:
-   "44.1k high fidelity, pristine studio recording, Dolby Atmos, Wall of Sound, mastering grade, cohesive glued mix, heavy mix bus compression, warm analog tape saturation."
+4. FORMAT OVERRIDE: 
+   - If the user explicitly asks for a solo instrument, start the Instruments section with "Solo [Instrument]" and enforce "beatless, zero percussion".
+
+5. HIGH-FIDELITY MIXING GLUE: End the "Mix:" section EXACTLY with:
+   "44.1k high fidelity, pristine studio recording, Dolby Atmos, wide stereo separation, cohesive glued mix, heavy mix bus compression, pristine transients, zero muddiness."
 
 Return ONLY the expanded English prompt string. Do not include conversational text, quotes, or JSON formatting.`;
 
@@ -44,7 +49,7 @@ Return ONLY the expanded English prompt string. Do not include conversational te
                 input: {
                     prompt: `User input: ${userPrompt}\n\nExpanded Prompt:`,
                     system_prompt: systemPrompt,
-                    max_tokens: 150
+                    max_tokens: 180
                 }
             }
         );
@@ -56,7 +61,6 @@ Return ONLY the expanded English prompt string. Do not include conversational te
             enhancedPrompt = enhancedPrompt.slice(1, -1);
         }
 
-        // 🔴 修改返回值：同时返回正向提示词和负向提示词，供你发给 Stable Audio
         res.status(200).json({ 
             optimizedPrompt: enhancedPrompt,
             negativePrompt: NEGATIVE_PROMPT
@@ -65,8 +69,8 @@ Return ONLY the expanded English prompt string. Do not include conversational te
     } catch (error) {
         console.error("LLM Enhance Error:", error.message);
         
-        // 🔴 更新兜底策略（Fallback）：遵循 Stable Audio 2.5 的管道符格式
-        const fallbackPrompt = `Format: Band | Genre: Pop, Cinematic | Instruments: modern synthesis, deep bass | Mood: Epic, expressive | 120 BPM | 44.1k high fidelity, pristine studio recording, Dolby Atmos, Wall of Sound, mastering grade.`;
+        // 🔴 兜底策略也必须遵循最新的管道流和物理 BPM
+        const fallbackPrompt = `${userBpm} BPM | Key: A Minor | Era: Modern | Genre: Pop, Cinematic | Instruments: modern synthesis, tight punchy bass | Mood: Epic, expressive | Structure: Intro -> Build -> Drop -> Outro | Mix: 44.1k high fidelity, pristine studio recording, Dolby Atmos, cohesive glued mix, heavy mix bus compression.`;
         
         res.status(200).json({ 
             optimizedPrompt: fallbackPrompt,
