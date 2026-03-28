@@ -8,13 +8,13 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
     try {
-        // 🔴 核心修改：正式接入 Stable Audio 商业级大模型，输出 44.1kHz 母带音质
+        // 🔴 终极满血版：直接榨干 GPU，生成 3 分钟完整曲目！
         const prediction = await replicate.predictions.create({
-            model: "stability-ai/stable-audio", 
+            model: "stability-ai/stable-audio", // 稳定的官方主线模型
             input: {
                 prompt: req.body.prompt,
-                seconds_total: 60, // Stable Audio 专属的时间参数
-                steps: 100         // 强制增加步数，让音质更加细腻
+                duration: 180, // 👈 物理极限拉满，生成 3 分钟的完整歌曲
+                steps: 8       // 👈 官方允许的最高画质步数
             }
         });
 
