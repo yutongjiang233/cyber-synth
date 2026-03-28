@@ -1,98 +1,158 @@
-/* --- CSS 变量 (从原作者处汲取灵感) --- */
+/* ===========================================
+   CSS 变量定义 (全局色彩与动画曲线)
+   =========================================== */
 :root {
-    /* 这个贝塞尔曲线是动画高级感的灵魂：起步快，结尾极度丝滑 */
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
     --duration-normal: 0.8s;
+    
+    --neon-cyan: #00ffff;
+    --neon-purple: #ff00ff;
+    --glass-bg: rgba(15, 20, 35, 0.15); /* 极度通透的底色 */
+    --glass-border: rgba(0, 255, 255, 0.25);
+    --text-main: rgba(255, 255, 255, 0.9);
+    --text-muted: rgba(255, 255, 255, 0.5);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+/* ===========================================
+   基础与排版 (现代扁平化)
+   =========================================== */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
 
 body {
     width: 100vw; height: 100vh; overflow: hidden;
     background-image: url('mandala.jpg');
     background-size: cover; background-position: center;
-    background-color: #050510; color: #fff;
+    color: var(--text-main);
     display: flex; justify-content: center; align-items: center;
 }
 
-.app-container {
-    width: 95%; max-width: 1400px; height: 95vh;
-    display: flex; flex-direction: column; justify-content: space-between;
-}
+.app-container { width: 95%; max-width: 1300px; height: 95vh; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
 
+/* 标题区 */
 .top-panel { text-align: center; margin-bottom: 20px; }
 .hologram-title {
-    color: transparent; font-size: 2.5rem; letter-spacing: 5px; text-transform: uppercase; font-weight: 300;
-    text-shadow: 0 0 8px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.4); margin-bottom: 10px;
+    font-size: 2.2rem; letter-spacing: 4px; font-weight: 600;
+    color: #fff; text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px rgba(0, 255, 255, 0.5);
+    margin-bottom: 5px;
 }
-.hologram-subtitle { font-size: 0.95rem; color: rgba(255, 255, 255, 0.7); letter-spacing: 1px; }
+.hologram-subtitle { font-size: 0.9rem; color: var(--text-muted); letter-spacing: 1px; font-weight: 300;}
 
-.synth-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; flex-grow: 1;
-}
+/* 网格布局 */
+.synth-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; flex-grow: 1; }
 .span-2 { grid-column: span 2; }
 
-/* --- 极简超薄玻璃面板 --- */
-.holo-panel {
-    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-    background: rgba(25, 20, 45, 0.1); 
-    border: 1px solid rgba(0, 255, 255, 0.2); 
-    border-radius: 8px; padding: 20px;
-    box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.05);
-    /* 加入复位的过渡效果，配合 JS 的 3D 悬浮使用 */
+/* ===========================================
+   高透玻璃面板核心逻辑
+   =========================================== */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(8px); /* 适度模糊，不破坏背景结构 */
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px; /* 扁平化圆角 */
+    padding: 20px;
+    box-shadow: 
+        inset 0 0 20px rgba(0, 255, 255, 0.05), /* 微弱内发光 */
+        0 8px 32px rgba(0, 0, 0, 0.3); /* 整体投影剥离感 */
     transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.4s var(--ease-out-expo);
 }
-
-.holo-panel:hover {
+.glass-panel:hover {
     border-color: rgba(0, 255, 255, 0.5);
-    box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.1), 0 0 10px rgba(0, 255, 255, 0.3);
+    box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.1), 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+.module h2 { font-size: 0.9rem; color: var(--neon-cyan); margin-bottom: 15px; font-weight: 500; letter-spacing: 2px; text-shadow: 0 0 5px rgba(0, 255, 255, 0.4); }
+
+/* ===========================================
+   极简动态控件 (按钮、滑块、输入框)
+   =========================================== */
+/* 按钮组 */
+.waveform-group { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }
+.waveform-group.small { justify-content: flex-start; }
+.wave-btn {
+    flex: 1; padding: 8px 0;
+    background: rgba(0, 255, 255, 0.05);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 6px;
+    color: var(--text-muted); font-size: 0.85rem; font-weight: 600; letter-spacing: 1px;
+    cursor: pointer; transition: all 0.2s ease;
+}
+.wave-btn:hover { background: rgba(0, 255, 255, 0.1); color: #fff; }
+.wave-btn.active {
+    background: rgba(0, 255, 255, 0.2);
+    border-color: var(--neon-cyan); color: var(--neon-cyan);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5), inset 0 0 8px rgba(0, 255, 255, 0.3);
 }
 
-.module h2 {
-    font-size: 0.9rem; color: rgba(0, 255, 255, 0.8); margin-bottom: 20px; text-align: center; font-weight: normal; letter-spacing: 1px;
-}
-.control-row { color: rgba(255, 255, 255, 0.6); text-align: center; margin-top: 10px; font-family: monospace; }
-.input-labels { display: flex; justify-content: space-around; }
+/* 霓虹滑块推杆 */
+.control-row-clean, .fader-group { display: flex; flex-direction: column; gap: 15px; }
+.fader-group { flex-direction: row; justify-content: space-around; height: 120px; align-items: flex-end; }
+.slider-item, .fader-item { display: flex; align-items: center; gap: 12px; }
+.fader-item { flex-direction: column; }
+.slider-item label, .fader-item label { width: 60px; font-size: 0.8rem; color: var(--text-muted); font-weight: 500;}
 
-.placeholder-vis {
-    height: 80px; background: rgba(0, 0, 0, 0.5); border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.05); margin-top: 20px;
+input[type="range"].neon-slider {
+    -webkit-appearance: none; flex-grow: 1; height: 4px;
+    background: rgba(255, 255, 255, 0.1); border-radius: 2px; outline: none; cursor: pointer;
 }
+input[type="range"].neon-slider.vertical { transform: rotate(-90deg); width: 80px; margin-bottom: 40px; }
+input[type="range"].neon-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); transition: transform 0.1s;
+}
+input[type="range"].neon-slider::-webkit-slider-thumb:hover { transform: scale(1.3); }
 
-/* --- 底部按钮 --- */
-.bottom-action { display: flex; justify-content: center; margin-top: 20px; }
-.synthesize-btn {
-    background: transparent; border: 1px solid #ff00ff; padding: 12px 30px; border-radius: 20px;
-    color: #fff; font-size: 1.1rem; letter-spacing: 2px; cursor: pointer;
-    animation: neon-breathe 2.5s infinite alternate;
+/* 输入框 */
+.input-form { display: flex; flex-direction: column; gap: 12px; }
+.input-row { display: flex; align-items: center; gap: 15px; }
+.input-row label { width: 90px; font-size: 0.8rem; color: var(--text-muted); letter-spacing: 1px;}
+.glow-input {
+    flex-grow: 1; padding: 10px 15px;
+    background: rgba(0, 0, 0, 0.2); /* 极简输入槽 */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 2px solid rgba(0, 255, 255, 0.3); /* 底部流光条 */
+    color: #fff; font-size: 0.9rem; border-radius: 6px; outline: none; transition: 0.3s;
 }
-@keyframes neon-breathe {
-    0% { box-shadow: 0 0 5px rgba(255, 0, 255, 0.2); text-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
-    100% { box-shadow: 0 0 15px rgba(255, 0, 255, 0.8); text-shadow: 0 0 8px #fff; border-color: #ff88ff; }
+.glow-input:focus { border-bottom-color: var(--neon-cyan); background: rgba(0, 255, 255, 0.05); }
+
+/* 配置区 */
+.config-flex { display: flex; align-items: center; justify-content: space-around; height: 100%; gap: 20px;}
+.bpm-display { font-size: 3rem; font-weight: 700; color: #fff; text-shadow: 0 0 15px var(--neon-purple); display: flex; align-items: baseline; gap: 5px; }
+.bpm-text { font-size: 1rem; color: var(--text-muted); font-weight: normal; text-shadow: none; }
+.tempo-slider-wrapper { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
+.tempo-slider-wrapper label { font-size: 0.8rem; color: var(--text-muted); }
+
+/* ===========================================
+   纯 CSS 动态数据流可视化 (替代切图)
+   =========================================== */
+.visualizer-box {
+    height: 70px; border-radius: 6px; margin-top: 15px; position: relative; overflow: hidden;
+    background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.05);
+}
+/* Oscillator 动态波形流 */
+.wave-vis::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 200%; height: 100%;
+    background: linear-gradient(90deg, transparent 0%, rgba(0, 255, 255, 0.4) 50%, transparent 100%);
+    animation: flow-wave 2.5s infinite linear; filter: blur(5px);
+}
+.wave-vis::after {
+    content: ''; position: absolute; top: 30%; left: 0; width: 200%; height: 2px;
+    background: linear-gradient(90deg, transparent, #fff, transparent);
+    animation: flow-wave 2s infinite linear reverse; box-shadow: 0 0 10px var(--neon-cyan);
+}
+@keyframes flow-wave { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
+
+/* Filter 动态频段条 */
+.spec-vis { display: flex; align-items: flex-end; justify-content: space-around; padding: 10px 5px; }
+.spec-vis::before {
+    content: ''; position: absolute; width: 100%; height: 100%; top: 0; left: 0;
+    background: repeating-linear-gradient(90deg, transparent, transparent 4px, rgba(0,255,255,0.2) 4px, rgba(0,255,255,0.2) 8px);
+    mask-image: linear-gradient(to top, black 0%, transparent 80%);
+    -webkit-mask-image: linear-gradient(to top, black 0%, transparent 80%);
 }
 
 /* ===========================================
-   入场瀑布流动效 (偷师成功！)
+   底部按钮 & 隐形开关
    =========================================== */
-.reveal {
-    opacity: 0;
-    /* 初始状态：往下沉 30px */
-    transform: translateY(30px);
-    /* 过渡效果绑定了极度丝滑的 --ease-out-expo 曲线 */
-    transition: opacity var(--duration-normal) var(--ease-out-expo),
-                transform var(--duration-normal) var(--ease-out-expo);
-}
-
-/* 当 JS 给 body 加上 loaded 标签时，所有框浮上来并显示 */
-body.loaded .reveal {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* 控制每个框出现的延迟时间，形成瀑布流视觉效果 */
-.delay-1 { transition-delay: 0.1s; }
-.delay-2 { transition-delay: 0.2s; }
-.delay-3 { transition-delay: 0.3s; }
-.delay-4 { transition-delay: 0.4s; }
-.delay-5 { transition-delay: 0.5s; }
-.delay-6 { transition-delay: 0.6s; }
-.delay-7 { transition-delay: 0.7s; }
+.bottom-action { display: flex; justify-content: center; margin-top: 10px; }
+.synthesize-btn {
+    padding: 15px 40px; background: transparent; border
