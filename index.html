@@ -9,112 +9,132 @@
 </head>
 <body>
 
+    <div class="edit-hotzone"></div>
+    <button id="editToggle" class="edit-toggle holo-btn">⚙️ ADVANCED RITUAL</button>
+    
     <div class="app-container">
         
-        <div class="glass-panel top-header">
-            <h1 class="neon-title">AI MUSIC GENERATOR</h1>
-            <p class="long-description">
-                DIT description. Bio-lum luminescent energy and particle networks organically connect and flow through all components, create, intertwined, living biological ecosystem - complex, shifting cosmic nebula gradients
+        <header class="top-panel holo-panel">
+            <h1 class="hologram-title">AI MUSIC GENERATOR</h1>
+            <p class="hologram-subtitle">
+                DIT Model | Sonic Ritual Spell Configuration
             </p>
-        </div>
+        </header>
 
-        <div class="synth-grid">
+        <main class="synth-grid">
             
-            <div class="glass-panel module">
+            <section class="module holo-panel oscillator">
                 <h2>I. OSCILLATOR</h2>
-                <div class="btn-group">
-                    <button class="active cyan-glow">SIN</button>
-                    <button>SQU</button>
-                    <button>TRI</button>
-                    <button>SAW</button>
-                </div>
-                <div class="visualizer-box wave-vis"></div>
-            </div>
+                <div class="control-row">[ SIN ] [ SQU ] [ TRI ] [ SAW ]</div>
+                <div class="placeholder-vis wave-vis"></div>
+            </section>
 
-            <div class="glass-panel module">
+            <section class="module holo-panel filter">
                 <h2>II. FILTER</h2>
-                <div class="knob-container">
-                    <div class="knob-wrapper">
-                        <div class="crystal-knob cyan-purple"><div class="indicator"></div></div>
-                        <label>Cutoff</label>
-                    </div>
-                    <div class="knob-wrapper">
-                        <div class="crystal-knob cyan-purple"><div class="indicator"></div></div>
-                        <label>Resonance</label>
-                    </div>
-                </div>
-                <div class="visualizer-box spec-vis"></div>
-            </div>
+                <div class="control-row">Cutoff ---O--- Resonance</div>
+                <div class="placeholder-vis spec-vis"></div>
+            </section>
 
-            <div class="glass-panel module">
+            <section class="module holo-panel envelope">
                 <h2>III. ENVELOPE</h2>
-                <div class="slider-group">
-                    <div class="slider-row"><label>Attack</label><input type="range" class="glow-slider"></div>
-                    <div class="slider-row"><label>Decay</label><input type="range" class="glow-slider"></div>
-                    <div class="slider-row"><label>Sustain</label><input type="range" class="glow-slider"></div>
-                    <div class="slider-row"><label>Release</label><input type="range" class="glow-slider"></div>
-                </div>
+                <div class="control-row">A / D / Sustain / R</div>
             </div>
 
-            <div class="glass-panel module">
+            <section class="module holo-panel lfo">
                 <h2>IV. LFO</h2>
-                <div class="btn-group lfo-waves">
-                    <button class="active cyan-glow"><i class="fa-solid fa-wave-square"></i> SIN</button>
-                    <button>SQU</button>
-                    <button>TRI</button>
-                    <button>SAW</button>
-                </div>
-                <div class="knob-container">
-                    <div class="knob-wrapper">
-                        <div class="crystal-knob cyan-pink"><div class="indicator" style="transform: rotate(45deg);"></div></div>
-                        <label>RATE<br><small>Hz</small></label>
-                    </div>
-                    <div class="knob-wrapper">
-                        <div class="crystal-knob cyan-pink"><div class="indicator" style="transform: rotate(-30deg);"></div></div>
-                        <label>DEPTH<br><small>%</small></label>
-                    </div>
-                </div>
+                <div class="control-row">Range --O-- Depth</div>
             </div>
 
-            <div class="glass-panel module span-2 ritual-config">
+            <section class="module holo-panel span-2 config">
                 <h2>RITUAL CONFIGURATION</h2>
-                <div class="bpm-display">120 <span class="bpm-text">BPM</span></div>
-                <div class="slider-row tempo-row">
-                    <input type="range" class="glow-slider orb-slider">
-                </div>
+                <div class="control-row">120 BPM ------O------ Tempo</div>
             </div>
 
-            <div class="glass-panel module span-2 spell-input">
+            <section class="module holo-panel span-2 input">
                 <h2>Sonic Ritual Spell - Input</h2>
-                <div class="input-row">
-                    <label>[GENRE]</label>
-                    <input type="text" value="Hard acid techno">
-                </div>
-                <div class="input-row">
-                    <label>[SOUNDS]</label>
-                    <input type="text" value="Roland TB-303 squelch, heavy resonance">
-                </div>
-                <div class="input-row">
-                    <label>[STRUCTURE]</label>
-                    <input type="text" value="Ambient build to driving drop">
+                <div class="control-row input-labels">
+                    <span>[GENRE]</span> <span>[SOUNDS]</span> <span>[STRUCTURE]</span>
                 </div>
             </div>
 
-        </div>
+        </main>
 
-        <div class="bottom-action">
-            <button class="synthesize-btn"><i class="fa-solid fa-crystal-ball"></i> SYNTHESIZE AUDIO RITUAL <i class="fa-solid fa-crystal-ball"></i></button>
-        </div>
+        <footer class="bottom-action">
+            <button class="synthesize-btn neon-purple-vis">SYNTHESIZE AUDIO RITUAL</button>
+        </footer>
 
-        <div class="glass-panel side-bar">
+        <aside class="glass-sidebar holo-panel">
             <i class="fa-solid fa-gear"></i>
             <i class="fa-solid fa-volume-high"></i>
             <i class="fa-solid fa-network-wired"></i>
             <i class="fa-solid fa-clock-rotate-left"></i>
             <i class="fa-solid fa-circle-info"></i>
-        </div>
+        </aside>
 
     </div>
 
+    <script>
+        // 我们模拟一个简单的 editor 对象，维持原代码逻辑
+        const editor = {
+            isActive: false,
+            toggleEditMode: function() {
+                this.isActive = !this.isActive;
+                const btn = document.getElementById('editToggle');
+                if(this.isActive) {
+                    btn.classList.add('active');
+                    btn.innerHTML = '🔴 RITUAL EDITING...';
+                    btn.style.borderColor = 'rgba(255, 0, 0, 0.8)'; // 开启时边框变红
+                    btn.style.color = '#ff88ff';
+                } else {
+                    btn.classList.remove('active');
+                    btn.innerHTML = '⚙️ ADVANCED RITUAL';
+                    btn.style.borderColor = 'rgba(0, 255, 255, 0.3)';
+                    btn.style.color = '#fff';
+                }
+            }
+        };
+
+        // 您复制来的原作者 JS 代码逻辑
+        document.getElementById('editToggle').addEventListener('click', () => {
+            editor.toggleEditMode();
+        });
+
+        const hotzone = document.querySelector('.edit-hotzone');
+        const editToggle = document.getElementById('editToggle');
+        let hideTimeout = null;
+
+        hotzone.addEventListener('mouseenter', () => {
+            clearTimeout(hideTimeout);
+            editToggle.classList.add('show');
+        });
+        
+        hotzone.addEventListener('mouseleave', () => {
+            hideTimeout = setTimeout(() => {
+                if (!editor.isActive) editToggle.classList.remove('show');
+            }, 400);
+        });
+        
+        editToggle.addEventListener('mouseenter', () => {
+            clearTimeout(hideTimeout);
+        });
+        
+        editToggle.addEventListener('mouseleave', () => {
+            hideTimeout = setTimeout(() => {
+                if (!editor.isActive) editToggle.classList.remove('show');
+            }, 400);
+        });
+
+        hotzone.addEventListener('click', () => {
+            editor.toggleEditMode();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if ((e.key === 'e' || e.key === 'E') && !e.target.getAttribute('contenteditable')) {
+                editor.toggleEditMode();
+                // 键盘触发也要显示按钮
+                if(editor.isActive) editToggle.classList.add('show');
+            }
+        });
+    </script>
 </body>
 </html>
