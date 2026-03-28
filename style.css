@@ -1,4 +1,4 @@
-/* --- 基础重置 --- */
+、/* --- 基础重置 (保持极简) --- */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -10,7 +10,8 @@ body {
     width: 100vw;
     height: 100vh;
     overflow: hidden; /* 防止滚动 */
-    background-image: url('mandala.jpg'); /* 直接引用根目录的背景图 */
+    /* 核心：将全屏曼陀罗背景贴上，这是视觉主体 */
+    background-image: url('mandala.jpg');
     background-size: cover;
     background-position: center;
     background-color: #050510;
@@ -30,253 +31,114 @@ body {
     position: relative;
 }
 
-/* --- 核心：毛玻璃/发光水晶面板 --- */
-.glass-panel {
-    background: rgba(20, 15, 45, 0.4); /* 深紫色半透明底色 */
-    backdrop-filter: blur(12px); /* 毛玻璃模糊效果 */
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(100, 200, 255, 0.2); /* 微微的青色高光边框 */
-    border-radius: 16px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 255, 255, 0.05);
-    padding: 20px;
-}
-
-/* --- 顶部描述框 --- */
-.top-header {
+/* --- 顶部全息标题与描述框 (极简、高透) --- */
+.top-panel {
     text-align: center;
     margin-bottom: 20px;
-    padding: 25px;
 }
 
-.neon-title {
-    color: #00ffff;
-    font-size: 2.2rem;
-    letter-spacing: 3px;
-    text-shadow: 0 0 10px #00ffff, 0 0 20px #0088ff;
-    margin-bottom: 15px;
+.hologram-title {
+    color: transparent; /* 文本设为透明，使用 text-shadow 显示霓虹光晕 */
+    font-size: 2.5rem;
+    letter-spacing: 5px;
     text-transform: uppercase;
+    font-weight: 300;
+    text-shadow: 
+        0 0 8px rgba(0, 255, 255, 0.8),
+        0 0 20px rgba(0, 255, 255, 0.4);
+    margin-bottom: 10px;
 }
 
-.long-description {
+.hologram-subtitle {
     font-size: 0.95rem;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.7);
     max-width: 900px;
     margin: 0 auto;
+    letter-spacing: 1px;
 }
 
-/* --- 中部网格布局 --- */
+/* --- 中部网格布局 (Grid) --- */
 .synth-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: auto auto;
-    gap: 20px;
-    flex-grow: 1;
+    grid-template-columns: repeat(4, 1fr); /* 四列等宽 */
+    grid-template-rows: auto auto; /* 两行 */
+    gap: 20px; /* 模块之间的间距 */
+    flex-grow: 1; /* 中部网格拉伸填满剩余空间 */
+    justify-content: center; /* 居中网格 */
 }
 
-.module h2 {
-    font-size: 1.1rem;
-    color: rgba(255, 255, 255, 0.9);
-    margin-bottom: 20px;
-    text-align: center;
-    letter-spacing: 1px;
-    text-shadow: 0 0 8px rgba(255,255,255,0.3);
+/* --- 核心核心：极简超薄全息/玻璃面板 (零资产，零磨砂，极致通透) --- */
+.holo-panel {
+    /* 1. 彻底移除之前的磨砂、模糊效果，不遮挡背景 */
+    backdrop-filter: blur(4px); /* 极轻微模糊，保证文字能看清但背景清晰可见 */
+    -webkit-backdrop-filter: blur(4px);
+    background: rgba(25, 20, 45, 0.1); /* 深紫色底色透明度极高(0.1)，几乎透明 */
+    
+    /* 2. 贴上极细的半透明青色/全息发光边框线 */
+    border: 1px solid rgba(0, 255, 255, 0.2); 
+    border-radius: 8px; /* 微微的圆角 */
+    
+    /* 3. 微弱的内发光，增加立体感但不挡背景 */
+    box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.05);
+    
+    /* 4. 优化内边距，确保控件在边框内对齐 */
+    padding: 20px;
+    color: #fff;
+    transition: all 0.3s ease;
+}
+
+/* 鼠标悬停时的霓虹光晕效果 */
+.holo-panel:hover {
+    border-color: rgba(0, 255, 255, 0.5);
+    box-shadow: 
+        inset 0 0 15px rgba(0, 255, 255, 0.1),
+        0 0 10px rgba(0, 255, 255, 0.3);
 }
 
 .span-2 {
-    grid-column: span 2;
+    grid-column: span 2; /* 第二排模块占两列 */
 }
 
-/* --- 按钮样式 --- */
-.btn-group {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
+/* 极简模块标题样式 */
+.module h2 {
+    font-size: 0.9rem;
+    color: rgba(0, 255, 255, 0.8); /* 霓虹青色 */
+    margin-bottom: 20px;
+    text-align: center;
+    letter-spacing: 1px;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+    font-weight: normal;
 }
 
-.btn-group button {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+/* 极简控件行的基本布局 */
+.control-row {
     color: rgba(255, 255, 255, 0.6);
-    padding: 8px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: 0.3s;
+    text-align: center;
+    margin-top: 10px;
+    font-family: 'Courier New', Courier, monospace; /* 使用代码风格字体 */
 }
 
-.btn-group button.active.cyan-glow {
-    border-color: #00ffff;
-    color: #00ffff;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4), inset 0 0 10px rgba(0, 255, 255, 0.2);
+.input-labels {
+    display: flex;
+    justify-content: space-around;
 }
 
-/* --- 可视化占位框 (波形/频谱) --- */
-.visualizer-box {
-    height: 100px;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 10px;
+/* 可视化：螺旋波形区域占位符 --- */
+.placeholder-vis {
+    height: 80px;
+    background: rgba(0, 0, 0, 0.5); /* 半透明黑底，模拟显示屏 */
+    border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
     position: relative;
     overflow: hidden;
+    margin-top: 20px;
 }
+/* 用 CSS 渐变假装这里有螺旋波形/频谱 */
+.wave-vis { background: radial-gradient(circle at center, rgba(0,255,255,0.1) 0%, rgba(0,0,0,0.5) 70%); }
+.spec-vis { background: linear-gradient(0deg, rgba(255,0,255,0.1) 0%, transparent 100%); }
 
-/* 用 CSS 渐变假装这里有波形/频谱 */
-.wave-vis { background: radial-gradient(circle at center, rgba(0,255,255,0.2) 0%, rgba(0,0,0,0.5) 70%); }
-.spec-vis { background: linear-gradient(0deg, rgba(255,0,255,0.2) 0%, transparent 100%); }
-
-/* --- 🌟 发光水晶旋钮 (纯 CSS 实现，替代齿轮) --- */
-.knob-container {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    height: 100px;
-}
-
-.knob-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-
-.knob-wrapper label {
-    font-size: 0.8rem;
-    color: rgba(255,255,255,0.7);
-    text-align: center;
-}
-
-.crystal-knob {
-    width: 55px;
-    height: 55px;
-    /* 核心：用 clip-path 裁出六边形水晶形状 */
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    position: relative;
-    cursor: pointer;
-    box-shadow: inset 0 0 15px rgba(255,255,255,0.8);
-}
-
-.cyan-purple { background: linear-gradient(135deg, #00ffff 0%, #aa00ff 100%); }
-.cyan-pink { background: linear-gradient(135deg, #00ffff 0%, #ff007f 100%); }
-
-/* 水晶旋钮上的指示点 */
-.indicator {
-    position: absolute;
-    top: 5px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 6px;
-    height: 6px;
-    background: #fff;
-    border-radius: 50%;
-    box-shadow: 0 0 8px #fff;
-}
-
-/* --- 滑块样式 (发光光球手柄) --- */
-.slider-group {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    margin-top: 10px;
-}
-
-.slider-row {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.slider-row label {
-    width: 50px;
-    font-size: 0.85rem;
-    color: rgba(255,255,255,0.7);
-}
-
-.glow-slider {
-    -webkit-appearance: none;
-    flex-grow: 1;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
-    outline: none;
-}
-
-/* 滑块手柄 - 迷幻光球 */
-.glow-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: radial-gradient(circle, #fff 20%, #ff00ff 80%);
-    box-shadow: 0 0 15px #ff00ff, 0 0 5px #fff;
-    cursor: pointer;
-}
-
-/* --- Ritual Config (BPM) --- */
-.ritual-config {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.bpm-display {
-    font-size: 3.5rem;
-    font-weight: bold;
-    color: #ff00ff;
-    text-shadow: 0 0 15px #ff00ff, 0 0 30px #aa00ff;
-    margin-bottom: 20px;
-    font-family: 'Times New Roman', serif; /* 类似截图中的哥特/衬线字体风格 */
-}
-
-.bpm-text { font-size: 1.5rem; }
-
-.tempo-row { width: 80%; }
-.orb-slider::-webkit-slider-thumb {
-    width: 30px;
-    height: 30px;
-    background: radial-gradient(circle, #aa00ff 20%, #4400aa 80%);
-    border: 2px solid rgba(255,255,255,0.5);
-}
-
-/* --- Input --- */
-.spell-input {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-}
-
-.input-row {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.input-row label {
-    width: 100px;
-    color: rgba(255,255,255,0.6);
-    font-size: 0.9rem;
-}
-
-.input-row input {
-    flex-grow: 1;
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255,255,255,0.1);
-    padding: 12px;
-    border-radius: 8px;
-    color: #fff;
-    font-size: 1rem;
-    outline: none;
-    transition: 0.3s;
-}
-
-.input-row input:focus {
-    border-color: #00ffff;
-    box-shadow: 0 0 10px rgba(0,255,255,0.3);
-}
-
-/* --- 底部合成按钮 --- */
+/* --- 底部合成按钮 (保持霓虹呼吸动画) --- */
 .bottom-action {
     display: flex;
     justify-content: center;
@@ -284,41 +146,100 @@ body {
 }
 
 .synthesize-btn {
-    background: linear-gradient(90deg, rgba(170,0,255,0.3), rgba(0,255,255,0.3));
-    border: 1px solid #ff00ff;
-    padding: 15px 40px;
-    border-radius: 30px;
+    background: transparent;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 20px;
     color: #fff;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: bold;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
     cursor: pointer;
-    box-shadow: 0 0 20px rgba(255,0,255,0.4);
-    backdrop-filter: blur(5px);
+    border: 1px solid #ff00ff;
     transition: 0.3s;
+    animation: neon-breathe 2.5s infinite alternate; /* 调用呼吸灯动画 */
 }
 
-.synthesize-btn:hover {
-    box-shadow: 0 0 30px rgba(255,0,255,0.8), 0 0 20px #00ffff;
-    transform: scale(1.02);
+/* 霓虹发光按钮动画 Keyframes */
+@keyframes neon-breathe {
+    0% {
+        box-shadow: 0 0 5px rgba(255, 0, 255, 0.2);
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+    }
+    100% {
+        box-shadow: 0 0 15px rgba(255, 0, 255, 0.8);
+        text-shadow: 0 0 8px #fff, 0 0 15px #ff00ff;
+        border-color: #ff88ff;
+    }
 }
 
-/* --- 右侧悬浮图标条 --- */
-.side-bar {
+/* --- 右侧悬浮图标条 (高透玻璃，零资产) --- */
+.glass-sidebar {
     position: absolute;
     right: 0;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
-    gap: 25px;
-    padding: 20px 15px;
-    font-size: 1.2rem;
+    gap: 20px;
+    padding: 20px 10px;
+    background: rgba(25, 20, 40, 0.15); /* 高透底色 */
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.05);
+    border-radius: 8px 0 0 8px; /* 右侧贴边，左侧圆角 */
+    font-size: 1.1rem;
     color: rgba(255,255,255,0.5);
 }
 
-.side-bar i:hover {
+.glass-sidebar i:hover {
     color: #00ffff;
     text-shadow: 0 0 10px #00ffff;
     cursor: pointer;
+}
+
+/* =========================================
+   追加的隐形按钮 CSS (从原作者处汲取灵感)
+   ========================================= */
+
+/* 1. 左上角的隐形正方形触发区 */
+.edit-hotzone {
+    position: fixed; 
+    top: 0; 
+    left: 0;
+    width: 80px; 
+    height: 80px;
+    z-index: 10000;
+    cursor: pointer;
+    /* background: rgba(255,0,0,0.2); 取消注释显示此隐形区域 */
+}
+
+/* 2. 隐藏的全息按钮 (平时透明度为0，且不可点击) */
+.edit-toggle {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    opacity: 0; /* 平时隐藏 */
+    pointer-events: none; /* 隐藏时鼠标穿透 */
+    transition: opacity 0.3s ease, border-color 0.3s ease;
+    z-index: 10001;
+    
+    /* 借用我们的全息极简风格 */
+    background: rgba(25, 20, 40, 0.7); /* 加深底色保证按钮可读 */
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
+/* 3. 当鼠标移入热区，或者开启编辑模式时，显示按钮 */
+.edit-toggle.show,
+.edit-toggle.active {
+    opacity: 1; /* 显示出来 */
+    pointer-events: auto; /* 允许点击 */
 }
