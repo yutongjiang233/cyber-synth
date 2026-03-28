@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Music Generator - Live Automation UI</title>
+    <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
     <style>
         /* ===========================================
            1. CSS 全局变量
@@ -177,7 +178,7 @@
         .tempo-limit { font-size: 1.1rem; color: #fff; font-weight: bold; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
 
         /* ===========================================
-           7. 输入区 & 底部按钮
+           7. 输入区 & 底部操作区 (包含播放器)
            =========================================== */
         .input-form { display: flex; flex-direction: column; gap: 15px; }
         .input-row { display: flex; align-items: center; gap: 15px; }
@@ -189,12 +190,13 @@
         }
         .glow-input:focus { border-bottom-color: var(--neon-cyan); background: rgba(0, 255, 255, 0.05); }
 
-        .bottom-action { display: flex; justify-content: center; margin-top: 10px; }
+        .bottom-action { display: flex; flex-direction: column; align-items: center; margin-top: 10px; gap: 20px; width: 100%; }
+        
         .synthesize-btn {
             padding: 15px 40px; background: transparent; border: 1px solid var(--neon-cyan);
             border-radius: 30px; color: #fff; font-size: 1.2rem; font-weight: 600; letter-spacing: 2px;
             cursor: pointer; transition: 0.3s; animation: pulse-glow 2s infinite alternate;
-            position: relative; overflow: hidden;
+            position: relative; overflow: hidden; z-index: 10;
         }
         .synthesize-btn:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--neon-cyan); background: rgba(0, 255, 255, 0.1); }
         
@@ -208,9 +210,40 @@
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
             animation: scan-light 1.5s infinite linear;
         }
+
+        /* 🔴 新增：底部真实音频播放器样式 */
+        #audio-player-wrapper {
+            width: 100%; max-width: 900px;
+            display: none; /* 默认隐藏，生成后显示 */
+            align-items: center; gap: 20px;
+            padding: 15px 25px;
+            border-radius: 40px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(0, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            animation: slide-up 0.5s var(--ease-out-expo) forwards;
+        }
+
+        .player-btn {
+            background: transparent; border: none; color: #fff;
+            font-size: 1.5rem; cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex; justify-content: center; align-items: center;
+            width: 40px; height: 40px; border-radius: 50%;
+        }
+        .player-btn:hover { color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan); transform: scale(1.1); background: rgba(255,255,255,0.1); }
         
+        .time-display {
+            font-family: monospace; font-size: 1rem; color: var(--neon-cyan);
+            font-weight: bold; letter-spacing: 1px; min-width: 45px; text-align: center;
+        }
+
+        #waveform { flex-grow: 1; height: 50px; cursor: pointer; }
+
         @keyframes scan-light { 100% { left: 200%; } }
         @keyframes pulse-glow { 0% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.3); } 100% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.8); border-color: #00ffff; } }
+        @keyframes slide-up { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
         
         .reveal { opacity: 0; transform: translateY(40px); transition: opacity var(--duration-normal) var(--ease-out-expo), transform var(--duration-normal) var(--ease-out-expo); }
         body.loaded .reveal { opacity: 1; transform: translateY(0); }
@@ -339,6 +372,18 @@
 
         <div class="bottom-action reveal delay-7">
             <button class="synthesize-btn" id="generate-btn">SYNTHESIZE AUDIO RITUAL</button>
+            
+            <div id="audio-player-wrapper">
+                <button class="player-btn" id="play-pause-btn" title="Play/Pause">⏸</button>
+                
+                <div class="time-display" id="current-time">0:00</div>
+                
+                <div id="waveform"></div>
+                
+                <div class="time-display" id="total-time">0:00</div>
+                
+                <button class="player-btn" id="download-btn" title="Download Audio">💾</button>
+            </div>
         </div>
 
     </div>
@@ -389,7 +434,7 @@
                 });
             });
 
-            // --- 3. 动态波形渲染引擎 (Canvas) ---
+            // --- 3. 动态波形渲染引擎 (合成界面的假波形) ---
             const canvas = document.getElementById('wave-canvas');
             const ctx = canvas.getContext('2d');
             let currentWaveType = 'sine';
@@ -415,7 +460,6 @@
                 ctx.beginPath();
                 ctx.lineWidth = 3;
                 
-                // 根据当前状态切换发光颜色
                 ctx.strokeStyle = isSynthesizing ? '#ff00ff' : '#00ffff'; 
                 ctx.shadowBlur = isSynthesizing ? 15 : 10;
                 ctx.shadowColor = ctx.strokeStyle;
@@ -427,28 +471,16 @@
                 for (let x = 0; x < width; x++) {
                     const normalizedX = x / width;
                     const phase = (normalizedX * Math.PI * 2 * activeFreq) + timeOffset;
-                    
                     let y = centerY;
-
                     switch (currentWaveType) {
-                        case 'sine':
-                            y = centerY - (Math.sin(phase) * activeAmp);
-                            break;
-                        case 'square':
-                            y = centerY - ((Math.sin(phase) >= 0 ? 1 : -1) * activeAmp);
-                            break;
-                        case 'triangle':
-                            y = centerY - ((2 / Math.PI) * Math.asin(Math.sin(phase)) * activeAmp);
-                            break;
-                        case 'sawtooth':
+                        case 'sine': y = centerY - (Math.sin(phase) * activeAmp); break;
+                        case 'square': y = centerY - ((Math.sin(phase) >= 0 ? 1 : -1) * activeAmp); break;
+                        case 'triangle': y = centerY - ((2 / Math.PI) * Math.asin(Math.sin(phase)) * activeAmp); break;
+                        case 'sawtooth': 
                             let sawVal = 2 * ((phase / (2 * Math.PI)) - Math.floor((phase / (2 * Math.PI)) + 0.5));
-                            y = centerY - (sawVal * activeAmp);
-                            break;
+                            y = centerY - (sawVal * activeAmp); break;
                     }
-                    
-                    // 合成状态下的波形抖动效果
                     if(isSynthesizing) y += (Math.random() * 6 - 3); 
-
                     if (x === 0) ctx.moveTo(x, y);
                     else ctx.lineTo(x, y);
                 }
@@ -457,10 +489,8 @@
                 timeOffset -= isSynthesizing ? 0.1 : 0.02; 
                 requestAnimationFrame(drawWaveform);
             }
-            
             setTimeout(() => { drawWaveform(); }, 100);
 
-            // Web Audio API 提示音
             let audioCtx;
             function playOscillator(type) {
                 if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
@@ -478,34 +508,22 @@
             // --- 4. 生成时的自动推子漂移 ---
             const autoSliders = Array.from(document.querySelectorAll('input.auto-slider'));
             autoSliders.forEach(slider => { slider.targetValue = parseFloat(slider.value); });
-
             function lerp(start, end, amt) { return (1 - amt) * start + amt * end; }
-
             function animateSliders() {
                 if (!isSynthesizing) return; 
-
                 autoSliders.forEach(slider => {
                     if (slider.dataset.manual === "true") return;
-
                     let currentVal = parseFloat(slider.value);
-                    let min = parseFloat(slider.min);
-                    let max = parseFloat(slider.max);
-
+                    let min = parseFloat(slider.min); let max = parseFloat(slider.max);
                     if (Math.abs(currentVal - slider.targetValue) < 1) {
                         let range = (max - min) * 0.3; 
-                        let randomChange = (Math.random() * range) - (range / 2);
-                        slider.targetValue = Math.max(min, Math.min(max, currentVal + randomChange));
+                        slider.targetValue = Math.max(min, Math.min(max, currentVal + (Math.random() * range) - (range / 2)));
                     }
-
                     let newVal = lerp(currentVal, slider.targetValue, 0.03);
                     slider.value = newVal;
                     updateSliderTail(slider);
-                    
-                    if(slider.id === 'tempo-slider') {
-                        bpmDisplay.textContent = Math.round(newVal);
-                    }
+                    if(slider.id === 'tempo-slider') bpmDisplay.textContent = Math.round(newVal);
                 });
-
                 if(Math.random() < 0.02) { 
                     const btns = Array.from(oscButtons);
                     const randomBtn = btns[Math.floor(Math.random() * btns.length)];
@@ -513,82 +531,121 @@
                     randomBtn.classList.add('auto-active');
                     currentWaveType = randomBtn.getAttribute('data-wave');
                 }
-
                 requestAnimationFrame(animateSliders);
             }
 
-            // --- 5. 核心逻辑：拦截输入并执行双重 API 生成 ---
+            // --- 🔴 5. 初始化 WaveSurfer 音频播放器 ---
+            let wavesurfer = WaveSurfer.create({
+                container: '#waveform',
+                waveColor: 'rgba(0, 255, 255, 0.5)', // 未播放区域颜色 (青色透明)
+                progressColor: '#ff00ff',            // 已播放区域颜色 (霓虹紫)
+                cursorColor: '#ffffff',
+                barWidth: 3,
+                barGap: 3,
+                barRadius: 3,
+                height: 50,
+                normalize: true // 自动最大化波形高度
+            });
+
+            const playPauseBtn = document.getElementById('play-pause-btn');
+            const currentTimeEl = document.getElementById('current-time');
+            const totalTimeEl = document.getElementById('total-time');
+            const downloadBtn = document.getElementById('download-btn');
+            let currentDownloadUrl = "";
+
+            // 格式化时间 (mm:ss)
+            const formatTime = (seconds) => {
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            };
+
+            // 监听波形更新事件
+            wavesurfer.on('audioprocess', () => {
+                currentTimeEl.textContent = formatTime(wavesurfer.getCurrentTime());
+            });
+            wavesurfer.on('ready', () => {
+                totalTimeEl.textContent = formatTime(wavesurfer.getDuration());
+                currentTimeEl.textContent = formatTime(0);
+                wavesurfer.play(); // 加载完直接播放
+                playPauseBtn.textContent = '⏸';
+            });
+            wavesurfer.on('finish', () => {
+                playPauseBtn.textContent = '▶';
+                genBtn.style.display = 'block'; // 播放完显示生成按钮
+            });
+
+            // 播放/暂停控制
+            playPauseBtn.addEventListener('click', () => {
+                wavesurfer.playPause();
+                playPauseBtn.textContent = wavesurfer.isPlaying() ? '⏸' : '▶';
+            });
+
+            // 下载逻辑
+            downloadBtn.addEventListener('click', () => {
+                if(!currentDownloadUrl) return;
+                const a = document.createElement('a');
+                a.href = currentDownloadUrl;
+                a.download = `CyberSynth_Generated_${Date.now()}.mp3`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
+
+            // --- 6. 核心逻辑：拦截输入并执行双重 API 生成 ---
             const genBtn = document.getElementById('generate-btn');
             const mainTitle = document.getElementById('main-title');
             const mainGrid = document.getElementById('main-grid');
+            const playerWrapper = document.getElementById('audio-player-wrapper');
             
             const genreInput = document.querySelectorAll('.glow-input')[0];
             const soundsInput = document.querySelectorAll('.glow-input')[1];
             const structureInput = document.querySelectorAll('.glow-input')[2];
 
             let pollInterval; 
-            let currentAudio = null; 
 
             genBtn.addEventListener('click', async () => {
                 if (isSynthesizing) return; 
                 
-                // 1. 触发 UI 狂暴动画
                 isSynthesizing = true;
                 genBtn.classList.add('processing');
                 mainTitle.classList.add('synthesizing');
                 mainGrid.classList.add('synthesizing');
                 document.querySelectorAll('.glass-panel').forEach(p => p.classList.add('active-module'));
                 
+                // 隐藏波形播放器（如果是第二次生成）
+                playerWrapper.style.display = 'none';
+                if(wavesurfer.isPlaying()) wavesurfer.stop();
+                
                 animateSliders(); 
 
-                if(currentAudio) {
-                    currentAudio.pause();
-                    currentAudio.currentTime = 0;
-                }
-
-                // 2. 精准抓取文本框和 BPM 旋钮的数据
                 const fullPrompt = `${genreInput.value}, ${soundsInput.value}, ${structureInput.value}`;
                 const currentTempo = document.getElementById('tempo-slider').value; 
                 
                 try {
-                    // 【第一步】：呼叫 Llama 3 扩写提示词
                     genBtn.textContent = "OPTIMIZING SPELL (AI ASSISTANT)...";
                     
                     const enhanceResponse = await fetch('/api/enhance', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            prompt: fullPrompt,
-                            bpm: currentTempo  // 强制将 BPM 喂给 AI
-                        })
+                        body: JSON.stringify({ prompt: fullPrompt, bpm: currentTempo })
                     });
                     
                     const enhanceData = await enhanceResponse.json();
                     const finalPrompt = enhanceData.optimizedPrompt || fullPrompt;
-                    
-                    // 完美植入：接住后端传回来的消杀词！
                     const finalNegative = enhanceData.negativePrompt || ""; 
                     
-                    console.log(`[BPM: ${currentTempo}] 魔法词已组装完毕:`, finalPrompt); 
-                    console.log(`[消杀层已激活]:`, finalNegative); 
-
-                    // 【第二步】：将终极咒语和消杀词发给 Stable Audio
                     genBtn.textContent = "COMMUNICATING WITH DiT CORE...";
                     
                     const response = await fetch('/api/generate', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        // 完美植入：把消杀词打包进 body，发给你的 /api/generate
-                        body: JSON.stringify({ 
-                            prompt: finalPrompt,
-                            negative_prompt: finalNegative 
-                        })
+                        body: JSON.stringify({ prompt: finalPrompt, negative_prompt: finalNegative })
                     });
 
                     let prediction = await response.json();
                     if (response.status !== 201) throw new Error(prediction.detail || "API Error");
 
-                    // 【第三步】：轮询服务器进度，直到歌曲生成完毕
                     pollInterval = setInterval(async () => {
                         const statusResponse = await fetch(`/api/status?id=${prediction.id}`);
                         let statusData = await statusResponse.json();
@@ -598,28 +655,35 @@
                         if (statusData.status === "succeeded") {
                             clearInterval(pollInterval);
                             
-                            // 拿到音频，恢复 UI 状态，自动播放！
+                            // 🔴 拿到音频后，喂给 WaveSurfer！
                             const audioUrl = Array.isArray(statusData.output) ? statusData.output[0] : statusData.output; 
-                            currentAudio = new Audio(audioUrl);
-                            currentAudio.play();
+                            currentDownloadUrl = audioUrl; // 保存下载链接
                             
-                            resetUI("RITUAL COMPLETE - PLAYING...");
-                            currentAudio.onended = () => { genBtn.textContent = "SYNTHESIZE AUDIO RITUAL"; };
+                            resetUI();
+                            
+                            // 隐藏生成按钮，显示高透玻璃播放器
+                            genBtn.style.display = 'none';
+                            playerWrapper.style.display = 'flex';
+                            
+                            // 让 WaveSurfer 加载音频并自动绘制条状波形
+                            wavesurfer.load(audioUrl);
                             
                         } else if (statusData.status === "failed" || statusData.status === "canceled") {
                             clearInterval(pollInterval);
                             resetUI("RITUAL FAILED - TRY AGAIN");
+                            genBtn.style.display = 'block';
                         }
                     }, 3000);
 
                 } catch (error) {
                     console.error("生成失败:", error);
                     resetUI("SYSTEM ERROR - OFFLINE");
+                    genBtn.style.display = 'block';
                 }
             });
 
             // 统一复位 UI 状态
-            function resetUI(buttonText) {
+            function resetUI(buttonText = "SYNTHESIZE AUDIO RITUAL") {
                 isSynthesizing = false;
                 genBtn.textContent = buttonText;
                 genBtn.classList.remove('processing');
@@ -630,8 +694,6 @@
                 const oscBtns = document.querySelectorAll('#osc-buttons .wave-btn');
                 oscBtns.forEach(b => b.classList.remove('auto-active'));
                 autoSliders.forEach(slider => slider.targetValue = parseFloat(slider.value));
-                
-                setTimeout(() => { if(!currentAudio || currentAudio.paused) genBtn.textContent = "SYNTHESIZE AUDIO RITUAL"; }, 3000);
             }
 
         });
