@@ -4,211 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Music Generator - Interactive UI</title>
-    <style>
-        /* ===========================================
-           1. CSS 全局变量
-           =========================================== */
-        :root {
-            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-            --duration-normal: 0.8s;
-            --neon-cyan: #00ffff;
-            --neon-purple: #ff00ff;
-            
-            /* 高透玻璃底色渐变 */
-            --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 100%); 
-            --glass-border: rgba(0, 255, 255, 0.25);
-            --text-main: rgba(255, 255, 255, 0.95);
-            --text-muted: rgba(255, 255, 255, 0.6);
-        }
-
-        /* ===========================================
-           2. 基础与排版
-           =========================================== */
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-
-        body {
-            width: 100vw; height: 100vh; overflow: hidden;
-            background-image: url('mandala.jpg');
-            background-size: cover; background-position: center;
-            color: var(--text-main);
-            display: flex; justify-content: center; align-items: center;
-        }
-
-        .app-container { 
-            width: 95%; max-width: 1300px; height: 95vh; 
-            display: flex; flex-direction: column; justify-content: space-between; position: relative; 
-        }
-
-        .top-panel { text-align: center; margin-bottom: 20px; }
-        .hologram-title {
-            font-size: 2.2rem; letter-spacing: 4px; font-weight: 600;
-            color: #fff; text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px rgba(0, 255, 255, 0.5);
-            margin-bottom: 5px;
-        }
-        .hologram-subtitle { font-size: 0.9rem; color: var(--text-muted); letter-spacing: 1px; font-weight: 300;}
-
-        .synth-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; flex-grow: 1; }
-        .span-2 { grid-column: span 2; }
-
-        /* ===========================================
-           3. 高透玻璃面板
-           =========================================== */
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            border: 1px solid var(--glass-border);
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            border-left: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.05), 0 8px 32px rgba(0, 0, 0, 0.3);
-            display: flex; flex-direction: column;
-        }
-        .module h2 { 
-            font-size: 1rem; color: var(--neon-cyan); margin-bottom: 15px; 
-            font-weight: 600; letter-spacing: 2px; text-shadow: 0 0 5px rgba(0, 255, 255, 0.4); 
-        }
-
-        /* ===========================================
-           4. 波形按钮 & 动态波形展示 (Canvas)
-           =========================================== */
-        .waveform-group { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 15px; }
-
-        .wave-btn {
-            flex: 1; aspect-ratio: 1; 
-            background-color: transparent; border: none; padding: 0;
-            background-size: contain; background-repeat: no-repeat; background-position: center;
-            cursor: pointer; transition: transform 0.2s ease, filter 0.3s ease; opacity: 0.6;
-        }
-        .wave-btn:hover { transform: scale(1.05); opacity: 0.8; }
-        .wave-btn.active { filter: drop-shadow(0 0 15px rgba(0, 255, 255, 1)); opacity: 1; }
-
-        .osc-sin { background-image: url('images/osc-sin.png'); }
-        .osc-tri { background-image: url('images/osc-tri.png'); }
-        .osc-squ { background-image: url('images/osc-squ.png'); }
-        .osc-saw { background-image: url('images/osc-saw.png'); }
-
-        .active-wave-display {
-            width: 100%; height: 90px; margin-top: 15px;
-            background-color: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 8px; box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.8);
-            display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden;
-        }
-        .active-wave-display::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
-            background-size: 10px 10px; pointer-events: none;
-        }
-        canvas#wave-canvas { width: 100%; height: 100%; display: block; }
-
-        /* ===========================================
-           5. 🔴 全局滑块样式 (水滴把手 waterknob.png + 横向排版)
-           =========================================== */
-        .control-row-clean { display: flex; flex-direction: column; gap: 20px; }
-        
-        /* 旧的左右排列模式 (用于 LFO) */
-        .slider-item { display: flex; align-items: center; gap: 15px; width: 100%; }
-        .slider-item label { width: 80px; font-size: 0.95rem; color: #fff; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.8); letter-spacing: 1px; }
-
-        /* 🔴 核心布局：上下堆叠排列模式 (用于 Filter 和 Envelope) */
-        .fader-group { 
-            display: flex; flex-direction: column; 
-            justify-content: center; height: auto; align-items: stretch; 
-            gap: 25px; /* 滑块组之间的垂直间距 */
-            padding: 10px 0; margin-top: 5px;
-        }
-        .fader-item { 
-            display: flex; flex-direction: column; 
-            align-items: center; /* 标签居中 */
-            gap: 8px; /* 轨道和标签的距离 */
-            width: 100%; 
-        }
-        .fader-item label { 
-            width: auto; font-size: 0.95rem; color: #fff; 
-            font-weight: 600; letter-spacing: 1px; text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-        }
-
-        /* 统一轨道样式 */
-        input[type="range"] {
-            -webkit-appearance: none; flex-grow: 1; width: 100%; height: 6px;
-            background: rgba(15, 20, 35, 0.6); border: 1px solid rgba(255, 255, 255, 0.2); 
-            border-radius: 3px; outline: none; cursor: pointer;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.8);
-            transform: none !important; margin-bottom: 0 !important;
-        }
-
-        /* 统一把手 (waterknob.png) */
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            
-            /* 请根据 nob.png 实际比例调整这里 */
-            width: 50px;  
-            height: 50px; 
-            
-            background-color: transparent; border-radius: 0; box-shadow: none;
-            background-image: url('images/nob.png'); 
-            background-size: contain; background-repeat: no-repeat; background-position: center;
-            
-            /* 居中微调: -(把手高度 50px - 轨道高度 6px) / 2 = -22px */
-            margin-top: -22px; 
-            transition: filter 0.2s, transform 0.1s;
-        }
-        input[type="range"]::-webkit-slider-thumb:hover { 
-            transform: scale(1.05); filter: brightness(1.2) drop-shadow(0 0 5px rgba(0, 255, 255, 0.4)); 
-        }
-
-        /* ===========================================
-           6. 配置区 (BPM 迷幻渐变色)
-           =========================================== */
-        .config-flex { display: flex; align-items: center; justify-content: space-between; height: 100%; gap: 30px;}
-
-        .bpm-display { 
-            font-size: 3.5rem; font-weight: 800; display: flex; align-items: baseline; gap: 5px; 
-            background: linear-gradient(135deg, #00ffff 0%, #7b2cbf 50%, #0050ff 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 12px rgba(123, 44, 191, 0.8));
-        }
-        .bpm-text { 
-            font-size: 1rem; font-weight: bold; letter-spacing: 2px;
-            -webkit-text-fill-color: rgba(255, 255, 255, 0.6);
-        }
-
-        .tempo-control-area { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
-        .tempo-slider-container { display: flex; align-items: center; gap: 15px; width: 100%; }
-        .tempo-limit { font-size: 1rem; color: #fff; font-weight: bold; }
-
-        /* ===========================================
-           7. 输入区 & 底部按钮
-           =========================================== */
-        .input-form { display: flex; flex-direction: column; gap: 15px; }
-        .input-row { display: flex; align-items: center; gap: 15px; }
-        .input-row label { width: 100px; font-size: 1rem; color: var(--text-muted); letter-spacing: 1px;}
-        .glow-input {
-            flex-grow: 1; padding: 10px 15px; background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-bottom: 2px solid rgba(0, 255, 255, 0.3);
-            color: #fff; font-size: 0.9rem; border-radius: 6px; outline: none; transition: 0.3s;
-        }
-        .glow-input:focus { border-bottom-color: var(--neon-cyan); background: rgba(0, 255, 255, 0.05); }
-
-        .bottom-action { display: flex; justify-content: center; margin-top: 10px; }
-        .synthesize-btn {
-            padding: 15px 40px; background: transparent; border: 1px solid var(--neon-cyan);
-            border-radius: 30px; color: #fff; font-size: 1.1rem; font-weight: 600; letter-spacing: 2px;
-            cursor: pointer; transition: 0.3s; animation: pulse-glow 2s infinite alternate;
-        }
-        .synthesize-btn:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--neon-cyan); background: rgba(0, 255, 255, 0.1); }
-        @keyframes pulse-glow { 0% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.3); } 100% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.8); border-color: #00ffff; } }
-        .edit-hotzone, .edit-toggle { display: none !important; }
-
-        /* 入场动效 */
-        .reveal { opacity: 0; transform: translateY(40px); transition: opacity var(--duration-normal) var(--ease-out-expo), transform var(--duration-normal) var(--ease-out-expo); }
-        body.loaded .reveal { opacity: 1; transform: translateY(0); }
-        .delay-1 { transition-delay: 0.1s; } .delay-2 { transition-delay: 0.2s; }
-        .delay-3 { transition-delay: 0.3s; } .delay-4 { transition-delay: 0.4s; }
-        .delay-5 { transition-delay: 0.5s; } .delay-6 { transition-delay: 0.6s; }
-        .delay-7 { transition-delay: 0.7s; }
-    </style>
+    <link rel="stylesheet" href="style.css"> 
 </head>
 <body class="loaded">
     <div class="app-container">
@@ -253,19 +49,19 @@
                 <h2>III. ENVELOPE</h2>
                 <div class="fader-group">
                     <div class="fader-item">
-                        <input type="range" class="neon-slider" min="0" max="100" value="40">
+                        <input type="range" class="envelope-slider" min="0" max="100" value="40">
                         <label>Attack</label>
                     </div>
                     <div class="fader-item">
-                        <input type="range" class="neon-slider" min="0" max="100" value="60">
+                        <input type="range" class="envelope-slider" min="0" max="100" value="60">
                         <label>Decay</label>
                     </div>
                     <div class="fader-item">
-                        <input type="range" class="neon-slider" min="0" max="100" value="50">
+                        <input type="range" class="envelope-slider" min="0" max="100" value="50">
                         <label>Sustain</label>
                     </div>
                     <div class="fader-item">
-                        <input type="range" class="neon-slider" min="0" max="100" value="80">
+                        <input type="range" class="envelope-slider" min="0" max="100" value="80">
                         <label>Release</label>
                     </div>
                 </div>
@@ -402,7 +198,8 @@
                 }
                 ctx.stroke();
             }
-            drawWaveform('sine');
+            // 确保字体加载后再绘制，或者延迟一点点绘制
+            setTimeout(() => { drawWaveform('sine'); }, 100);
 
             // --- 3. Web Audio API 发声逻辑 ---
             let audioCtx;
