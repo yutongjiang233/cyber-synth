@@ -227,18 +227,44 @@ document.addEventListener('DOMContentLoaded', () => {
         const structure = inputs[2].value || "Organic swell";
         const bpmRangeVal = document.getElementById('bpmRange').value;
         
-        const masterKeywords = "distinct individual instruments, crisp and clear separation, mastered, perfectly balanced EQ, professional studio mix, lossless FLAC quality";
-        const finalPrompt = `${genre}, ${sounds}, ${structure}, ${bpmRangeVal} BPM, ${masterKeywords}`;
+        // 【核心修改 1】：组合基础用户的输入，去掉你之前手动写的 masterKeywords
+        // 因为这些神仙词现在全部由后端的 Llama 3 字典包办了！
+        const combinedPrompt = `[GENRE]: ${genre}, [SOUNDS]: ${sounds}, [STRUCTURE]: ${structure}`;
 
         try {
+            // ==========================================
+            // 【核心修改 2】：第一步，请求后端 /api/enhance 扩写提示词
+            // ==========================================
+            console.log(`Sending to Brain: ${bpmRangeVal} BPM...`);
+            const enhanceResponse = await fetch('/api/enhance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    prompt: combinedPrompt,
+                    bpm: bpmRangeVal  // 将滑块的 BPM 精准传给大语言模型
+                })
+            });
+
+            if (!enhanceResponse.ok) throw new Error("Failed to enhance prompt");
+            
+            const enhanceData = await enhanceResponse.json();
+            const optimizedPrompt = enhanceData.optimizedPrompt;
+            console.log("LLM Expanded Prompt:", optimizedPrompt); // 你可以在控制台看到扩写后的终极咒语
+            
+            generateBtn.innerText = "🧬 SYNTHESIZING AUDIO (3 MINS MAX)... 🧬"; // 更新 UI 提示
+
+            // ==========================================
+            // 【核心修改 3】：第二步，拿着扩写好的神级咒语去请求真正的音乐生成 API
+            // ==========================================
             const response = await fetch('/api/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: finalPrompt })
+                body: JSON.stringify({ prompt: optimizedPrompt })
             });
 
             const data = await response.json();
 
+            // 如果你的 /api/generate 依然是直接返回 data.audioUrl，就走这段逻辑
             if (data.audioUrl) {
                 generateBtn.innerText = "🎵 MANDALA AWAKENED 🎵";
                 generateBtn.style.background = "linear-gradient(90deg, var(--bio-blue), var(--bio-purple))";
@@ -258,7 +284,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 ritualAudio.play();
 
-            } else { throw new Error("No audio returned"); }
+            } else { 
+                // 如果用到轮询，你可能需要在这里处理 data.id 的轮询逻辑
+                throw new Error("No audio returned immediately (Needs Polling?)"); 
+            }
 
         } catch (error) {
             console.error("生成出错:", error);
