@@ -8,13 +8,13 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
     try {
-        // 🔴 终极满血版：直接榨干 GPU，生成 3 分钟完整曲目！
+        // 🔴 满血 2.5 版本：精准指向官方稳定版模型，拉满 3 分钟算力！
         const prediction = await replicate.predictions.create({
-            model: "stability-ai/stable-audio", // 稳定的官方主线模型
+            model: "stability-ai/stable-audio-2.5", // 👈 精确指向最新的 2.5 版本
             input: {
                 prompt: req.body.prompt,
-                duration: 180, // 👈 物理极限拉满，生成 3 分钟的完整歌曲
-                steps: 8       // 👈 官方允许的最高画质步数
+                duration: 180, // 👈 物理极限拉满：180 秒（3分钟完整曲目）
+                steps: 8       // 👈 画质参数拉满：官方允许的最高 8 步
             }
         });
 
