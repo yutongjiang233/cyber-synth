@@ -541,8 +541,7 @@
                 requestAnimationFrame(animateSliders);
             }
 
-            // --- 5. 🔴 真·云端联网版：接入 Vercel + Replicate API ---
-            // 获取输入框的内容
+            // --- 5. 🔴 终极两步走架构：LLM 扩写 -> 音乐生成 ---
             const genreInput = document.querySelectorAll('.glow-input')[0];
             const soundsInput = document.querySelectorAll('.glow-input')[1];
             const structureInput = document.querySelectorAll('.glow-input')[2];
@@ -551,12 +550,9 @@
             let currentAudio = null; 
 
             genBtn.addEventListener('click', async () => {
-                // 如果正在合成中，防止重复点击
                 if (isSynthesizing) return; 
                 
-                // 启动 UI 暴走状态
                 isSynthesizing = true;
-                genBtn.textContent = "COMMUNICATING WITH DiT CORE...";
                 genBtn.classList.add('processing');
                 mainTitle.classList.add('synthesizing');
                 mainGrid.classList.add('synthesizing');
@@ -564,48 +560,54 @@
                 
                 animateSliders(); 
 
-                // 如果之前有播放音乐，先暂停
                 if(currentAudio) {
                     currentAudio.pause();
                     currentAudio.currentTime = 0;
                 }
 
-                // 拼接给大模型的 Prompt
                 const fullPrompt = `${genreInput.value}, ${soundsInput.value}, ${structureInput.value}`;
                 
                 try {
-                    // 1. 发送第一波请求，获取生成任务小票 (加入了 duration: 60)
+                    // 🔴 步骤 1：先呼叫 LLM 大语言模型帮你写“神级咒语”
+                    genBtn.textContent = "OPTIMIZING SPELL (AI ASSISTANT)...";
+                    
+                    const enhanceResponse = await fetch('/api/enhance', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ prompt: fullPrompt })
+                    });
+                    const enhanceData = await enhanceResponse.json();
+                    
+                    // 拿到扩写后的长词（如果报错了，就用原词兜底）
+                    const finalPrompt = enhanceData.optimizedPrompt || fullPrompt;
+                    console.log("🔥 AI 自动为你定制的提示词:", finalPrompt); // 按 F12 可以在控制台偷看 AI 帮你写了什么！
+
+                    // 🔴 步骤 2：拿着定制好的长词，去呼叫音乐大模型
+                    genBtn.textContent = "COMMUNICATING WITH DiT CORE...";
+                    
                     const response = await fetch('/api/generate', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ prompt: fullPrompt, duration: 60 }) // 🔴 这里加入了 60 秒参数
+                        body: JSON.stringify({ prompt: finalPrompt })
                     });
 
                     let prediction = await response.json();
-                    
                     if (response.status !== 201) throw new Error(prediction.detail || "API Error");
 
-                    // 2. 开始轮询，每 3 秒去 Vercel 查询进度
+                    // 🔴 步骤 3：开始轮询进度
                     pollInterval = setInterval(async () => {
                         const statusResponse = await fetch(`/api/status?id=${prediction.id}`);
                         let statusData = await statusResponse.json();
 
-                        // 在按钮上实时显示当前模型状态 (Starting, Processing...)
                         genBtn.textContent = `SYNTHESIZING... [${statusData.status.toUpperCase()}]`;
 
                         if (statusData.status === "succeeded") {
                             clearInterval(pollInterval);
-                            
-                            // 拿到生成的音频 URL (处理单个字符串或数组格式)
                             const audioUrl = Array.isArray(statusData.output) ? statusData.output[0] : statusData.output; 
                             currentAudio = new Audio(audioUrl);
                             currentAudio.play();
-
                             resetUI("RITUAL COMPLETE - PLAYING...");
-                            
-                            // 音乐放完后恢复按钮
                             currentAudio.onended = () => { genBtn.textContent = "SYNTHESIZE AUDIO RITUAL"; };
-
                         } else if (statusData.status === "failed" || statusData.status === "canceled") {
                             clearInterval(pollInterval);
                             resetUI("RITUAL FAILED - TRY AGAIN");
@@ -618,7 +620,6 @@
                 }
             });
 
-            // 辅助函数：恢复界面安静状态
             function resetUI(buttonText) {
                 isSynthesizing = false;
                 genBtn.textContent = buttonText;
