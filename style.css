@@ -1,116 +1,85 @@
 /* ===========================================
-   CSS 变量定义 (全局色彩与动画曲线)
-   =========================================== */
-:root {
-    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-    --duration-normal: 0.8s;
-    
-    --neon-cyan: #00ffff;
-    --neon-purple: #ff00ff;
-    /* 🔴 修改点 1：把纯色背景换成极低透明度的微光渐变，去掉厚重感 */
-    --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 100%); 
-    --glass-border: rgba(0, 255, 255, 0.25);
-    --text-main: rgba(255, 255, 255, 0.9);
-    --text-muted: rgba(255, 255, 255, 0.5);
-}
-
-/* ===========================================
-   基础与排版
-   =========================================== */
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-
-body {
-    width: 100vw; height: 100vh; overflow: hidden;
-    background-image: url('mandala.jpg');
-    background-size: cover; background-position: center;
-    color: var(--text-main);
-    display: flex; justify-content: center; align-items: center;
-}
-
-.app-container { width: 95%; max-width: 1300px; height: 95vh; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
-
-/* 标题区 */
-.top-panel { text-align: center; margin-bottom: 20px; }
-.hologram-title {
-    font-size: 2.2rem; letter-spacing: 4px; font-weight: 600;
-    color: #fff; text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px rgba(0, 255, 255, 0.5);
-    margin-bottom: 5px;
-}
-.hologram-subtitle { font-size: 0.9rem; color: var(--text-muted); letter-spacing: 1px; font-weight: 300;}
-
-/* 网格布局 */
-.synth-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; flex-grow: 1; }
-.span-2 { grid-column: span 2; }
-
-/* ===========================================
-   高透玻璃面板核心逻辑
-   =========================================== */
-.glass-panel {
-    background: var(--glass-bg);
-    /* 🔴 修改点 2：将模糊度从 8px 降到 4px，透出背景漩涡细节 */
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    
-    border: 1px solid var(--glass-border);
-    /* 🔴 修改点 3：增加顶部和左侧的白色细高光，模拟玻璃切边的物理质感 */
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    border-left: 1px solid rgba(255, 255, 255, 0.2);
-    
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 
-        inset 0 0 20px rgba(0, 255, 255, 0.05),
-        0 8px 32px rgba(0, 0, 0, 0.3);
-    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.4s var(--ease-out-expo);
-}
-.glass-panel:hover {
-    border-color: rgba(0, 255, 255, 0.5);
-    box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.1), 0 8px 32px rgba(0, 0, 0, 0.4);
-}
-.module h2 { font-size: 0.9rem; color: var(--neon-cyan); margin-bottom: 15px; font-weight: 500; letter-spacing: 2px; text-shadow: 0 0 5px rgba(0, 255, 255, 0.4); }
-
-/* ===========================================
-   🌟 专业 PNG 资产波形按钮 (指定到 images 文件夹) - 原封不动！
-   =========================================== */
-.waveform-group { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 15px; }
-.waveform-group.small { justify-content: flex-start; gap: 8px; }
-.waveform-group.small .wave-btn { flex: none; width: 40px; }
-
-.wave-btn {
-    flex: 1; 
-    aspect-ratio: 1; /* 保持完美正方形 */
-    background-color: transparent; border: none; box-shadow: none; padding: 0;
-    background-size: contain; background-repeat: no-repeat; background-position: center;
-    cursor: pointer; transition: transform 0.2s ease, filter 0.3s ease;
-}
-
-.wave-btn:hover {
-    transform: scale(1.05);
-    filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.6)); 
-}
-.wave-btn.active {
-    filter: drop-shadow(0 0 15px rgba(0, 255, 255, 1)); 
-}
-
-/* 核心：精确指向 images 文件夹里的资产 */
-.osc-sin { background-image: url('images/osc-sin.png'); }
-.osc-tri { background-image: url('images/osc-tri.png'); }
-.osc-squ { background-image: url('images/osc-squ.png'); }
-.osc-saw { background-image: url('images/osc-saw.png'); }
-
-/* ===========================================
-   霓虹滑块推杆 & 输入框
+   霓虹滑块推杆 & 输入框 (修改为横向水滴滑块，完美还原图片布局)
    =========================================== */
 .control-row-clean, .fader-group { display: flex; flex-direction: column; gap: 15px; }
-.fader-group { flex-direction: row; justify-content: space-around; height: 120px; align-items: flex-end; }
-.slider-item, .fader-item { display: flex; align-items: center; gap: 12px; }
-.fader-item { flex-direction: column; }
-.slider-item label, .fader-item label { width: 60px; font-size: 0.8rem; color: var(--text-muted); font-weight: 500;}
 
-input[type="range"].neon-slider {
-    -webkit-appearance: none; flex-grow: 1; height: 4px;
-    background: rgba(255, 255, 255, 0.1); border-radius: 2px; outline: none; cursor: pointer;
+/* 🔴 核心修改 1：改变 fader-group 的排列方向和间距 */
+.fader-group { 
+    flex-direction: column; /* 强制垂直堆叠每个滑块项 */
+    justify-content: center; 
+    height: auto; /* 取消固定的120px高度，让内容撑开 */
+    align-items: stretch; /* 让滑块项水平拉满容器 */
+    gap: 20px; /* 滑块之间的垂直间距 */
+    padding: 0 10px;
+    margin-top: 10px;
 }
-input[type="range"].neon-slider.vertical { transform: rotate(-90deg); width: 80px; margin-bottom: 40px; }
+
+.slider-item, .fader-item { display: flex; align-items: center; gap: 12px; }
+
+/* 🔴 核心修改 2：强制 fader-item (滑块和标签的容器) 上下排列，并居中标签 */
+.fader-item { 
+    flex-direction: column; /* 强制上下排列 */
+    gap: 5px; /* 滑块和标签的间距 */
+    align-items: center; /* 标签居中 */
+    width: 100%; /* 拉满父容器 */
+}
+
+.slider-item label, .fader-item label { 
+    width: auto; /* 取消固定的60px宽度 */
+    font-size: 0.95rem; /* 稍微放大一点标签 */
+    color: #fff; /* 改为亮白色 */
+    font-weight: 600; 
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8); /* 增加文字阴影，提高在复杂背景上的可读性 */
+    letter-spacing: 1px; 
+}
+
+/* 🔴 核心修改 3：重新设计滑块轨道，做出玻璃凹槽感 */
+input[type="range"].neon-slider {
+    -webkit-appearance: none; 
+    flex-grow: 1; 
+    width: 100%; /* 横向拉满 */
+    height: 10px; /* 加粗一点，做出凹槽感 */
+    background: rgba(15, 20, 35, 0.6); /* 深色半透明底槽 */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* 凹槽边缘反光 */
+    border-radius: 8px; 
+    outline: none; 
+    cursor: pointer;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.8), inset 0 0 5px rgba(0, 255, 255, 0.05); /* 内阴影做出凹陷感 */
+}
+
+/* 🔴 核心修改 4：最重要的一步，强制覆盖掉 HTML 中 .vertical 类带来的旋转效果 */
+input[type="range"].neon-slider.vertical { 
+    transform: none; /* 取消旋转，让它横过来 */
+    width: 100%; /* 覆盖原本设置的 80px 宽度 */
+    margin-bottom: 0; /* 取消原本为了垂直布局设置的 margin */
+}
+
+/* 🔴 核心修改 5：应用你的 nob.png 资产作为把手 */
 input[type="range"].neon-slider::-webkit-slider-thumb {
-    -webkit-
+    -webkit-appearance: none;
+    width: 50px;  /* 🔴 根据你 nob.png 的实际长宽比调整这里 */
+    height: 35px; /* 🔴 根据你 nob.png 的实际长宽比调整这里 */
+    
+    background-color: transparent; /* 取消原本的紫色背景 */
+    box-shadow: none; /* 取消原本的光晕，因为你的图片里应该自带光晕或质感了 */
+    border-radius: 0; /* 取消圆角，完全依赖图片形状 */
+    
+    /* 引用你的自定义水滴把手图片 */
+    background-image: url('images/nob.png'); 
+    background-size: contain; 
+    background-repeat: no-repeat; 
+    background-position: center; 
+    
+    margin-top: -12px; /* 🔴 关键：微调这个数值 (通常是 -(把手高度-轨道高度)/2 )，让把手垂直居中在凹槽上 */
+    transition: filter 0.2s, transform 0.1s;
+}
+
+/* 悬停效果：稍微提亮或放大图片把手 */
+input[type="range"].neon-slider::-webkit-slider-thumb:hover { 
+    transform: scale(1.05);
+    filter: brightness(1.2); 
+}
+
+/* ===========================================
+   输入框 (接下来的代码保持你原本的即可)
+   =========================================== */
