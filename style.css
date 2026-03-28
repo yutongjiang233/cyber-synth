@@ -1,245 +1,98 @@
-、/* --- 基础重置 (保持极简) --- */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+/* --- CSS 变量 (从原作者处汲取灵感) --- */
+:root {
+    /* 这个贝塞尔曲线是动画高级感的灵魂：起步快，结尾极度丝滑 */
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --duration-normal: 0.8s;
 }
 
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+
 body {
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden; /* 防止滚动 */
-    /* 核心：将全屏曼陀罗背景贴上，这是视觉主体 */
+    width: 100vw; height: 100vh; overflow: hidden;
     background-image: url('mandala.jpg');
-    background-size: cover;
-    background-position: center;
-    background-color: #050510;
-    color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background-size: cover; background-position: center;
+    background-color: #050510; color: #fff;
+    display: flex; justify-content: center; align-items: center;
 }
 
 .app-container {
-    width: 95%;
-    max-width: 1400px;
-    height: 95vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    position: relative;
+    width: 95%; max-width: 1400px; height: 95vh;
+    display: flex; flex-direction: column; justify-content: space-between;
 }
 
-/* --- 顶部全息标题与描述框 (极简、高透) --- */
-.top-panel {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
+.top-panel { text-align: center; margin-bottom: 20px; }
 .hologram-title {
-    color: transparent; /* 文本设为透明，使用 text-shadow 显示霓虹光晕 */
-    font-size: 2.5rem;
-    letter-spacing: 5px;
-    text-transform: uppercase;
-    font-weight: 300;
-    text-shadow: 
-        0 0 8px rgba(0, 255, 255, 0.8),
-        0 0 20px rgba(0, 255, 255, 0.4);
-    margin-bottom: 10px;
+    color: transparent; font-size: 2.5rem; letter-spacing: 5px; text-transform: uppercase; font-weight: 300;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.4); margin-bottom: 10px;
 }
+.hologram-subtitle { font-size: 0.95rem; color: rgba(255, 255, 255, 0.7); letter-spacing: 1px; }
 
-.hologram-subtitle {
-    font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.7);
-    max-width: 900px;
-    margin: 0 auto;
-    letter-spacing: 1px;
-}
-
-/* --- 中部网格布局 (Grid) --- */
 .synth-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 四列等宽 */
-    grid-template-rows: auto auto; /* 两行 */
-    gap: 20px; /* 模块之间的间距 */
-    flex-grow: 1; /* 中部网格拉伸填满剩余空间 */
-    justify-content: center; /* 居中网格 */
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; flex-grow: 1;
 }
+.span-2 { grid-column: span 2; }
 
-/* --- 核心核心：极简超薄全息/玻璃面板 (零资产，零磨砂，极致通透) --- */
+/* --- 极简超薄玻璃面板 --- */
 .holo-panel {
-    /* 1. 彻底移除之前的磨砂、模糊效果，不遮挡背景 */
-    backdrop-filter: blur(4px); /* 极轻微模糊，保证文字能看清但背景清晰可见 */
-    -webkit-backdrop-filter: blur(4px);
-    background: rgba(25, 20, 45, 0.1); /* 深紫色底色透明度极高(0.1)，几乎透明 */
-    
-    /* 2. 贴上极细的半透明青色/全息发光边框线 */
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    background: rgba(25, 20, 45, 0.1); 
     border: 1px solid rgba(0, 255, 255, 0.2); 
-    border-radius: 8px; /* 微微的圆角 */
-    
-    /* 3. 微弱的内发光，增加立体感但不挡背景 */
+    border-radius: 8px; padding: 20px;
     box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.05);
-    
-    /* 4. 优化内边距，确保控件在边框内对齐 */
-    padding: 20px;
-    color: #fff;
-    transition: all 0.3s ease;
+    /* 加入复位的过渡效果，配合 JS 的 3D 悬浮使用 */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.4s var(--ease-out-expo);
 }
 
-/* 鼠标悬停时的霓虹光晕效果 */
 .holo-panel:hover {
     border-color: rgba(0, 255, 255, 0.5);
-    box-shadow: 
-        inset 0 0 15px rgba(0, 255, 255, 0.1),
-        0 0 10px rgba(0, 255, 255, 0.3);
+    box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.1), 0 0 10px rgba(0, 255, 255, 0.3);
 }
 
-.span-2 {
-    grid-column: span 2; /* 第二排模块占两列 */
-}
-
-/* 极简模块标题样式 */
 .module h2 {
-    font-size: 0.9rem;
-    color: rgba(0, 255, 255, 0.8); /* 霓虹青色 */
-    margin-bottom: 20px;
-    text-align: center;
-    letter-spacing: 1px;
-    text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
-    font-weight: normal;
+    font-size: 0.9rem; color: rgba(0, 255, 255, 0.8); margin-bottom: 20px; text-align: center; font-weight: normal; letter-spacing: 1px;
 }
+.control-row { color: rgba(255, 255, 255, 0.6); text-align: center; margin-top: 10px; font-family: monospace; }
+.input-labels { display: flex; justify-content: space-around; }
 
-/* 极简控件行的基本布局 */
-.control-row {
-    color: rgba(255, 255, 255, 0.6);
-    text-align: center;
-    margin-top: 10px;
-    font-family: 'Courier New', Courier, monospace; /* 使用代码风格字体 */
-}
-
-.input-labels {
-    display: flex;
-    justify-content: space-around;
-}
-
-/* 可视化：螺旋波形区域占位符 --- */
 .placeholder-vis {
-    height: 80px;
-    background: rgba(0, 0, 0, 0.5); /* 半透明黑底，模拟显示屏 */
-    border-radius: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
-    position: relative;
-    overflow: hidden;
-    margin-top: 20px;
-}
-/* 用 CSS 渐变假装这里有螺旋波形/频谱 */
-.wave-vis { background: radial-gradient(circle at center, rgba(0,255,255,0.1) 0%, rgba(0,0,0,0.5) 70%); }
-.spec-vis { background: linear-gradient(0deg, rgba(255,0,255,0.1) 0%, transparent 100%); }
-
-/* --- 底部合成按钮 (保持霓虹呼吸动画) --- */
-.bottom-action {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
+    height: 80px; background: rgba(0, 0, 0, 0.5); border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.05); margin-top: 20px;
 }
 
+/* --- 底部按钮 --- */
+.bottom-action { display: flex; justify-content: center; margin-top: 20px; }
 .synthesize-btn {
-    background: transparent;
-    border: none;
-    padding: 12px 30px;
-    border-radius: 20px;
-    color: #fff;
-    font-size: 1.1rem;
-    font-weight: bold;
-    letter-spacing: 2px;
-    cursor: pointer;
-    border: 1px solid #ff00ff;
-    transition: 0.3s;
-    animation: neon-breathe 2.5s infinite alternate; /* 调用呼吸灯动画 */
+    background: transparent; border: 1px solid #ff00ff; padding: 12px 30px; border-radius: 20px;
+    color: #fff; font-size: 1.1rem; letter-spacing: 2px; cursor: pointer;
+    animation: neon-breathe 2.5s infinite alternate;
 }
-
-/* 霓虹发光按钮动画 Keyframes */
 @keyframes neon-breathe {
-    0% {
-        box-shadow: 0 0 5px rgba(255, 0, 255, 0.2);
-        text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
-    }
-    100% {
-        box-shadow: 0 0 15px rgba(255, 0, 255, 0.8);
-        text-shadow: 0 0 8px #fff, 0 0 15px #ff00ff;
-        border-color: #ff88ff;
-    }
+    0% { box-shadow: 0 0 5px rgba(255, 0, 255, 0.2); text-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
+    100% { box-shadow: 0 0 15px rgba(255, 0, 255, 0.8); text-shadow: 0 0 8px #fff; border-color: #ff88ff; }
 }
 
-/* --- 右侧悬浮图标条 (高透玻璃，零资产) --- */
-.glass-sidebar {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding: 20px 10px;
-    background: rgba(25, 20, 40, 0.15); /* 高透底色 */
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(0, 255, 255, 0.2);
-    box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.05);
-    border-radius: 8px 0 0 8px; /* 右侧贴边，左侧圆角 */
-    font-size: 1.1rem;
-    color: rgba(255,255,255,0.5);
+/* ===========================================
+   入场瀑布流动效 (偷师成功！)
+   =========================================== */
+.reveal {
+    opacity: 0;
+    /* 初始状态：往下沉 30px */
+    transform: translateY(30px);
+    /* 过渡效果绑定了极度丝滑的 --ease-out-expo 曲线 */
+    transition: opacity var(--duration-normal) var(--ease-out-expo),
+                transform var(--duration-normal) var(--ease-out-expo);
 }
 
-.glass-sidebar i:hover {
-    color: #00ffff;
-    text-shadow: 0 0 10px #00ffff;
-    cursor: pointer;
+/* 当 JS 给 body 加上 loaded 标签时，所有框浮上来并显示 */
+body.loaded .reveal {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-/* =========================================
-   追加的隐形按钮 CSS (从原作者处汲取灵感)
-   ========================================= */
-
-/* 1. 左上角的隐形正方形触发区 */
-.edit-hotzone {
-    position: fixed; 
-    top: 0; 
-    left: 0;
-    width: 80px; 
-    height: 80px;
-    z-index: 10000;
-    cursor: pointer;
-    /* background: rgba(255,0,0,0.2); 取消注释显示此隐形区域 */
-}
-
-/* 2. 隐藏的全息按钮 (平时透明度为0，且不可点击) */
-.edit-toggle {
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    opacity: 0; /* 平时隐藏 */
-    pointer-events: none; /* 隐藏时鼠标穿透 */
-    transition: opacity 0.3s ease, border-color 0.3s ease;
-    z-index: 10001;
-    
-    /* 借用我们的全息极简风格 */
-    background: rgba(25, 20, 40, 0.7); /* 加深底色保证按钮可读 */
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(0, 255, 255, 0.3);
-    color: #fff;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 0.85rem;
-    letter-spacing: 1px;
-}
-
-/* 3. 当鼠标移入热区，或者开启编辑模式时，显示按钮 */
-.edit-toggle.show,
-.edit-toggle.active {
-    opacity: 1; /* 显示出来 */
-    pointer-events: auto; /* 允许点击 */
-}
+/* 控制每个框出现的延迟时间，形成瀑布流视觉效果 */
+.delay-1 { transition-delay: 0.1s; }
+.delay-2 { transition-delay: 0.2s; }
+.delay-3 { transition-delay: 0.3s; }
+.delay-4 { transition-delay: 0.4s; }
+.delay-5 { transition-delay: 0.5s; }
+.delay-6 { transition-delay: 0.6s; }
+.delay-7 { transition-delay: 0.7s; }
