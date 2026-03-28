@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Music Generator - Interactive UI</title>
+    <title>AI Music Generator - Live Automation UI</title>
     <style>
         /* ===========================================
            1. CSS 全局变量
@@ -41,22 +41,28 @@
             display: flex; flex-direction: column; justify-content: space-between; position: relative; 
         }
 
-        /* 🔴 修改点 2 & 3: 标题区字体变大，副标题颜色同步 */
         .top-panel { text-align: center; margin-bottom: 20px; }
         .hologram-title {
-            font-size: 2.8rem; /* 主标题更大了 */
+            font-size: 2.8rem; 
             letter-spacing: 5px; 
             font-weight: 700;
             color: #fff; 
             text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px rgba(0, 255, 255, 0.5);
             margin-bottom: 8px;
+            /* 合成时的闪烁动画 */
+            transition: text-shadow 0.3s;
         }
+        .hologram-title.synthesizing {
+            animation: text-pulse 1s infinite alternate;
+        }
+        @keyframes text-pulse {
+            0% { text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px rgba(0, 255, 255, 0.5); }
+            100% { text-shadow: 0 0 20px var(--neon-purple), 0 0 40px rgba(255, 0, 255, 0.8), 0 0 60px var(--neon-cyan); color: #e0f7fa; }
+        }
+
         .hologram-subtitle { 
-            font-size: 1.1rem; /* 副标题稍微大一点 */
-            color: var(--neon-cyan); /* 颜色同步为青色 */
-            letter-spacing: 2px; 
-            font-weight: 500;
-            text-shadow: 0 0 8px rgba(0, 255, 255, 0.6); /* 增加发光效果，更清晰 */
+            font-size: 1.1rem; color: var(--neon-cyan); letter-spacing: 2px; 
+            font-weight: 500; text-shadow: 0 0 8px rgba(0, 255, 255, 0.6); 
         }
 
         .synth-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; flex-grow: 1; }
@@ -67,22 +73,25 @@
            =========================================== */
         .glass-panel {
             background: var(--glass-bg);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
             border: 1px solid var(--glass-border);
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            border-left: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2); border-left: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px; padding: 20px;
             box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.05), 0 8px 32px rgba(0, 0, 0, 0.3);
             display: flex; flex-direction: column;
+            transition: box-shadow 0.5s, border-color 0.5s; /* 为合成时的状态变化加过渡 */
         }
-        /* 🔴 修改点 2: 模块标题字体变大 */
+        /* 面板在合成时的发光状态 */
+        .glass-panel.active-module {
+            box-shadow: inset 0 0 30px rgba(255, 0, 255, 0.15), 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 255, 255, 0.2);
+            border-color: rgba(255, 0, 255, 0.4);
+        }
         .module h2 { 
-            font-size: 1.2rem; 
-            color: var(--neon-cyan); margin-bottom: 15px; 
+            font-size: 1.2rem; color: var(--neon-cyan); margin-bottom: 15px; 
             font-weight: 600; letter-spacing: 2px; text-shadow: 0 0 5px rgba(0, 255, 255, 0.4); 
+            transition: color 0.3s;
         }
+        .glass-panel.active-module h2 { color: var(--neon-purple); text-shadow: 0 0 8px rgba(255, 0, 255, 0.6); }
 
         /* ===========================================
            4. 波形按钮 & Canvas 动态波形展示区
@@ -97,6 +106,9 @@
         }
         .wave-btn:hover { transform: scale(1.05); opacity: 0.8; }
         .wave-btn.active { filter: drop-shadow(0 0 15px rgba(0, 255, 255, 1)); opacity: 1; }
+        
+        /* 合成时，按钮随机高亮的类 */
+        .wave-btn.auto-active { filter: drop-shadow(0 0 20px var(--neon-purple)); opacity: 1; transform: scale(1.1); }
 
         .osc-sin { background-image: url('images/osc-sin.png'); }
         .osc-tri { background-image: url('images/osc-tri.png'); }
@@ -121,39 +133,24 @@
            =========================================== */
         .control-row-clean { display: flex; flex-direction: column; gap: 20px; }
         
-        /* 左右排列模式 (用于 LFO 和 Tempo) */
         .slider-item { display: flex; align-items: center; gap: 15px; width: 100%; }
-        /* 🔴 修改点 2: 标签字体变大 */
         .slider-item label { width: 80px; font-size: 1.1rem; color: #fff; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.8); letter-spacing: 1px; }
 
-        /* 上下堆叠排列模式 (用于 Filter 和 Envelope) */
         .fader-group { 
             display: flex; flex-direction: column; 
             justify-content: center; height: auto; align-items: stretch; 
-            gap: 25px; 
-            padding: 10px 0; margin-top: 5px;
+            gap: 25px; padding: 10px 0; margin-top: 5px;
         }
-        .fader-item { 
-            display: flex; flex-direction: column; 
-            align-items: center; 
-            gap: 8px; 
-            width: 100%; 
-        }
-        /* 🔴 修改点 2: 标签字体变大 */
+        .fader-item { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
         .fader-item label { 
             width: auto; font-size: 1.1rem; color: #fff; 
             font-weight: 600; letter-spacing: 1px; text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
 
         /* 轨道 & 渐变尾巴 */
-        input[type="range"] {
-            -webkit-appearance: none; 
-            flex-grow: 1; 
-            width: 100%; 
-            height: 6px; 
-            border-radius: 3px; 
-            outline: none; 
-            cursor: pointer;
+        input[type="range"].auto-slider {
+            -webkit-appearance: none; flex-grow: 1; width: 100%; height: 6px; 
+            border-radius: 3px; outline: none; cursor: pointer;
             background: linear-gradient(
                 to right, 
                 var(--neon-purple) 0%, 
@@ -161,33 +158,32 @@
                 rgba(15, 20, 35, 0.6) var(--slider-fill, 50%), 
                 rgba(15, 20, 35, 0.6) 100%
             );
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);
             transform: none !important; margin-bottom: 0 !important;
+            /* 滑块自己的过渡效果，如果用户手动拖，我们要关闭它防止冲突 */
+            transition: --slider-fill 0.1s linear; 
         }
 
         /* 发光小圆钮把手 */
-        input[type="range"]::-webkit-slider-thumb {
+        input[type="range"].auto-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 16px;  
-            height: 16px; 
-            border-radius: 50%;
-            background: #fff; 
-            border: 2px solid var(--neon-cyan); 
-            box-shadow: 
-                0 0 10px var(--neon-cyan), 
-                0 0 20px rgba(0, 255, 255, 0.6),
-                inset 0 0 4px rgba(0,0,0,0.5);
-            transition: transform 0.1s;
+            width: 16px; height: 16px; border-radius: 50%;
+            background: #fff; border: 2px solid var(--neon-cyan); 
+            box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px rgba(0, 255, 255, 0.6), inset 0 0 4px rgba(0,0,0,0.5);
+            transition: transform 0.1s, box-shadow 0.3s; /* 加入阴影过渡，合成时更亮 */
         }
-
-        input[type="range"]::-webkit-slider-thumb:hover { 
-            transform: scale(1.4); 
-            box-shadow: 0 0 15px var(--neon-cyan), 0 0 30px var(--neon-purple); 
+        input[type="range"].auto-slider::-webkit-slider-thumb:hover { 
+            transform: scale(1.4); box-shadow: 0 0 15px var(--neon-cyan), 0 0 30px var(--neon-purple); 
+        }
+        
+        /* 合成状态下把手更亮 */
+        .synthesizing input[type="range"].auto-slider::-webkit-slider-thumb {
+            box-shadow: 0 0 15px var(--neon-purple), 0 0 30px var(--neon-cyan), inset 0 0 4px rgba(0,0,0,0.5);
+            border-color: var(--neon-purple);
         }
 
         /* ===========================================
-           6. 配置区 (BPM 迷幻深邃渐变色)
+           6. 配置区 (BPM)
            =========================================== */
         .config-flex { display: flex; align-items: center; justify-content: space-between; height: 100%; gap: 30px;}
 
@@ -196,15 +192,14 @@
             background: linear-gradient(135deg, #00ffff 0%, #7b2cbf 50%, #0050ff 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 0 15px rgba(123, 44, 191, 0.8));
+            transition: filter 0.5s;
         }
-        .bpm-text { 
-            font-size: 1rem; font-weight: bold; letter-spacing: 2px;
-            -webkit-text-fill-color: rgba(255, 255, 255, 0.6);
-        }
+        /* 合成时 BPM 呼吸灯 */
+        .synthesizing .bpm-display { filter: drop-shadow(0 0 25px rgba(0, 255, 255, 1)); }
 
+        .bpm-text { font-size: 1rem; font-weight: bold; letter-spacing: 2px; -webkit-text-fill-color: rgba(255, 255, 255, 0.6); }
         .tempo-control-area { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
         .tempo-slider-container { display: flex; align-items: center; gap: 15px; width: 100%; }
-        /* 🔴 修改点 2: Tempo 标签变大 */
         .tempo-limit { font-size: 1.1rem; color: #fff; font-weight: bold; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
 
         /* ===========================================
@@ -212,14 +207,11 @@
            =========================================== */
         .input-form { display: flex; flex-direction: column; gap: 15px; }
         .input-row { display: flex; align-items: center; gap: 15px; }
-        /* 🔴 修改点 2: 标签变大 */
         .input-row label { width: 120px; font-size: 1.1rem; color: var(--text-muted); letter-spacing: 1px;}
         .glow-input {
             flex-grow: 1; padding: 12px 15px; background: rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.1); border-bottom: 2px solid rgba(0, 255, 255, 0.3);
-            color: #fff; 
-            font-size: 1.1rem; /* 🔴 修改点 2: 输入框内文字变大 */
-            border-radius: 6px; outline: none; transition: 0.3s;
+            color: #fff; font-size: 1.1rem; border-radius: 6px; outline: none; transition: 0.3s;
         }
         .glow-input:focus { border-bottom-color: var(--neon-cyan); background: rgba(0, 255, 255, 0.05); }
 
@@ -228,14 +220,27 @@
             padding: 15px 40px; background: transparent; border: 1px solid var(--neon-cyan);
             border-radius: 30px; color: #fff; font-size: 1.2rem; font-weight: 600; letter-spacing: 2px;
             cursor: pointer; transition: 0.3s; animation: pulse-glow 2s infinite alternate;
+            position: relative; overflow: hidden;
         }
         .synthesize-btn:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--neon-cyan); background: rgba(0, 255, 255, 0.1); }
+        
+        /* 按钮处于工作状态的样式 */
+        .synthesize-btn.processing {
+            background: rgba(255, 0, 255, 0.2); border-color: var(--neon-purple);
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.8), inset 0 0 10px rgba(255,0,255,0.5);
+            animation: none;
+        }
+        .synthesize-btn.processing::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: scan-light 1.5s infinite linear;
+        }
+        @keyframes scan-light { 100% { left: 200%; } }
         @keyframes pulse-glow { 0% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.3); } 100% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.8); border-color: #00ffff; } }
+        
         .edit-hotzone, .edit-toggle { display: none !important; }
 
-        /* ===========================================
-           8. 入场动效
-           =========================================== */
+        /* 入场动效 */
         .reveal { opacity: 0; transform: translateY(40px); transition: opacity var(--duration-normal) var(--ease-out-expo), transform var(--duration-normal) var(--ease-out-expo); }
         body.loaded .reveal { opacity: 1; transform: translateY(0); }
         .delay-1 { transition-delay: 0.1s; } .delay-2 { transition-delay: 0.2s; }
@@ -248,11 +253,11 @@
     <div class="app-container">
         
         <div class="top-panel">
-            <h1 class="hologram-title">AI MUSIC GENERATOR</h1>
+            <h1 class="hologram-title" id="main-title">AI MUSIC GENERATOR</h1>
             <p class="hologram-subtitle">Powered by DiT Model | Sonic Ritual Spell Configuration</p>
         </div>
 
-        <div class="synth-grid">
+        <div class="synth-grid" id="main-grid">
             
             <div id="oscillator-container" class="glass-panel module reveal delay-1">
                 <h2>I. OSCILLATOR</h2>
@@ -269,43 +274,43 @@
                 </div>
             </div>
 
-            <div id="filter-container" class="glass-panel module reveal delay-2">
+            <div id="filter-container" class="glass-panel module reveal delay-2 auto-panel">
                 <h2>II. FILTER</h2>
                 <div class="fader-group">
                     <div class="fader-item">
-                        <input type="range" min="0" max="100" value="70">
+                        <input type="range" class="auto-slider filter-cutoff" min="0" max="100" value="70" step="0.1">
                         <label>Cutoff</label>
                     </div>
                     <div class="fader-item">
-                        <input type="range" min="0" max="100" value="40">
+                        <input type="range" class="auto-slider filter-reso" min="0" max="100" value="40" step="0.1">
                         <label>Resonance</label>
                     </div>
                 </div>
             </div>
 
-            <div id="envelope-container" class="glass-panel module reveal delay-3">
+            <div id="envelope-container" class="glass-panel module reveal delay-3 auto-panel">
                 <h2>III. ENVELOPE</h2>
                 <div class="fader-group">
                     <div class="fader-item">
-                        <input type="range" min="0" max="100" value="40">
+                        <input type="range" class="auto-slider env-a" min="0" max="100" value="40" step="0.1">
                         <label>Attack</label>
                     </div>
                     <div class="fader-item">
-                        <input type="range" min="0" max="100" value="60">
+                        <input type="range" class="auto-slider env-d" min="0" max="100" value="60" step="0.1">
                         <label>Decay</label>
                     </div>
                     <div class="fader-item">
-                        <input type="range" min="0" max="100" value="50">
+                        <input type="range" class="auto-slider env-s" min="0" max="100" value="50" step="0.1">
                         <label>Sustain</label>
                     </div>
                     <div class="fader-item">
-                        <input type="range" min="0" max="100" value="80">
+                        <input type="range" class="auto-slider env-r" min="0" max="100" value="80" step="0.1">
                         <label>Release</label>
                     </div>
                 </div>
             </div>
 
-            <div id="lfo-container" class="glass-panel module reveal delay-4">
+            <div id="lfo-container" class="glass-panel module reveal delay-4 auto-panel">
                 <h2>IV. LFO</h2>
                 <div class="control-row-clean">
                     <div class="waveform-group" id="lfo-buttons">
@@ -316,11 +321,11 @@
                     </div>
                     <div class="slider-item">
                         <label>Range</label>
-                        <input type="range" min="0" max="100" value="60">
+                        <input type="range" class="auto-slider lfo-range" min="0" max="100" value="60" step="0.1">
                     </div>
                     <div class="slider-item">
                         <label>Depth</label>
-                        <input type="range" min="0" max="100" value="90">
+                        <input type="range" class="auto-slider lfo-depth" min="0" max="100" value="90" step="0.1">
                     </div>
                 </div>
             </div>
@@ -334,7 +339,7 @@
                         <label style="color: #fff; font-weight: 600; font-size: 1.1rem; margin-bottom: 5px; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">Tempo Slide</label>
                         <div class="tempo-slider-container">
                             <span class="tempo-limit">70 BPM</span>
-                            <input type="range" id="tempo-slider" min="70" max="150" value="120">
+                            <input type="range" class="auto-slider tempo-slider" id="tempo-slider" min="70" max="150" value="120" step="1">
                             <span class="tempo-limit">150 BPM</span>
                         </div>
                     </div>
@@ -362,7 +367,7 @@
         </div>
 
         <div class="bottom-action reveal delay-7">
-            <button class="synthesize-btn">SYNTHESIZE AUDIO RITUAL</button>
+            <button class="synthesize-btn" id="generate-btn">SYNTHESIZE AUDIO RITUAL</button>
         </div>
 
     </div>
@@ -370,9 +375,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
-            // --- 1. 动态更新滑块渐变尾巴的函数 ---
+            // --- 1. 滑块渐变尾巴核心功能 ---
             const allSliders = document.querySelectorAll('input[type="range"]');
-            
             function updateSliderTail(slider) {
                 const min = slider.min || 0;
                 const max = slider.max || 100;
@@ -380,117 +384,215 @@
                 const percentage = ((val - min) / (max - min)) * 100;
                 slider.style.setProperty('--slider-fill', `${percentage}%`);
             }
-
+            
             allSliders.forEach(slider => {
-                updateSliderTail(slider); 
+                updateSliderTail(slider); // 初始化
                 slider.addEventListener('input', (e) => {
                     updateSliderTail(e.target);
+                    // 标记用户正在手动干预，暂停该滑块的自动动画
+                    e.target.dataset.manual = "true";
+                    clearTimeout(e.target.manualTimeout);
+                    e.target.manualTimeout = setTimeout(() => { e.target.dataset.manual = "false"; }, 1500);
                 });
             });
 
-            // --- 2. BPM 滑块联动 ---
+            // BPM 同步
             const tempoSlider = document.getElementById('tempo-slider');
             const bpmDisplay = document.getElementById('bpm-value-display');
-            
-            tempoSlider.addEventListener('input', (e) => {
-                bpmDisplay.textContent = e.target.value;
-            });
+            tempoSlider.addEventListener('input', (e) => { bpmDisplay.textContent = Math.round(e.target.value); });
 
-            // --- 3. Canvas 波形绘制逻辑 ---
-            const canvas = document.getElementById('wave-canvas');
-            const ctx = canvas.getContext('2d');
-            
-            function resizeCanvas() {
-                const rect = canvas.parentElement.getBoundingClientRect();
-                canvas.width = rect.width * window.devicePixelRatio;
-                canvas.height = rect.height * window.devicePixelRatio;
-                ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-                canvas.style.width = `${rect.width}px`;
-                canvas.style.height = `${rect.height}px`;
-            }
-            window.addEventListener('resize', resizeCanvas);
-            resizeCanvas();
-
-            function drawWaveform(type) {
-                const width = canvas.width / window.devicePixelRatio;
-                const height = canvas.height / window.devicePixelRatio;
-                
-                ctx.clearRect(0, 0, width, height);
-                
-                ctx.beginPath();
-                ctx.lineWidth = 3;
-                ctx.strokeStyle = '#00ffff'; 
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = '#00ffff';
-                
-                const centerY = height / 2;
-                const amplitude = height * 0.35; 
-                const frequency = 3; 
-
-                for (let x = 0; x < width; x++) {
-                    const phase = (x / width) * Math.PI * 2 * frequency;
-                    let y = centerY;
-
-                    switch (type) {
-                        case 'sine': y = centerY - Math.sin(phase) * amplitude; break;
-                        case 'square': y = centerY - (Math.sin(phase) > 0 ? 1 : -1) * amplitude; break;
-                        case 'triangle': y = centerY - (Math.abs((phase / Math.PI) % 2 - 1) * 2 - 1) * amplitude; break;
-                        case 'sawtooth': y = centerY - (((phase / Math.PI) % 2) - 1) * amplitude; break;
-                    }
-
-                    if (x === 0) { ctx.moveTo(x, y); } 
-                    else { ctx.lineTo(x, y); }
-                }
-                ctx.stroke();
-            }
-            setTimeout(() => { drawWaveform('sine'); }, 100);
-
-            // --- 4. Web Audio API 发声逻辑 ---
-            let audioCtx;
-            function playOscillator(type) {
-                if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-                if (audioCtx.state === 'suspended') { audioCtx.resume(); }
-
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-
-                oscillator.type = type; 
-                oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); 
-
-                gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-                gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05); 
-                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime + 0.4); 
-                gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5); 
-
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-
-                oscillator.start();
-                oscillator.stop(audioCtx.currentTime + 0.5); 
-            }
-
-            // --- 5. 绑定 Oscillator 按钮点击事件 ---
+            // --- 2. 基础交互：LFO 和 Oscillator 按钮点击 ---
             const oscButtons = document.querySelectorAll('#osc-buttons .wave-btn');
             oscButtons.forEach(btn => {
                 btn.addEventListener('click', () => {
                     oscButtons.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    const waveType = btn.getAttribute('data-wave');
-                    drawWaveform(waveType);
-                    playOscillator(waveType);
+                    currentWaveType = btn.getAttribute('data-wave');
+                    if(!isSynthesizing) playOscillator(currentWaveType); // 非合成状态下发测试音
                 });
             });
 
-            // --- 6. 🔴 绑定 LFO 按钮点击事件 (仅高亮，不发声) ---
             const lfoButtons = document.querySelectorAll('#lfo-buttons .wave-btn');
             lfoButtons.forEach(btn => {
                 btn.addEventListener('click', () => {
-                    // 移除 LFO 模块内其他按钮的高亮
                     lfoButtons.forEach(b => b.classList.remove('active'));
-                    // 高亮当前点击的按钮
                     btn.classList.add('active');
                 });
             });
+
+            // --- 3. Canvas 核心：动态波形生成引擎 ---
+            const canvas = document.getElementById('wave-canvas');
+            const ctx = canvas.getContext('2d');
+            let currentWaveType = 'sine';
+            let isSynthesizing = false;
+            let timeOffset = 0; // 用于波动动画
+            let baseAmplitude = 0.35;
+            let baseFrequency = 3;
+
+            function resizeCanvas() {
+                const rect = canvas.parentElement.getBoundingClientRect();
+                canvas.width = rect.width * window.devicePixelRatio;
+                canvas.height = rect.height * window.devicePixelRatio;
+                ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            function drawWaveform() {
+                const width = canvas.width / window.devicePixelRatio;
+                const height = canvas.height / window.devicePixelRatio;
+                ctx.clearRect(0, 0, width, height);
+                
+                ctx.beginPath();
+                ctx.lineWidth = 3;
+                
+                // 合成时颜色变为紫色，否则青色
+                ctx.strokeStyle = isSynthesizing ? '#ff00ff' : '#00ffff'; 
+                ctx.shadowBlur = isSynthesizing ? 15 : 10;
+                ctx.shadowColor = ctx.strokeStyle;
+                
+                const centerY = height / 2;
+                
+                // 如果在合成中，加入随机噪点和高频抖动让波形看起来很疯狂
+                let jitter = isSynthesizing ? (Math.random() * 4 - 2) : 0;
+                let activeAmp = height * baseAmplitude * (isSynthesizing ? (0.8 + Math.random()*0.4) : 1);
+                let activeFreq = baseFrequency + (isSynthesizing ? Math.sin(timeOffset)*2 : 0);
+
+                for (let x = 0; x < width; x++) {
+                    const phase = (x / width) * Math.PI * 2 * activeFreq + timeOffset;
+                    let y = centerY;
+
+                    // 复杂的波形合成逻辑
+                    switch (currentWaveType) {
+                        case 'sine': y = centerY - Math.sin(phase) * activeAmp; break;
+                        case 'square': y = centerY - (Math.sin(phase) > 0 ? 1 : -1) * activeAmp; break;
+                        case 'triangle': y = centerY - (Math.abs((phase / Math.PI) % 2 - 1) * 2 - 1) * activeAmp; break;
+                        case 'sawtooth': y = centerY - (((phase / Math.PI) % 2) - 1) * activeAmp; break;
+                    }
+                    
+                    if(isSynthesizing) y += (Math.random() * 6 - 3); // 加入毛刺噪点
+
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                if (isSynthesizing) {
+                    timeOffset -= 0.1; // 波形滚动速度
+                } else {
+                    timeOffset -= 0.02; // 待机时的缓慢呼吸
+                }
+                requestAnimationFrame(drawWaveform);
+            }
+            drawWaveform(); // 启动渲染循环
+
+            // Web Audio API (简单测试音)
+            let audioCtx;
+            function playOscillator(type) {
+                if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+                if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type; osc.frequency.setValueAtTime(440, audioCtx.currentTime); 
+                gain.gain.setValueAtTime(0, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.05); 
+                gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3); 
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3); 
+            }
+
+            // --- 4. 🔴 终极魔法：参数自动漂移动画引擎 ---
+            const genBtn = document.getElementById('generate-btn');
+            const mainTitle = document.getElementById('main-title');
+            const mainGrid = document.getElementById('main-grid');
+            
+            // 收集所有需要自动漂移的滑块
+            const autoSliders = Array.from(document.querySelectorAll('input.auto-slider'));
+            
+            // 为每个滑块初始化目标值
+            autoSliders.forEach(slider => {
+                slider.targetValue = parseFloat(slider.value);
+            });
+
+            // 线性插值函数，用于平滑过渡
+            function lerp(start, end, amt) {
+                return (1 - amt) * start + amt * end;
+            }
+
+            function animateSliders() {
+                if (!isSynthesizing) return; // 如果停止合成了，就不动了
+
+                autoSliders.forEach(slider => {
+                    // 如果用户正在手动拖，跳过它
+                    if (slider.dataset.manual === "true") return;
+
+                    let currentVal = parseFloat(slider.value);
+                    let min = parseFloat(slider.min);
+                    let max = parseFloat(slider.max);
+
+                    // 如果当前值接近目标值，分配一个新的随机目标值
+                    if (Math.abs(currentVal - slider.targetValue) < 1) {
+                        // 在当前值附近小范围随机跳动，而不是全盘乱跳
+                        let range = (max - min) * 0.3; 
+                        let randomChange = (Math.random() * range) - (range / 2);
+                        let nextTarget = currentVal + randomChange;
+                        // 确保不出界
+                        slider.targetValue = Math.max(min, Math.min(max, nextTarget));
+                    }
+
+                    // 平滑逼近目标值 (速度系数 0.03，越小越平滑)
+                    let newVal = lerp(currentVal, slider.targetValue, 0.03);
+                    slider.value = newVal;
+                    updateSliderTail(slider);
+                    
+                    // 如果是 BPM 滑块，同步更新文字
+                    if(slider.id === 'tempo-slider') {
+                        bpmDisplay.textContent = Math.round(newVal);
+                    }
+                });
+
+                // 随机切换 LFO 和 OSC 的波形按钮状态 (假装 AI 在尝试不同波形)
+                if(Math.random() < 0.02) { // 2% 概率切换
+                    const btns = Array.from(oscButtons);
+                    const randomBtn = btns[Math.floor(Math.random() * btns.length)];
+                    btns.forEach(b => b.classList.remove('auto-active'));
+                    randomBtn.classList.add('auto-active');
+                    currentWaveType = randomBtn.getAttribute('data-wave');
+                }
+
+                requestAnimationFrame(animateSliders);
+            }
+
+            // --- 5. 绑定生成按钮的魔法 ---
+            genBtn.addEventListener('click', () => {
+                isSynthesizing = !isSynthesizing; // 切换状态
+                
+                if (isSynthesizing) {
+                    // 开始生成！
+                    genBtn.textContent = "STOP RITUAL";
+                    genBtn.classList.add('processing');
+                    mainTitle.classList.add('synthesizing');
+                    mainGrid.classList.add('synthesizing');
+                    
+                    // 给带有自动滑块的面板加上发光状态
+                    document.querySelectorAll('.auto-panel').forEach(p => p.classList.add('active-module'));
+                    
+                    animateSliders(); // 启动自动化引擎
+                } else {
+                    // 停止生成
+                    genBtn.textContent = "SYNTHESIZE AUDIO RITUAL";
+                    genBtn.classList.remove('processing');
+                    mainTitle.classList.remove('synthesizing');
+                    mainGrid.classList.remove('synthesizing');
+                    
+                    document.querySelectorAll('.auto-panel').forEach(p => p.classList.remove('active-module'));
+                    oscButtons.forEach(b => b.classList.remove('auto-active'));
+                    
+                    // 将所有目标值设回当前值，让它们平稳停下
+                    autoSliders.forEach(slider => slider.targetValue = parseFloat(slider.value));
+                }
+            });
+
         });
     </script>
 </body>
