@@ -304,13 +304,13 @@
             <div id="ritual-config-container" class="glass-panel module reveal delay-5 span-2">
                 <h2>RITUAL CONFIGURATION</h2>
                 <div class="config-flex">
-                    <div class="bpm-display"><span id="bpm-value-display">120</span> <span class="bpm-text">BPM</span></div>
+                    <div class="bpm-display"><span id="bpm-value-display">115</span> <span class="bpm-text">BPM</span></div>
                     
                     <div class="tempo-control-area">
                         <label style="color: #fff; font-weight: 600; font-size: 1.1rem; margin-bottom: 5px; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">Tempo Slide</label>
                         <div class="tempo-slider-container">
                             <span class="tempo-limit">70 BPM</span>
-                            <input type="range" class="auto-slider tempo-slider" id="tempo-slider" min="70" max="150" value="120" step="1">
+                            <input type="range" class="auto-slider tempo-slider" id="tempo-slider" min="70" max="150" value="115" step="1">
                             <span class="tempo-limit">150 BPM</span>
                         </div>
                     </div>
@@ -322,15 +322,15 @@
                 <div class="input-form">
                     <div class="input-row">
                         <label>[GENRE]</label>
-                        <input type="text" class="glow-input" placeholder="Hard acid techno..." value="Hard acid techno...">
+                        <input type="text" class="glow-input" placeholder="Bossa Nova Lounge, Seaside Chillout..." value="Bossa Nova Lounge, Seaside Chillout, Tropical">
                     </div>
                     <div class="input-row">
                         <label>[SOUNDS]</label>
-                        <input type="text" class="glow-input" placeholder="Roland TB-303 squelch..." value="Roland TB-303 squelch, heavy resonance...">
+                        <input type="text" class="glow-input" placeholder="soothing nylon acoustic guitar..." value="soothing nylon acoustic guitar, gliding warm Rhodes piano, relaxed percussion, gentle ocean waves ambiance">
                     </div>
                     <div class="input-row">
                         <label>[STRUCTURE]</label>
-                        <input type="text" class="glow-input" placeholder="Ambient build to driving drop..." value="Ambient build to driving drop...">
+                        <input type="text" class="glow-input" placeholder="patient smooth intro with wave sounds..." value="patient smooth intro with wave sounds, relaxing groovy Bossa section, tropical strings spotlight, calm fade out">
                     </div>
                 </div>
             </div>
@@ -566,7 +566,7 @@
                     const enhanceData = await enhanceResponse.json();
                     const finalPrompt = enhanceData.optimizedPrompt || fullPrompt;
                     
-                    // 🔴🔴🔴 完美植入：在这里接住后端传回来的消杀词！
+                    // 完美植入：接住后端传回来的消杀词！
                     const finalNegative = enhanceData.negativePrompt || ""; 
                     
                     console.log(`[BPM: ${currentTempo}] 魔法词已组装完毕:`, finalPrompt); 
@@ -578,7 +578,7 @@
                     const response = await fetch('/api/generate', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        // 🔴🔴🔴 完美植入：把消杀词打包进 body，发给你的 /api/generate
+                        // 完美植入：把消杀词打包进 body，发给你的 /api/generate
                         body: JSON.stringify({ 
                             prompt: finalPrompt,
                             negative_prompt: finalNegative 
