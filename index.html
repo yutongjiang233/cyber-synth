@@ -41,13 +41,23 @@
             display: flex; flex-direction: column; justify-content: space-between; position: relative; 
         }
 
+        /* 🔴 修改点 2 & 3: 标题区字体变大，副标题颜色同步 */
         .top-panel { text-align: center; margin-bottom: 20px; }
         .hologram-title {
-            font-size: 2.2rem; letter-spacing: 4px; font-weight: 600;
-            color: #fff; text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px rgba(0, 255, 255, 0.5);
-            margin-bottom: 5px;
+            font-size: 2.8rem; /* 主标题更大了 */
+            letter-spacing: 5px; 
+            font-weight: 700;
+            color: #fff; 
+            text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px rgba(0, 255, 255, 0.5);
+            margin-bottom: 8px;
         }
-        .hologram-subtitle { font-size: 0.9rem; color: var(--text-muted); letter-spacing: 1px; font-weight: 300;}
+        .hologram-subtitle { 
+            font-size: 1.1rem; /* 副标题稍微大一点 */
+            color: var(--neon-cyan); /* 颜色同步为青色 */
+            letter-spacing: 2px; 
+            font-weight: 500;
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.6); /* 增加发光效果，更清晰 */
+        }
 
         .synth-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; flex-grow: 1; }
         .span-2 { grid-column: span 2; }
@@ -67,8 +77,10 @@
             box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.05), 0 8px 32px rgba(0, 0, 0, 0.3);
             display: flex; flex-direction: column;
         }
+        /* 🔴 修改点 2: 模块标题字体变大 */
         .module h2 { 
-            font-size: 1rem; color: var(--neon-cyan); margin-bottom: 15px; 
+            font-size: 1.2rem; 
+            color: var(--neon-cyan); margin-bottom: 15px; 
             font-weight: 600; letter-spacing: 2px; text-shadow: 0 0 5px rgba(0, 255, 255, 0.4); 
         }
 
@@ -105,33 +117,35 @@
         canvas#wave-canvas { width: 100%; height: 100%; display: block; }
 
         /* ===========================================
-           5. 🔴 全局发光小圆钮滑块 & 渐变能量尾巴
+           5. 全局发光小圆钮滑块 & 渐变能量尾巴
            =========================================== */
         .control-row-clean { display: flex; flex-direction: column; gap: 20px; }
         
-        /* 旧的左右排列模式 (用于 LFO 和 Tempo) */
+        /* 左右排列模式 (用于 LFO 和 Tempo) */
         .slider-item { display: flex; align-items: center; gap: 15px; width: 100%; }
-        .slider-item label { width: 80px; font-size: 1rem; color: #fff; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.8); letter-spacing: 1px; }
+        /* 🔴 修改点 2: 标签字体变大 */
+        .slider-item label { width: 80px; font-size: 1.1rem; color: #fff; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.8); letter-spacing: 1px; }
 
-        /* 🔴 核心排版：上下堆叠排列模式 (用于 Filter 和 Envelope) */
+        /* 上下堆叠排列模式 (用于 Filter 和 Envelope) */
         .fader-group { 
             display: flex; flex-direction: column; 
             justify-content: center; height: auto; align-items: stretch; 
-            gap: 25px; /* 滑块组之间的垂直间距 */
+            gap: 25px; 
             padding: 10px 0; margin-top: 5px;
         }
         .fader-item { 
             display: flex; flex-direction: column; 
-            align-items: center; /* 标签居中在正下方 */
-            gap: 8px; /* 轨道和标签的距离 */
+            align-items: center; 
+            gap: 8px; 
             width: 100%; 
         }
+        /* 🔴 修改点 2: 标签字体变大 */
         .fader-item label { 
-            width: auto; font-size: 1rem; color: #fff; 
+            width: auto; font-size: 1.1rem; color: #fff; 
             font-weight: 600; letter-spacing: 1px; text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
 
-        /* 🔴 滑块轨道 & 渐变尾巴 (使用 CSS 变量 --slider-fill 控制进度) */
+        /* 轨道 & 渐变尾巴 */
         input[type="range"] {
             -webkit-appearance: none; 
             flex-grow: 1; 
@@ -140,7 +154,6 @@
             border-radius: 3px; 
             outline: none; 
             cursor: pointer;
-            /* 背景分两段：左侧是紫青渐变的能量尾巴，右侧是深色半透明玻璃槽 */
             background: linear-gradient(
                 to right, 
                 var(--neon-purple) 0%, 
@@ -153,27 +166,24 @@
             transform: none !important; margin-bottom: 0 !important;
         }
 
-        /* 🔴 核心：发光小圆钮把手 */
+        /* 发光小圆钮把手 */
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 16px;  
             height: 16px; 
             border-radius: 50%;
-            background: #fff; /* 把手中心亮白色 */
-            border: 2px solid var(--neon-cyan); /* 青色边框 */
-            
-            /* 制造强烈的霓虹发光感 */
+            background: #fff; 
+            border: 2px solid var(--neon-cyan); 
             box-shadow: 
                 0 0 10px var(--neon-cyan), 
                 0 0 20px rgba(0, 255, 255, 0.6),
                 inset 0 0 4px rgba(0,0,0,0.5);
-                
             transition: transform 0.1s;
         }
 
         input[type="range"]::-webkit-slider-thumb:hover { 
-            transform: scale(1.4); /* 鼠标悬停时放大 */
-            box-shadow: 0 0 15px var(--neon-cyan), 0 0 30px var(--neon-purple); /* 悬停时增强光晕 */
+            transform: scale(1.4); 
+            box-shadow: 0 0 15px var(--neon-cyan), 0 0 30px var(--neon-purple); 
         }
 
         /* ===========================================
@@ -183,7 +193,6 @@
 
         .bpm-display { 
             font-size: 3.8rem; font-weight: 800; display: flex; align-items: baseline; gap: 5px; 
-            /* 🔴 迷幻深邃渐变色：青色 -> 紫色 -> 深蓝色 */
             background: linear-gradient(135deg, #00ffff 0%, #7b2cbf 50%, #0050ff 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 0 15px rgba(123, 44, 191, 0.8));
@@ -195,25 +204,29 @@
 
         .tempo-control-area { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
         .tempo-slider-container { display: flex; align-items: center; gap: 15px; width: 100%; }
-        .tempo-limit { font-size: 1rem; color: #fff; font-weight: bold; }
+        /* 🔴 修改点 2: Tempo 标签变大 */
+        .tempo-limit { font-size: 1.1rem; color: #fff; font-weight: bold; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
 
         /* ===========================================
            7. 输入区 & 底部按钮
            =========================================== */
         .input-form { display: flex; flex-direction: column; gap: 15px; }
         .input-row { display: flex; align-items: center; gap: 15px; }
-        .input-row label { width: 100px; font-size: 1rem; color: var(--text-muted); letter-spacing: 1px;}
+        /* 🔴 修改点 2: 标签变大 */
+        .input-row label { width: 120px; font-size: 1.1rem; color: var(--text-muted); letter-spacing: 1px;}
         .glow-input {
-            flex-grow: 1; padding: 10px 15px; background: rgba(0, 0, 0, 0.2);
+            flex-grow: 1; padding: 12px 15px; background: rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.1); border-bottom: 2px solid rgba(0, 255, 255, 0.3);
-            color: #fff; font-size: 1rem; border-radius: 6px; outline: none; transition: 0.3s;
+            color: #fff; 
+            font-size: 1.1rem; /* 🔴 修改点 2: 输入框内文字变大 */
+            border-radius: 6px; outline: none; transition: 0.3s;
         }
         .glow-input:focus { border-bottom-color: var(--neon-cyan); background: rgba(0, 255, 255, 0.05); }
 
         .bottom-action { display: flex; justify-content: center; margin-top: 10px; }
         .synthesize-btn {
             padding: 15px 40px; background: transparent; border: 1px solid var(--neon-cyan);
-            border-radius: 30px; color: #fff; font-size: 1.1rem; font-weight: 600; letter-spacing: 2px;
+            border-radius: 30px; color: #fff; font-size: 1.2rem; font-weight: 600; letter-spacing: 2px;
             cursor: pointer; transition: 0.3s; animation: pulse-glow 2s infinite alternate;
         }
         .synthesize-btn:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--neon-cyan); background: rgba(0, 255, 255, 0.1); }
@@ -295,7 +308,7 @@
             <div id="lfo-container" class="glass-panel module reveal delay-4">
                 <h2>IV. LFO</h2>
                 <div class="control-row-clean">
-                    <div class="waveform-group">
+                    <div class="waveform-group" id="lfo-buttons">
                         <button class="wave-btn osc-sin active" title="Sine"></button>
                         <button class="wave-btn osc-tri" title="Triangle"></button>
                         <button class="wave-btn osc-squ" title="Square"></button>
@@ -318,7 +331,7 @@
                     <div class="bpm-display"><span id="bpm-value-display">120</span> <span class="bpm-text">BPM</span></div>
                     
                     <div class="tempo-control-area">
-                        <label style="color: #fff; font-weight: 600; font-size: 0.95rem; margin-bottom: 5px;">Tempo Slide</label>
+                        <label style="color: #fff; font-weight: 600; font-size: 1.1rem; margin-bottom: 5px; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">Tempo Slide</label>
                         <div class="tempo-slider-container">
                             <span class="tempo-limit">70 BPM</span>
                             <input type="range" id="tempo-slider" min="70" max="150" value="120">
@@ -357,7 +370,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
-            // --- 1. 🔴 动态更新滑块渐变尾巴的函数 ---
+            // --- 1. 动态更新滑块渐变尾巴的函数 ---
             const allSliders = document.querySelectorAll('input[type="range"]');
             
             function updateSliderTail(slider) {
@@ -365,18 +378,15 @@
                 const max = slider.max || 100;
                 const val = slider.value;
                 const percentage = ((val - min) / (max - min)) * 100;
-                // 将百分比传入 CSS 变量 --slider-fill
                 slider.style.setProperty('--slider-fill', `${percentage}%`);
             }
 
-            // 初始化所有滑块尾巴，并绑定拖动事件
             allSliders.forEach(slider => {
                 updateSliderTail(slider); 
                 slider.addEventListener('input', (e) => {
                     updateSliderTail(e.target);
                 });
             });
-
 
             // --- 2. BPM 滑块联动 ---
             const tempoSlider = document.getElementById('tempo-slider');
@@ -422,29 +432,17 @@
                     let y = centerY;
 
                     switch (type) {
-                        case 'sine':
-                            y = centerY - Math.sin(phase) * amplitude;
-                            break;
-                        case 'square':
-                            y = centerY - (Math.sin(phase) > 0 ? 1 : -1) * amplitude;
-                            break;
-                        case 'triangle':
-                            y = centerY - (Math.abs((phase / Math.PI) % 2 - 1) * 2 - 1) * amplitude;
-                            break;
-                        case 'sawtooth':
-                            y = centerY - (((phase / Math.PI) % 2) - 1) * amplitude;
-                            break;
+                        case 'sine': y = centerY - Math.sin(phase) * amplitude; break;
+                        case 'square': y = centerY - (Math.sin(phase) > 0 ? 1 : -1) * amplitude; break;
+                        case 'triangle': y = centerY - (Math.abs((phase / Math.PI) % 2 - 1) * 2 - 1) * amplitude; break;
+                        case 'sawtooth': y = centerY - (((phase / Math.PI) % 2) - 1) * amplitude; break;
                     }
 
-                    if (x === 0) {
-                        ctx.moveTo(x, y);
-                    } else {
-                        ctx.lineTo(x, y);
-                    }
+                    if (x === 0) { ctx.moveTo(x, y); } 
+                    else { ctx.lineTo(x, y); }
                 }
                 ctx.stroke();
             }
-            // 确保字体加载后再绘制
             setTimeout(() => { drawWaveform('sine'); }, 100);
 
             // --- 4. Web Audio API 发声逻辑 ---
@@ -471,7 +469,7 @@
                 oscillator.stop(audioCtx.currentTime + 0.5); 
             }
 
-            // --- 5. 绑定按钮点击事件 ---
+            // --- 5. 绑定 Oscillator 按钮点击事件 ---
             const oscButtons = document.querySelectorAll('#osc-buttons .wave-btn');
             oscButtons.forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -480,6 +478,17 @@
                     const waveType = btn.getAttribute('data-wave');
                     drawWaveform(waveType);
                     playOscillator(waveType);
+                });
+            });
+
+            // --- 6. 🔴 绑定 LFO 按钮点击事件 (仅高亮，不发声) ---
+            const lfoButtons = document.querySelectorAll('#lfo-buttons .wave-btn');
+            lfoButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // 移除 LFO 模块内其他按钮的高亮
+                    lfoButtons.forEach(b => b.classList.remove('active'));
+                    // 高亮当前点击的按钮
+                    btn.classList.add('active');
                 });
             });
         });
