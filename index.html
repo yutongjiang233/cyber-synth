@@ -79,9 +79,8 @@
             border-radius: 12px; padding: 20px;
             box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.05), 0 8px 32px rgba(0, 0, 0, 0.3);
             display: flex; flex-direction: column;
-            transition: box-shadow 0.5s, border-color 0.5s; /* 为合成时的状态变化加过渡 */
+            transition: box-shadow 0.5s, border-color 0.5s; 
         }
-        /* 面板在合成时的发光状态 */
         .glass-panel.active-module {
             box-shadow: inset 0 0 30px rgba(255, 0, 255, 0.15), 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 255, 255, 0.2);
             border-color: rgba(255, 0, 255, 0.4);
@@ -106,8 +105,6 @@
         }
         .wave-btn:hover { transform: scale(1.05); opacity: 0.8; }
         .wave-btn.active { filter: drop-shadow(0 0 15px rgba(0, 255, 255, 1)); opacity: 1; }
-        
-        /* 合成时，按钮随机高亮的类 */
         .wave-btn.auto-active { filter: drop-shadow(0 0 20px var(--neon-purple)); opacity: 1; transform: scale(1.1); }
 
         .osc-sin { background-image: url('images/osc-sin.png'); }
@@ -137,46 +134,31 @@
         .slider-item label { width: 80px; font-size: 1.1rem; color: #fff; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.8); letter-spacing: 1px; }
 
         .fader-group { 
-            display: flex; flex-direction: column; 
-            justify-content: center; height: auto; align-items: stretch; 
+            display: flex; flex-direction: column; justify-content: center; height: auto; align-items: stretch; 
             gap: 25px; padding: 10px 0; margin-top: 5px;
         }
         .fader-item { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
-        .fader-item label { 
-            width: auto; font-size: 1.1rem; color: #fff; 
-            font-weight: 600; letter-spacing: 1px; text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-        }
+        .fader-item label { width: auto; font-size: 1.1rem; color: #fff; font-weight: 600; letter-spacing: 1px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
 
-        /* 轨道 & 渐变尾巴 */
         input[type="range"].auto-slider {
             -webkit-appearance: none; flex-grow: 1; width: 100%; height: 6px; 
             border-radius: 3px; outline: none; cursor: pointer;
-            background: linear-gradient(
-                to right, 
-                var(--neon-purple) 0%, 
-                var(--neon-cyan) var(--slider-fill, 50%), 
-                rgba(15, 20, 35, 0.6) var(--slider-fill, 50%), 
-                rgba(15, 20, 35, 0.6) 100%
-            );
+            background: linear-gradient(to right, var(--neon-purple) 0%, var(--neon-cyan) var(--slider-fill, 50%), rgba(15, 20, 35, 0.6) var(--slider-fill, 50%), rgba(15, 20, 35, 0.6) 100%);
             border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);
             transform: none !important; margin-bottom: 0 !important;
-            /* 滑块自己的过渡效果，如果用户手动拖，我们要关闭它防止冲突 */
             transition: --slider-fill 0.1s linear; 
         }
 
-        /* 发光小圆钮把手 */
         input[type="range"].auto-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 16px; height: 16px; border-radius: 50%;
+            -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
             background: #fff; border: 2px solid var(--neon-cyan); 
             box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px rgba(0, 255, 255, 0.6), inset 0 0 4px rgba(0,0,0,0.5);
-            transition: transform 0.1s, box-shadow 0.3s; /* 加入阴影过渡，合成时更亮 */
+            transition: transform 0.1s, box-shadow 0.3s; 
         }
         input[type="range"].auto-slider::-webkit-slider-thumb:hover { 
             transform: scale(1.4); box-shadow: 0 0 15px var(--neon-cyan), 0 0 30px var(--neon-purple); 
         }
         
-        /* 合成状态下把手更亮 */
         .synthesizing input[type="range"].auto-slider::-webkit-slider-thumb {
             box-shadow: 0 0 15px var(--neon-purple), 0 0 30px var(--neon-cyan), inset 0 0 4px rgba(0,0,0,0.5);
             border-color: var(--neon-purple);
@@ -194,7 +176,6 @@
             filter: drop-shadow(0 0 15px rgba(123, 44, 191, 0.8));
             transition: filter 0.5s;
         }
-        /* 合成时 BPM 呼吸灯 */
         .synthesizing .bpm-display { filter: drop-shadow(0 0 25px rgba(0, 255, 255, 1)); }
 
         .bpm-text { font-size: 1rem; font-weight: bold; letter-spacing: 2px; -webkit-text-fill-color: rgba(255, 255, 255, 0.6); }
@@ -224,7 +205,6 @@
         }
         .synthesize-btn:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--neon-cyan); background: rgba(0, 255, 255, 0.1); }
         
-        /* 按钮处于工作状态的样式 */
         .synthesize-btn.processing {
             background: rgba(255, 0, 255, 0.2); border-color: var(--neon-purple);
             box-shadow: 0 0 30px rgba(255, 0, 255, 0.8), inset 0 0 10px rgba(255,0,255,0.5);
@@ -240,7 +220,6 @@
         
         .edit-hotzone, .edit-toggle { display: none !important; }
 
-        /* 入场动效 */
         .reveal { opacity: 0; transform: translateY(40px); transition: opacity var(--duration-normal) var(--ease-out-expo), transform var(--duration-normal) var(--ease-out-expo); }
         body.loaded .reveal { opacity: 1; transform: translateY(0); }
         .delay-1 { transition-delay: 0.1s; } .delay-2 { transition-delay: 0.2s; }
@@ -389,26 +368,24 @@
                 updateSliderTail(slider); // 初始化
                 slider.addEventListener('input', (e) => {
                     updateSliderTail(e.target);
-                    // 标记用户正在手动干预，暂停该滑块的自动动画
                     e.target.dataset.manual = "true";
                     clearTimeout(e.target.manualTimeout);
                     e.target.manualTimeout = setTimeout(() => { e.target.dataset.manual = "false"; }, 1500);
                 });
             });
 
-            // BPM 同步
             const tempoSlider = document.getElementById('tempo-slider');
             const bpmDisplay = document.getElementById('bpm-value-display');
             tempoSlider.addEventListener('input', (e) => { bpmDisplay.textContent = Math.round(e.target.value); });
 
-            // --- 2. 基础交互：LFO 和 Oscillator 按钮点击 ---
+            // --- 2. 基础交互：按钮点击 ---
             const oscButtons = document.querySelectorAll('#osc-buttons .wave-btn');
             oscButtons.forEach(btn => {
                 btn.addEventListener('click', () => {
                     oscButtons.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     currentWaveType = btn.getAttribute('data-wave');
-                    if(!isSynthesizing) playOscillator(currentWaveType); // 非合成状态下发测试音
+                    if(!isSynthesizing) playOscillator(currentWaveType);
                 });
             });
 
@@ -420,12 +397,12 @@
                 });
             });
 
-            // --- 3. Canvas 核心：动态波形生成引擎 ---
+            // --- 3. 🔴 Canvas 核心：动态波形生成引擎 (已修复居中问题) ---
             const canvas = document.getElementById('wave-canvas');
             const ctx = canvas.getContext('2d');
             let currentWaveType = 'sine';
             let isSynthesizing = false;
-            let timeOffset = 0; // 用于波动动画
+            let timeOffset = 0; 
             let baseAmplitude = 0.35;
             let baseFrequency = 3;
 
@@ -446,31 +423,45 @@
                 ctx.beginPath();
                 ctx.lineWidth = 3;
                 
-                // 合成时颜色变为紫色，否则青色
                 ctx.strokeStyle = isSynthesizing ? '#ff00ff' : '#00ffff'; 
                 ctx.shadowBlur = isSynthesizing ? 15 : 10;
                 ctx.shadowColor = ctx.strokeStyle;
                 
-                const centerY = height / 2;
+                const centerY = height / 2; // Y轴的正中心
                 
-                // 如果在合成中，加入随机噪点和高频抖动让波形看起来很疯狂
                 let jitter = isSynthesizing ? (Math.random() * 4 - 2) : 0;
                 let activeAmp = height * baseAmplitude * (isSynthesizing ? (0.8 + Math.random()*0.4) : 1);
                 let activeFreq = baseFrequency + (isSynthesizing ? Math.sin(timeOffset)*2 : 0);
 
                 for (let x = 0; x < width; x++) {
-                    const phase = (x / width) * Math.PI * 2 * activeFreq + timeOffset;
+                    // phase: 0 到 1 之间的值，乘以 2PI 转换为弧度，乘以 frequency 决定显示几个周期
+                    const normalizedX = x / width;
+                    const phase = (normalizedX * Math.PI * 2 * activeFreq) + timeOffset;
+                    
                     let y = centerY;
 
-                    // 复杂的波形合成逻辑
+                    // 🔴 完美的中心对称波形数学公式
                     switch (currentWaveType) {
-                        case 'sine': y = centerY - Math.sin(phase) * activeAmp; break;
-                        case 'square': y = centerY - (Math.sin(phase) > 0 ? 1 : -1) * activeAmp; break;
-                        case 'triangle': y = centerY - (Math.abs((phase / Math.PI) % 2 - 1) * 2 - 1) * activeAmp; break;
-                        case 'sawtooth': y = centerY - (((phase / Math.PI) % 2) - 1) * activeAmp; break;
+                        case 'sine':
+                            y = centerY - (Math.sin(phase) * activeAmp);
+                            break;
+                        case 'square':
+                            // Math.sin(phase) 大于0时为正峰，小于0时为负峰
+                            y = centerY - ((Math.sin(phase) >= 0 ? 1 : -1) * activeAmp);
+                            break;
+                        case 'triangle':
+                            // 标准三角波：使用 asin(sin(x)) 保证以 0 为中心对称
+                            y = centerY - ((2 / Math.PI) * Math.asin(Math.sin(phase)) * activeAmp);
+                            break;
+                        case 'sawtooth':
+                            // 标准锯齿波：使用 atan(tan(x)) 或者取模，但必须减去偏移量
+                            // -1 到 1 的精确锯齿波：
+                            let sawVal = 2 * ((phase / (2 * Math.PI)) - Math.floor((phase / (2 * Math.PI)) + 0.5));
+                            y = centerY - (sawVal * activeAmp);
+                            break;
                     }
                     
-                    if(isSynthesizing) y += (Math.random() * 6 - 3); // 加入毛刺噪点
+                    if(isSynthesizing) y += (Math.random() * 6 - 3); 
 
                     if (x === 0) ctx.moveTo(x, y);
                     else ctx.lineTo(x, y);
@@ -478,15 +469,17 @@
                 ctx.stroke();
 
                 if (isSynthesizing) {
-                    timeOffset -= 0.1; // 波形滚动速度
+                    timeOffset -= 0.1; 
                 } else {
-                    timeOffset -= 0.02; // 待机时的缓慢呼吸
+                    timeOffset -= 0.02; 
                 }
                 requestAnimationFrame(drawWaveform);
             }
-            drawWaveform(); // 启动渲染循环
+            
+            // 确保字体等资源加载后执行，防止首次计算错位
+            setTimeout(() => { drawWaveform(); }, 100);
 
-            // Web Audio API (简单测试音)
+            // Web Audio API
             let audioCtx;
             function playOscillator(type) {
                 if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
@@ -501,58 +494,43 @@
                 osc.start(); osc.stop(audioCtx.currentTime + 0.3); 
             }
 
-            // --- 4. 🔴 终极魔法：参数自动漂移动画引擎 ---
+            // --- 4. 参数自动漂移动画引擎 ---
             const genBtn = document.getElementById('generate-btn');
             const mainTitle = document.getElementById('main-title');
             const mainGrid = document.getElementById('main-grid');
-            
-            // 收集所有需要自动漂移的滑块
             const autoSliders = Array.from(document.querySelectorAll('input.auto-slider'));
             
-            // 为每个滑块初始化目标值
-            autoSliders.forEach(slider => {
-                slider.targetValue = parseFloat(slider.value);
-            });
+            autoSliders.forEach(slider => { slider.targetValue = parseFloat(slider.value); });
 
-            // 线性插值函数，用于平滑过渡
-            function lerp(start, end, amt) {
-                return (1 - amt) * start + amt * end;
-            }
+            function lerp(start, end, amt) { return (1 - amt) * start + amt * end; }
 
             function animateSliders() {
-                if (!isSynthesizing) return; // 如果停止合成了，就不动了
+                if (!isSynthesizing) return; 
 
                 autoSliders.forEach(slider => {
-                    // 如果用户正在手动拖，跳过它
                     if (slider.dataset.manual === "true") return;
 
                     let currentVal = parseFloat(slider.value);
                     let min = parseFloat(slider.min);
                     let max = parseFloat(slider.max);
 
-                    // 如果当前值接近目标值，分配一个新的随机目标值
                     if (Math.abs(currentVal - slider.targetValue) < 1) {
-                        // 在当前值附近小范围随机跳动，而不是全盘乱跳
                         let range = (max - min) * 0.3; 
                         let randomChange = (Math.random() * range) - (range / 2);
                         let nextTarget = currentVal + randomChange;
-                        // 确保不出界
                         slider.targetValue = Math.max(min, Math.min(max, nextTarget));
                     }
 
-                    // 平滑逼近目标值 (速度系数 0.03，越小越平滑)
                     let newVal = lerp(currentVal, slider.targetValue, 0.03);
                     slider.value = newVal;
                     updateSliderTail(slider);
                     
-                    // 如果是 BPM 滑块，同步更新文字
                     if(slider.id === 'tempo-slider') {
                         bpmDisplay.textContent = Math.round(newVal);
                     }
                 });
 
-                // 随机切换 LFO 和 OSC 的波形按钮状态 (假装 AI 在尝试不同波形)
-                if(Math.random() < 0.02) { // 2% 概率切换
+                if(Math.random() < 0.02) { 
                     const btns = Array.from(oscButtons);
                     const randomBtn = btns[Math.floor(Math.random() * btns.length)];
                     btns.forEach(b => b.classList.remove('auto-active'));
@@ -563,23 +541,20 @@
                 requestAnimationFrame(animateSliders);
             }
 
-            // --- 5. 绑定生成按钮的魔法 ---
+            // --- 5. 绑定生成按钮 ---
             genBtn.addEventListener('click', () => {
-                isSynthesizing = !isSynthesizing; // 切换状态
+                isSynthesizing = !isSynthesizing; 
                 
                 if (isSynthesizing) {
-                    // 开始生成！
                     genBtn.textContent = "STOP RITUAL";
                     genBtn.classList.add('processing');
                     mainTitle.classList.add('synthesizing');
                     mainGrid.classList.add('synthesizing');
                     
-                    // 给带有自动滑块的面板加上发光状态
                     document.querySelectorAll('.auto-panel').forEach(p => p.classList.add('active-module'));
                     
-                    animateSliders(); // 启动自动化引擎
+                    animateSliders(); 
                 } else {
-                    // 停止生成
                     genBtn.textContent = "SYNTHESIZE AUDIO RITUAL";
                     genBtn.classList.remove('processing');
                     mainTitle.classList.remove('synthesizing');
@@ -588,7 +563,6 @@
                     document.querySelectorAll('.auto-panel').forEach(p => p.classList.remove('active-module'));
                     oscButtons.forEach(b => b.classList.remove('auto-active'));
                     
-                    // 将所有目标值设回当前值，让它们平稳停下
                     autoSliders.forEach(slider => slider.targetValue = parseFloat(slider.value));
                 }
             });
