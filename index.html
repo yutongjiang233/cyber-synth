@@ -574,11 +574,11 @@
                 const fullPrompt = `${genreInput.value}, ${soundsInput.value}, ${structureInput.value}`;
                 
                 try {
-                    // 1. 发送第一波请求，获取生成任务小票
+                    // 1. 发送第一波请求，获取生成任务小票 (加入了 duration: 60)
                     const response = await fetch('/api/generate', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ prompt: fullPrompt })
+                        body: JSON.stringify({ prompt: fullPrompt, duration: 60 }) // 🔴 这里加入了 60 秒参数
                     });
 
                     let prediction = await response.json();
